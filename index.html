@@ -493,13 +493,15 @@
                     <p style="color: #718096; margin-bottom: 16px; font-size: 14px;">실제 배우들의 딥페이크 기술을 활용한 프리미엄 모델입니다. 더욱 자연스럽고 전문적인 광고 제작이 가능합니다.</p>
                     
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
-                        <div class="card" onclick="selectModel(this, 'actor1', 'premium')">
-                            <div class="model-image" data-model="actor1" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/2d3748/ffffff?text=공유'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
-                                <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
-                            </div>
-                            <h3 style="font-weight: 600; margin-bottom: 4px;">채연</h3>
-                            <p style="font-size: 12px; color: #718096;">상큼한 20대의 채연의 모습 그대로</p>
-                        </div>
+        <!-- actor1 예시 (Google Drive 이미지 사용) -->
+        <div class="card" onclick="selectModel(this, 'actor1', 'premium')">
+            <div class="model-image" data-model="actor1" style="width: 100%; height: 120px; border-radius: 6px; margin-bottom: 12px; overflow: hidden; position: relative;">
+                <img src="https://drive.google.com/uc?export=view&id=1guM6b-R5_KTGhFwMzqLLWX1gkvSTTP0D" alt="채연" style="width: 100%; height: 100%; object-fit: cover;">
+                <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
+            </div>
+            <h3 style="font-weight: 600; margin-bottom: 4px;">채연</h3>
+            <p style="font-size: 12px; color: #718096;">상큼한 20대의 채연의 모습 그대로</p>
+        </div>
                         
                         <div class="card" onclick="selectModel(this, 'actor2', 'premium')">
                             <div class="model-image" data-model="actor2" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/553c9a/ffffff?text=아이유'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
