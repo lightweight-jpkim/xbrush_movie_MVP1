@@ -1373,17 +1373,13 @@
             setTimeout(() => {
                 imageOptions.forEach((option, index) => {
                     const cutNumber = cut.replace('cut', '');
+                    const randomId = Date.now() + index; // 현재 시간 + 인덱스로 고유한 랜덤 ID 생성
                     
                     // 새로운 이미지 HTML 생성
                     option.innerHTML = `
-                        <div style="position: relative; width: 100%; height: 100%; background: linear-gradient(${45 + index * 30}deg, 
-                            ${getRandomColor()}, ${getRandomColor()}); 
-                            border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 500;">
-                            <div style="text-align: center;">
-                                <div style="font-size: 14px; margin-bottom: 4px;">시안 ${cutNumber}-${index + 1}</div>
-                                <div style="font-size: 10px; opacity: 0.8;">새로 생성됨</div>
-                            </div>
-                        </div>
+                        <img src="https://picsum.photos/400/225?random=${randomId}" 
+                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" 
+                             alt="시안 ${cutNumber}-${index + 1}">
                     `;
                     
                     // 클릭 이벤트 다시 연결
