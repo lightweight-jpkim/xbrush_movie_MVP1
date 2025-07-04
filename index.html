@@ -827,7 +827,7 @@
                         </div>
                     </div>
                     
-                    <p style="color: #718096; font-size: 14px;">약 10초 정도 소요됩니다. 잠시만 기다려주세요! ✨</p>
+                    <p style="color: #718096; font-size: 14px;">약 3초 정도 소요됩니다. 잠시만 기다려주세요! ✨</p>
                 </div>
             </div>
 
@@ -1134,29 +1134,43 @@
         // 단계 이동 함수
         function goToStep(step) {
             // 이전 단계들이 완료되었는지 확인
-            if (step > 1 && !isStepCompleted(step - 1)) {
+            if (step > 1 && step !== 4.5 && !isStepCompleted(step - 1)) {
                 return;
             }
             
             // 현재 단계 비활성화
-            document.getElementById(`step${currentStep}`).classList.remove('active');
-            if (currentStep !== 4.5) {
-                document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+            if (currentStep === 4.5) {
+                const step4_5 = document.getElementById('step4_5');
+                if (step4_5) step4_5.classList.remove('active');
+            } else {
+                const currentStepElement = document.getElementById(`step${currentStep}`);
+                if (currentStepElement) currentStepElement.classList.remove('active');
+                
+                const currentStepNav = document.querySelector(`[data-step="${currentStep}"]`);
+                if (currentStepNav) currentStepNav.classList.remove('active');
             }
             
             // 새 단계 활성화
             currentStep = step;
             if (step === 4.5) {
-                document.getElementById('step4_5').classList.add('active');
+                const step4_5 = document.getElementById('step4_5');
+                if (step4_5) step4_5.classList.add('active');
             } else {
-                document.getElementById(`step${currentStep}`).classList.add('active');
-                document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+                const newStepElement = document.getElementById(`step${currentStep}`);
+                if (newStepElement) newStepElement.classList.add('active');
+                
+                const newStepNav = document.querySelector(`[data-step="${currentStep}"]`);
+                if (newStepNav) newStepNav.classList.add('active');
             }
             
             // 완료된 단계들 표시 (4.5는 제외)
-            for (let i = 1; i < (step === 4.5 ? 4 : currentStep); i++) {
-                document.querySelector(`[data-step="${i}"]`).classList.add('completed');
-                document.querySelector(`[data-step="${i}"]`).classList.remove('active');
+            const maxStep = step === 4.5 ? 4 : currentStep;
+            for (let i = 1; i < maxStep; i++) {
+                const stepNav = document.querySelector(`[data-step="${i}"]`);
+                if (stepNav) {
+                    stepNav.classList.add('completed');
+                    stepNav.classList.remove('active');
+                }
             }
             
             // 진행률 바 업데이트
