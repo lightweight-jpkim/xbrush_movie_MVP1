@@ -980,13 +980,14 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;">
                     <!-- 영상 미리보기 -->
                     <div>
-                        <div style="width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; margin-bottom: 16px;">
-                            <div style="text-align: center;">
-                                <div style="font-size: 48px; margin-bottom: 8px;">▶️</div>
-                                <div>광고 영상 미리보기</div>
-                                <div style="font-size: 14px; opacity: 0.7; margin-top: 4px;">15초 • 1080p</div>
-                            </div>
-                        </div>
+                        <video 
+                            style="width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; margin-bottom: 16px;"
+                            src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/안동%20사과%20TVCM%2018s%20버전%20모델%20이상아.mp4"
+                            autoplay
+                            controls
+                            loop
+                            muted>
+                        </video>
                         
                         <div style="display: flex; gap: 12px;">
                             <button class="btn btn-primary" style="flex: 1;" onclick="downloadVideo()">
