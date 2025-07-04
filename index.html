@@ -174,6 +174,28 @@
             background: #3182ce;
             color: white;
         }
+        
+        .btn-disabled {
+            background: #a0aec0 !important;
+            color: #718096 !important;
+            cursor: not-allowed !important;
+        }
+        
+        .btn-disabled:hover {
+            background: #a0aec0 !important;
+            transform: none !important;
+        }
+        
+        .btn-disabled {
+            background: #a0aec0 !important;
+            color: #718096 !important;
+            cursor: not-allowed !important;
+        }
+        
+        .btn-disabled:hover {
+            background: #a0aec0 !important;
+            transform: none !important;
+        }
 
         /* 헤딩 스타일 */
         .heading {
@@ -451,7 +473,7 @@
                     
                     <div class="card-grid">
                         <div class="card" onclick="selectModel(this, 'virtual1', 'free')">
-                            <div class="model-image" data-model="virtual1" style="width: 100%; height: 120px; background-image: url('https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/7.png'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                            <div class="model-image" data-model="virtual1" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/667eea/ffffff?text=AI+Model+A'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
                                 <div style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); color: #2d3748; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">FREE</div>
                             </div>
                             <h3 style="font-weight: 600; margin-bottom: 4px;">젊은 여성 모델</h3>
@@ -459,7 +481,7 @@
                         </div>
                         
                         <div class="card" onclick="selectModel(this, 'virtual2', 'free')">
-                            <div class="model-image" data-model="virtual2" style="width: 100%; height: 120px; background-image: url('https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/8.png'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                            <div class="model-image" data-model="virtual2" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/f093fb/ffffff?text=AI+Model+B'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
                                 <div style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); color: #2d3748; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">FREE</div>
                             </div>
                             <h3 style="font-weight: 600; margin-bottom: 4px;">성숙한 남성 모델</h3>
@@ -467,7 +489,7 @@
                         </div>
                         
                         <div class="card" onclick="selectModel(this, 'virtual3', 'free')">
-                            <div class="model-image" data-model="virtual3" style="width: 100%; height: 120px; background-image: url('https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/9.png'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                            <div class="model-image" data-model="virtual3" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/4facfe/ffffff?text=AI+Model+C'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
                                 <div style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); color: #2d3748; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">FREE</div>
                             </div>
                             <h3 style="font-weight: 600; margin-bottom: 4px;">중년 여성 모델</h3>
@@ -475,7 +497,7 @@
                         </div>
                         
                         <div class="card" onclick="selectModel(this, 'virtual4', 'free')">
-                            <div class="model-image" data-model="virtual4" style="width: 100%; height: 120px; background-image: url('https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/10.png'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                            <div class="model-image" data-model="virtual4" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/fa709a/ffffff?text=AI+Model+D'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
                                 <div style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); color: #2d3748; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">FREE</div>
                             </div>
                             <h3 style="font-weight: 600; margin-bottom: 4px;">젊은 남성 모델</h3>
@@ -493,26 +515,24 @@
                     <p style="color: #718096; margin-bottom: 16px; font-size: 14px;">실제 배우들의 딥페이크 기술을 활용한 프리미엄 모델입니다. 더욱 자연스럽고 전문적인 광고 제작이 가능합니다.</p>
                     
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
-        <!-- actor1 예시 (Google Drive 이미지 사용) -->
-        <div class="card" onclick="selectModel(this, 'actor1', 'premium')">
-            <div class="model-image" data-model="actor1" style="width: 100%; height: 120px; border-radius: 6px; margin-bottom: 12px; overflow: hidden; position: relative;">
-                <img src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/chae.png" alt="채연" style="width: 100%; height: 100%; object-fit: cover;">
-                <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
-            </div>
-            <h3 style="font-weight: 600; margin-bottom: 4px;">채연</h3>
-            <p style="font-size: 12px; color: #718096;">상큼한 20대의 채연의 모습 그대로</p>
-        </div>
-                        
-                        <div class="card" onclick="selectModel(this, 'actor2', 'premium')">
-                            <div class="model-image" data-model="actor2" style="width: 100%; height: 120px; background-image: url('https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/2.png'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                        <div class="card" onclick="selectModel(this, 'actor1', 'premium')">
+                            <div class="model-image" data-model="actor1" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/2d3748/ffffff?text=공유'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
                                 <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
                             </div>
-                            <h3 style="font-weight: 600; margin-bottom: 4px;">이상아</h3>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">공유</h3>
+                            <p style="font-size: 12px; color: #718096;">따뜻하고 신뢰감 있는 남성 매력</p>
+                        </div>
+                        
+                        <div class="card" onclick="selectModel(this, 'actor2', 'premium')">
+                            <div class="model-image" data-model="actor2" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/553c9a/ffffff?text=아이유'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                                <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
+                            </div>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">아이유</h3>
                             <p style="font-size: 12px; color: #718096;">밝고 친근한 국민적 매력</p>
                         </div>
                         
                         <div class="card" onclick="selectModel(this, 'actor3', 'premium')">
-                            <div class="model-image" data-model="actor3" style="width: 100%; height: 120px; background-image: url('https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/3.png'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                            <div class="model-image" data-model="actor3" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/1a202c/ffffff?text=이정재'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
                                 <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
                             </div>
                             <h3 style="font-weight: 600; margin-bottom: 4px;">이정재</h3>
@@ -520,7 +540,7 @@
                         </div>
                         
                         <div class="card" onclick="selectModel(this, 'actor4', 'premium')">
-                            <div class="model-image" data-model="actor4" style="width: 100%; height: 120px; background-image: url('https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/4.png'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                            <div class="model-image" data-model="actor4" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/c53030/ffffff?text=전지현'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
                                 <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
                             </div>
                             <h3 style="font-weight: 600; margin-bottom: 4px;">전지현</h3>
@@ -528,7 +548,7 @@
                         </div>
                         
                         <div class="card" onclick="selectModel(this, 'actor5', 'premium')">
-                            <div class="model-image" data-model="actor5" style="width: 100%; height: 120px; background-image: url('https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/5.png'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                            <div class="model-image" data-model="actor5" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/065f46/ffffff?text=박서준'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
                                 <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
                             </div>
                             <h3 style="font-weight: 600; margin-bottom: 4px;">박서준</h3>
@@ -536,7 +556,7 @@
                         </div>
                         
                         <div class="card" onclick="selectModel(this, 'actor6', 'premium')">
-                            <div class="model-image" data-model="actor6" style="width: 100%; height: 120px; background-image: url('https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/6.png'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                            <div class="model-image" data-model="actor6" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/7c2d12/ffffff?text=손예진'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
                                 <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
                             </div>
                             <h3 style="font-weight: 600; margin-bottom: 4px;">손예진</h3>
@@ -981,23 +1001,24 @@
         
         const MODEL_IMAGES = {
             // 버츄얼 모델 이미지 (4개)
-            virtual1: 'https://via.placeholder.com/300x300/667eea/ffffff?text=AI+Model+A',
-            virtual2: 'https://via.placeholder.com/300x300/f093fb/ffffff?text=AI+Model+B', 
-            virtual3: 'https://via.placeholder.com/300x300/4facfe/ffffff?text=AI+Model+C',
-            virtual4: 'https://via.placeholder.com/300x300/fa709a/ffffff?text=AI+Model+D',
+            virtual1: 'https://picsum.photos/300/300?random=1',
+            virtual2: 'https://picsum.photos/300/300?random=2', 
+            virtual3: 'https://picsum.photos/300/300?random=3',
+            virtual4: 'https://picsum.photos/300/300?random=4',
             
-            // 실제 배우 이미지 (6개) - 여기에 실제 이미지 URL을 넣으세요
-            actor1: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/chae.png',  // 채연
-            actor2: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/2.png',  // 아이유
-            actor3: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/2.png',  // 이정재
-            actor4: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/2.png',  // 전지현
-            actor5: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/2.png',  // 박서준
-            actor6: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/2.png'   // 손예진
+            // 실제 배우 이미지 (6개) - 임시로 랜덤 이미지 사용
+            actor1: 'https://picsum.photos/300/300?random=5',  // 공유
+            actor2: 'https://picsum.photos/300/300?random=6',  // 아이유
+            actor3: 'https://picsum.photos/300/300?random=7',  // 이정재
+            actor4: 'https://picsum.photos/300/300?random=8',  // 전지현
+            actor5: 'https://picsum.photos/300/300?random=9',  // 박서준
+            actor6: 'https://picsum.photos/300/300?random=10'  // 손예진
         };
 
         let currentStep = 1;
         let selectedData = {
             model: null,
+            modelTier: null,
             productName: '',
             targetAudience: '',
             coreMessage: '',
@@ -1066,10 +1087,10 @@
         function isStepCompleted(step) {
             switch(step) {
                 case 1: return selectedData.model !== null;
-                case 2: return selectedData.productName && selectedData.targetAudience && selectedData.coreMessage && selectedData.tone;
-                case 3: return selectedData.format && selectedData.duration;
+                case 2: return selectedData.productName !== '' && selectedData.targetAudience !== '' && selectedData.coreMessage !== '' && selectedData.tone !== '';
+                case 3: return selectedData.format !== null && selectedData.duration !== null;
                 case 4: return selectedData.style !== null;
-                case 5: return selectedData.selectedImages.cut1 && selectedData.selectedImages.cut2 && selectedData.selectedImages.cut3;
+                case 5: return selectedData.selectedImages.cut1 !== null && selectedData.selectedImages.cut2 !== null && selectedData.selectedImages.cut3 !== null;
                 default: return true;
             }
         }
@@ -1080,6 +1101,15 @@
             const nextButton = document.getElementById(`step${currentStep}Next`);
             if (nextButton) {
                 nextButton.disabled = !isCompleted;
+                
+                // 버튼 스타일 업데이트
+                if (isCompleted) {
+                    nextButton.classList.remove('btn-disabled');
+                    nextButton.classList.add('btn-primary');
+                } else {
+                    nextButton.classList.add('btn-disabled');
+                    nextButton.classList.remove('btn-primary');
+                }
             }
         }
 
@@ -1459,20 +1489,7 @@
                     element.style.backgroundImage = `url('${MODEL_IMAGES[modelId]}')`;
                 }
             });
-        }dation();
-            updateProgressLine();
-            
-            // 6단계 진입 시 자동으로 7단계로 이동 (시뮬레이션)
-            const originalGoToStep = goToStep;
-            goToStep = function(step) {
-                originalGoToStep(step);
-                if (step === 6) {
-                    setTimeout(() => {
-                        originalGoToStep(7);
-                    }, 3000); // 3초 후 완성 단계로
-                }
-            };
-        });
+        }
     </script>
 </body>
 </html>
