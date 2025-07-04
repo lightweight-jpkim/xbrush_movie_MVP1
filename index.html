@@ -185,17 +185,6 @@
             background: #a0aec0 !important;
             transform: none !important;
         }
-        
-        .btn-disabled {
-            background: #a0aec0 !important;
-            color: #718096 !important;
-            cursor: not-allowed !important;
-        }
-        
-        .btn-disabled:hover {
-            background: #a0aec0 !important;
-            transform: none !important;
-        }
 
         /* 헤딩 스타일 */
         .heading {
@@ -364,6 +353,38 @@
         .image-option.selected {
             border-color: #3182ce;
             background: #ebf8ff;
+        }
+
+        /* CTA 배너 스타일 */
+        .cta-banner {
+            margin: 32px 0;
+            padding: 24px;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-banner:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .cta-banner:hover .shine {
+            left: 100% !important;
+        }
+
+        .shine {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s ease;
         }
 
         /* 반응형 */
@@ -565,6 +586,15 @@
                     </div>
                 </div>
                 
+                <!-- CTA 배너 1단계 -->
+                <div class="cta-banner" style="background: linear-gradient(135deg, #667eea, #764ba2);" onclick="applyAsModel()">
+                    <div class="shine"></div>
+                    <div style="position: relative; z-index: 1;">
+                        <h3 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 700;">🌟 당신도 xBrush 모델이 되어보세요!</h3>
+                        <p style="margin: 0; font-size: 16px; opacity: 0.9;">광고 사용 시마다 로열티 지급!</p>
+                    </div>
+                </div>
+                
                 <div class="action-buttons">
                     <div></div>
                     <button class="btn btn-primary" id="step1Next" onclick="nextStep()" disabled>다음 단계</button>
@@ -616,6 +646,15 @@
                         <option value="energetic">역동적이고 활기찬</option>
                         <option value="warm">따뜻하고 감성적인</option>
                     </select>
+                </div>
+                
+                <!-- CTA 배너 2단계 -->
+                <div class="cta-banner" style="background: linear-gradient(135deg, #38a169, #68d391);" onclick="applyAsModel()">
+                    <div class="shine"></div>
+                    <div style="position: relative; z-index: 1;">
+                        <h3 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 700;">💰 내 얼굴로 전국 광고 모델 되기!</h3>
+                        <p style="margin: 0; font-size: 16px; opacity: 0.9;">클릭 한 번으로 모델 등록하고 수익 창출하세요!</p>
+                    </div>
                 </div>
                 
                 <div class="action-buttons">
@@ -736,9 +775,59 @@
                     </div>
                 </div>
                 
+                <!-- CTA 배너 4단계 -->
+                <div class="cta-banner" style="background: linear-gradient(135deg, #e53e3e, #fc8181);" onclick="applyAsModel()">
+                    <div class="shine"></div>
+                    <div style="position: relative; z-index: 1;">
+                        <h3 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 700;">⭐ 누구나 광고 스타가 될 수 있어요!</h3>
+                        <p style="margin: 0; font-size: 16px; opacity: 0.9;">AI 모델 신청하고 국민적 인지도 UP!</p>
+                    </div>
+                </div>
+                
                 <div class="action-buttons">
                     <button class="btn btn-outline" onclick="prevStep()">이전 단계</button>
-                    <button class="btn btn-primary" id="step4Next" onclick="nextStep()" disabled>다음 단계</button>
+                    <button class="btn btn-primary" id="step4Next" onclick="nextStep()" disabled>이미지 시안 생성</button>
+                </div>
+            </div>
+
+            <!-- 4.5단계: 이미지 제작 중 -->
+            <div class="step-content" id="step4_5">
+                <div class="progress-indicator">
+                    <div class="progress-text">4.5/7 단계 - 이미지 제작 중</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 64%"></div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; padding: 60px 20px;">
+                    <div style="width: 80px; height: 80px; border: 4px solid #e2e8f0; border-top: 4px solid #3182ce; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 24px;"></div>
+                    
+                    <h1 class="heading">🎨 이미지 시안을 제작하고 있어요</h1>
+                    <p style="color: #718096; margin-bottom: 32px;">선택하신 스타일과 정보를 바탕으로<br>멋진 이미지 시안들을 생성하고 있습니다.</p>
+                    
+                    <div style="background: #f7fafc; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+                        <div class="subheading" style="margin-bottom: 16px;">제작 진행 상황</div>
+                        <div style="text-align: left;">
+                            <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 20px; height: 20px; background: #38a169; border-radius: 50%; margin-right: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">✓</div>
+                                <span>컨셉 분석 완료</span>
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 20px; height: 20px; background: #3182ce; border-radius: 50%; margin-right: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; animation: pulse 2s infinite;">⋯</div>
+                                <span>이미지 생성 중...</span>
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 20px; height: 20px; background: #e2e8f0; border-radius: 50%; margin-right: 12px;"></div>
+                                <span style="color: #a0aec0;">품질 검증</span>
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 20px; height: 20px; background: #e2e8f0; border-radius: 50%; margin-right: 12px;"></div>
+                                <span style="color: #a0aec0;">시안 준비</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p style="color: #718096; font-size: 14px;">약 10초 정도 소요됩니다. 잠시만 기다려주세요! ✨</p>
                 </div>
             </div>
 
@@ -952,6 +1041,15 @@
                     </div>
                 </div>
                 
+                <!-- CTA 배너 7단계 -->
+                <div class="cta-banner" style="background: linear-gradient(135deg, #ed8936, #f6ad55);" onclick="applyAsModel()">
+                    <div class="shine"></div>
+                    <div style="position: relative; z-index: 1;">
+                        <h3 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 700;">🎬 이런 퀄리티로 당신도 모델이 될 수 있어요!</h3>
+                        <p style="margin: 0; font-size: 16px; opacity: 0.9;">지금 신청하고 AI 광고계 데뷔하세요!</p>
+                    </div>
+                </div>
+                
                 <div class="action-buttons">
                     <button class="btn btn-outline" onclick="startOver()">새 광고 만들기</button>
                     <button class="btn btn-primary" onclick="goToLibrary()">내 광고 보관함</button>
@@ -1042,15 +1140,21 @@
             
             // 현재 단계 비활성화
             document.getElementById(`step${currentStep}`).classList.remove('active');
-            document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+            if (currentStep !== 4.5) {
+                document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+            }
             
             // 새 단계 활성화
             currentStep = step;
-            document.getElementById(`step${currentStep}`).classList.add('active');
-            document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+            if (step === 4.5) {
+                document.getElementById('step4_5').classList.add('active');
+            } else {
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+            }
             
-            // 완료된 단계들 표시
-            for (let i = 1; i < currentStep; i++) {
+            // 완료된 단계들 표시 (4.5는 제외)
+            for (let i = 1; i < (step === 4.5 ? 4 : currentStep); i++) {
                 document.querySelector(`[data-step="${i}"]`).classList.add('completed');
                 document.querySelector(`[data-step="${i}"]`).classList.remove('active');
             }
@@ -1065,13 +1169,23 @@
         }
 
         function nextStep() {
-            if (currentStep < 7) {
+            if (currentStep === 4) {
+                // 4단계에서 4.5단계로 (이미지 생성 중)
+                goToStep(4.5);
+                // 3초 후 5단계로 이동
+                setTimeout(() => {
+                    goToStep(5);
+                }, 3000);
+            } else if (currentStep < 7) {
                 goToStep(currentStep + 1);
             }
         }
 
         function prevStep() {
-            if (currentStep > 1) {
+            if (currentStep === 5) {
+                // 5단계에서 4단계로 바로 이동 (4.5 건너뛰기)
+                goToStep(4);
+            } else if (currentStep > 1) {
                 goToStep(currentStep - 1);
             }
         }
@@ -1079,7 +1193,12 @@
         // 진행률 바 업데이트
         function updateProgressLine() {
             const progressLine = document.getElementById('progressLine');
-            const progress = ((currentStep - 1) / 6) * 100;
+            let progress;
+            if (currentStep === 4.5) {
+                progress = ((4.5 - 1) / 6) * 100;
+            } else {
+                progress = ((currentStep - 1) / 6) * 100;
+            }
             progressLine.style.width = progress + '%';
         }
 
@@ -1302,15 +1421,6 @@
             }, 3000);
         }
         
-        function getCutIndex(cut) {
-            switch(cut) {
-                case 'cut1': return 1;
-                case 'cut2': return 2;
-                case 'cut3': return 3;
-                default: return 1;
-            }
-        }
-        
         function getRandomColor() {
             const colors = [
                 '#667eea', '#764ba2', '#f093fb', '#f5576c', 
@@ -1415,6 +1525,7 @@
             // 데이터 초기화
             selectedData = {
                 model: null,
+                modelTier: null,
                 productName: '',
                 targetAudience: '',
                 coreMessage: '',
@@ -1450,6 +1561,11 @@
 
         function goToLibrary() {
             alert('광고 보관함으로 이동합니다!');
+        }
+
+        // CTA 배너 클릭 함수
+        function applyAsModel() {
+            alert('모델 신청 페이지로 이동합니다! 🌟\n\n✅ 신청 프로세스:\n1. 얼굴 스캔 업로드\n2. 개인정보 입력\n3. 계약서 작성\n4. AI 모델 생성\n\n💰 예상 수익: 월 50-200만원');
         }
 
         // 단계 클릭 이벤트
