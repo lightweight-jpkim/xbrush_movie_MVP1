@@ -1995,22 +1995,15 @@
         }
 
         function backToVideoOptions() {
-            // 영상 제작 옵션으로 돌아가기
-            // 옵션 선택 그리드를 다시 표시
-            const optionGrid = document.querySelector('#step6 div[style*="display: grid"]');
-            if (optionGrid) optionGrid.style.display = 'grid';
-            
-            // 설명 문구도 다시 표시
-            const description = document.querySelector('#step6 p[style*="color: #718096"]');
-            if (description) description.style.display = 'block';
-            
-            // 액션 버튼들 표시
-            const actions = document.getElementById('step6Actions');
-            if (actions) actions.style.display = 'block';
+            // 이미지 시안에서 시나리오 확인 단계(step 5)로 돌아가기
+            showToast('시나리오 확인 단계로 돌아갑니다');
             
             // 이미지 시안 섹션 숨김
             const imageSection = document.getElementById('imagePreviewSection');
             if (imageSection) imageSection.style.display = 'none';
+            
+            // Step 5로 이동
+            goToStep(5);
         }
 
         function startVideoWithSelectedImages() {
@@ -2053,8 +2046,10 @@
                 
                 if (progress >= 100) {
                     clearInterval(progressInterval);
+                    // 영상 완성 후 결과 확인 단계(step 7)로 이동
                     setTimeout(() => {
-                        nextStep(); // 영상 완성 후 다음 단계로
+                        showToast('영상 제작이 완료되었습니다! 🎉');
+                        goToStep(7); // 결과 확인 단계로 이동
                     }, 1000);
                 }
             }, 800);
