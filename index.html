@@ -1812,12 +1812,23 @@
         function approveScenario() {
             selectedData.scenarioApproved = true;
             checkNextButton();
-            showToast('시나리오가 승인되었습니다! 영상 제작을 시작할 수 있습니다.');
             
-            // 자동으로 다음 단계로 이동
-            setTimeout(() => {
-                nextStep();
-            }, 1000);
+            // 사용자가 이미지 시안 경로를 선택했는지 확인
+            if (selectedData.hasChosenImagePreview) {
+                showToast('시나리오가 승인되었습니다! 이미지 선택 페이지로 이동합니다.');
+                
+                // 이미지 선택 페이지로 이동
+                setTimeout(() => {
+                    showImagePreviewOption();
+                }, 1000);
+            } else {
+                showToast('시나리오가 승인되었습니다! 영상 제작을 시작할 수 있습니다.');
+                
+                // 자동으로 다음 단계로 이동
+                setTimeout(() => {
+                    nextStep();
+                }, 1000);
+            }
         }
 
         function cancelEdit() {
@@ -1975,6 +1986,9 @@
         function showImagePreviewOption() {
             // 이미지 시안 확인 옵션 선택
             showToast('이미지 시안을 먼저 확인합니다 🖼️');
+            
+            // 사용자가 이미지 시안 경로를 선택했음을 기록
+            selectedData.hasChosenImagePreview = true;
             
             // 현재 스텝이 5라면 먼저 6으로 이동
             if (currentStep === 5) {
