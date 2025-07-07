@@ -1974,10 +1974,16 @@
             // 이미지 시안 확인 옵션 선택
             showToast('이미지 시안을 먼저 확인합니다 🖼️');
             
-            // 옵션 선택 숨기고 이미지 시안 섹션 표시
-            document.querySelector('#step6 > div:nth-child(3)').style.display = 'none'; // 옵션 선택
-            document.getElementById('step6Actions').style.display = 'none';
-            document.getElementById('imagePreviewSection').style.display = 'block';
+            // 먼저 step 6으로 이동
+            currentStep = 6;
+            showStep(6);
+            
+            // 그 다음 이미지 시안 섹션 표시
+            setTimeout(() => {
+                document.querySelector('#step6 > div:nth-child(3)').style.display = 'none'; // 옵션 선택
+                document.getElementById('step6Actions').style.display = 'none';
+                document.getElementById('imagePreviewSection').style.display = 'block';
+            }, 300);
         }
 
         function backToVideoOptions() {
