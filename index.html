@@ -459,16 +459,11 @@
                 
                 <div class="step" data-step="6">
                     <div class="step-number">6</div>
-                    <div class="step-label">이미지 시안</div>
+                    <div class="step-label">영상 제작</div>
                 </div>
                 
                 <div class="step" data-step="7">
                     <div class="step-number">7</div>
-                    <div class="step-label">영상 제작</div>
-                </div>
-                
-                <div class="step" data-step="8">
-                    <div class="step-number">8</div>
                     <div class="step-label">결과 확인</div>
                 </div>
             </div>
@@ -893,140 +888,281 @@
                     </div>
                 </div>
                 
-                <!-- 이미지 시안 옵션 선택 -->
-                <div style="background: #fffaf0; border-radius: 12px; padding: 24px; margin-bottom: 24px; border-left: 4px solid #f6ad55;">
-                    <h3 style="margin-bottom: 16px;">🎨 다음 단계를 선택해주세요</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div class="card" onclick="skipImagePreview()" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <div style="font-size: 24px; margin-bottom: 8px;">⚡</div>
-                            <h4 style="margin-bottom: 8px;">바로 영상 제작</h4>
-                            <p style="font-size: 12px; color: #718096;">시나리오 그대로 영상을 제작합니다</p>
-                        </div>
-                        <div class="card" onclick="showImagePreview()" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <div style="font-size: 24px; margin-bottom: 8px;">🖼️</div>
-                            <h4 style="margin-bottom: 8px;">이미지 시안 확인</h4>
-                            <p style="font-size: 12px; color: #718096;">먼저 이미지를 확인하고 수정할 수 있습니다</p>
-                        </div>
-                    </div>
-                </div>
-                
                 <div class="action-buttons">
                     <button class="btn btn-outline" onclick="prevStep()">이전 단계</button>
-                    <button class="btn btn-primary" id="step5Next" onclick="nextStep()" disabled style="display: none;">다음 단계</button>
+                    <button class="btn btn-primary" id="step5Next" onclick="nextStep()" disabled style="display: none;">시나리오 승인하고 다음 단계</button>
                 </div>
             </div>
 
-            <!-- 6단계: 이미지 시안 선택 -->
+            <!-- 6단계: 영상 제작 -->
             <div class="step-content" id="step6">
                 <div class="progress-indicator">
-                    <div class="progress-text">6/7 단계 - 이미지 시안 선택</div>
+                    <div class="progress-text">6/7 단계 - 영상 제작</div>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 85%"></div>
                     </div>
                 </div>
                 
-                <h1 class="heading">이미지 시안을 선택해주세요</h1>
-                <p style="color: #718096; margin-bottom: 24px;">각 컷별로 4개의 시안 중 마음에 드는 이미지를 선택하세요. 선택된 이미지들로 최종 영상이 제작됩니다.</p>
+                <h1 class="heading">🎬 영상 제작 옵션을 선택해주세요</h1>
+                <p style="color: #718096; margin-bottom: 32px;">시나리오가 승인되었습니다. 영상 제작 방식을 선택해주세요.</p>
                 
-                <div class="subheading">컷 1: 오프닝 장면</div>
-                <div class="image-grid">
-                    <div class="image-option" onclick="selectImage(this, 'cut1', 'img1')">
-                        <img src="https://picsum.photos/400/225?random=1" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 1-1">
+                <!-- 영상 제작 옵션 선택 -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;">
+                    <div class="card" onclick="startDirectVideoCreation()" style="padding: 32px; text-align: center; cursor: pointer; border: 2px solid #e2e8f0; transition: all 0.2s ease;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">⚡</div>
+                        <h3 style="margin-bottom: 12px; color: #2d3748;">바로 영상 제작</h3>
+                        <p style="font-size: 14px; color: #718096; margin-bottom: 16px;">승인된 시나리오로 즉시 영상을 제작합니다. 빠르고 간단한 방법입니다.</p>
+                        <div style="background: #38a169; color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block;">추천</div>
                     </div>
-                    <div class="image-option" onclick="selectImage(this, 'cut1', 'img2')">
-                        <img src="https://picsum.photos/400/225?random=2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 1-2">
-                    </div>
-                    <div class="image-option" onclick="selectImage(this, 'cut1', 'img3')">
-                        <img src="https://picsum.photos/400/225?random=3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 1-3">
-                    </div>
-                    <div class="image-option" onclick="selectImage(this, 'cut1', 'img4')">
-                        <img src="https://picsum.photos/400/225?random=4" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 1-4">
+                    
+                    <div class="card" onclick="showImagePreviewOption()" style="padding: 32px; text-align: center; cursor: pointer; border: 2px solid #e2e8f0; transition: all 0.2s ease;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🖼️</div>
+                        <h3 style="margin-bottom: 12px; color: #2d3748;">이미지 시안 먼저 확인</h3>
+                        <p style="font-size: 14px; color: #718096; margin-bottom: 16px;">각 장면의 이미지를 미리 확인하고 수정한 후 영상을 제작합니다.</p>
+                        <div style="background: #3182ce; color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block;">정밀 제어</div>
                     </div>
                 </div>
-                <button class="btn btn-outline" style="margin-top: 8px;" onclick="regenerateImages('cut1')">이 컷 다시 생성 (3 토큰)</button>
                 
-                <div class="subheading" style="margin-top: 32px;">컷 2: 제품 소개</div>
-                <div class="image-grid">
-                    <div class="image-option" onclick="selectImage(this, 'cut2', 'img1')">
-                        <img src="https://picsum.photos/400/225?random=5" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 2-1">
+                <!-- 진행중 표시 (숨김 상태) -->
+                <div id="videoCreationProgress" style="display: none; background: #f0fff4; border-radius: 12px; padding: 32px; text-align: center; border-left: 4px solid #38a169;">
+                    <div style="font-size: 64px; margin-bottom: 16px;">🎬</div>
+                    <h2 style="margin-bottom: 16px; color: #2d3748;">영상 제작 중...</h2>
+                    <p style="color: #718096; margin-bottom: 24px;">AI가 최고 품질의 영상을 제작하고 있습니다. 잠시만 기다려주세요.</p>
+                    
+                    <div style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-weight: 500;">진행 상황</span>
+                            <span id="progressPercentage">15%</span>
+                        </div>
+                        <div style="background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div id="progressBar" style="background: linear-gradient(90deg, #38a169, #48bb78); height: 100%; width: 15%; transition: width 0.5s ease;"></div>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 14px; color: #718096;" id="progressStatus">시나리오 분석 중...</div>
                     </div>
-                    <div class="image-option" onclick="selectImage(this, 'cut2', 'img2')">
-                        <img src="https://picsum.photos/400/225?random=6" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 2-2">
-                    </div>
-                    <div class="image-option" onclick="selectImage(this, 'cut2', 'img3')">
-                        <img src="https://picsum.photos/400/225?random=7" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 2-3">
-                    </div>
-                    <div class="image-option" onclick="selectImage(this, 'cut2', 'img4')">
-                        <img src="https://picsum.photos/400/225?random=8" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 2-4">
+                    
+                    <div style="font-size: 14px; color: #718096;">
+                        예상 완료 시간: <strong>약 3-5분</strong>
                     </div>
                 </div>
-                <button class="btn btn-outline" style="margin-top: 8px;" onclick="regenerateImages('cut2')">이 컷 다시 생성 (3 토큰)</button>
                 
-                <div class="subheading" style="margin-top: 32px;">컷 3: 마무리 장면</div>
-                <div class="image-grid">
-                    <div class="image-option" onclick="selectImage(this, 'cut3', 'img1')">
-                        <img src="https://picsum.photos/400/225?random=9" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 3-1">
-                    </div>
-                    <div class="image-option" onclick="selectImage(this, 'cut3', 'img2')">
-                        <img src="https://picsum.photos/400/225?random=10" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 3-2">
-                    </div>
-                    <div class="image-option" onclick="selectImage(this, 'cut3', 'img3')">
-                        <img src="https://picsum.photos/400/225?random=11" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 3-3">
-                    </div>
-                    <div class="image-option" onclick="selectImage(this, 'cut3', 'img4')">
-                        <img src="https://picsum.photos/400/225?random=12" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 3-4">
-                    </div>
-                </div>
-                <button class="btn btn-outline" style="margin-top: 8px;" onclick="regenerateImages('cut3')">이 컷 다시 생성 (3 토큰)</button>
-                
-                <div class="action-buttons">
+                <div class="action-buttons" id="step6Actions">
                     <button class="btn btn-outline" onclick="prevStep()">이전 단계</button>
-                    <button class="btn btn-primary" id="step6Next" onclick="nextStep()" disabled>영상 제작 시작</button>
+                    <button class="btn btn-primary" id="step6Next" onclick="nextStep()" disabled style="display: none;">다음 단계</button>
+                </div>
+                
+                <!-- 이미지 시안 선택 섹션 (숨김 상태) -->
+                <div id="imagePreviewSection" style="display: none;">
+                    <h2 style="margin-bottom: 24px; color: #2d3748;">🖼️ 이미지 시안을 선택해주세요</h2>
+                    <p style="color: #718096; margin-bottom: 24px;">각 컷별로 4개의 시안 중 마음에 드는 이미지를 선택하세요. 선택된 이미지들로 최종 영상이 제작됩니다.</p>
+                    
+                    <div class="subheading">컷 1: 오프닝 장면</div>
+                    <div class="image-grid">
+                        <div class="image-option" onclick="selectImage(this, 'cut1', 'img1')">
+                            <img src="https://picsum.photos/400/225?random=1" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 1-1">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut1', 'img2')">
+                            <img src="https://picsum.photos/400/225?random=2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 1-2">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut1', 'img3')">
+                            <img src="https://picsum.photos/400/225?random=3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 1-3">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut1', 'img4')">
+                            <img src="https://picsum.photos/400/225?random=4" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 1-4">
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" style="margin-top: 8px;" onclick="regenerateImages('cut1')">이 컷 다시 생성 (3 토큰)</button>
+                    
+                    <div class="subheading" style="margin-top: 32px;">컷 2: 제품 소개</div>
+                    <div class="image-grid">
+                        <div class="image-option" onclick="selectImage(this, 'cut2', 'img1')">
+                            <img src="https://picsum.photos/400/225?random=5" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 2-1">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut2', 'img2')">
+                            <img src="https://picsum.photos/400/225?random=6" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 2-2">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut2', 'img3')">
+                            <img src="https://picsum.photos/400/225?random=7" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 2-3">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut2', 'img4')">
+                            <img src="https://picsum.photos/400/225?random=8" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 2-4">
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" style="margin-top: 8px;" onclick="regenerateImages('cut2')">이 컷 다시 생성 (3 토큰)</button>
+                    
+                    <div class="subheading" style="margin-top: 32px;">컷 3: 마무리 장면</div>
+                    <div class="image-grid">
+                        <div class="image-option" onclick="selectImage(this, 'cut3', 'img1')">
+                            <img src="https://picsum.photos/400/225?random=9" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 3-1">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut3', 'img2')">
+                            <img src="https://picsum.photos/400/225?random=10" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 3-2">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut3', 'img3')">
+                            <img src="https://picsum.photos/400/225?random=11" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 3-3">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut3', 'img4')">
+                            <img src="https://picsum.photos/400/225?random=12" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 3-4">
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" style="margin-top: 8px;" onclick="regenerateImages('cut3')">이 컷 다시 생성 (3 토큰)</button>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-outline" onclick="backToVideoOptions()">이전으로</button>
+                        <button class="btn btn-primary" id="step6ImageNext" onclick="nextStep()" disabled>선택된 이미지로 영상 제작</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- 7단계: 영상 제작 중 -->
+            <!-- 7단계: 결과 확인 (이전 8단계에서 변경) -->
             <div class="step-content" id="step7">
                 <div class="progress-indicator">
-                    <div class="progress-text">7/7 단계 - 영상 제작 중</div>
+                    <div class="progress-text">7/7 단계 - 결과 확인</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 95%"></div>
+                        <div class="progress-fill" style="width: 100%"></div>
                     </div>
                 </div>
                 
-                <div style="text-align: center; padding: 60px 20px;">
-                    <div style="width: 80px; height: 80px; border: 4px solid #e2e8f0; border-top: 4px solid #3182ce; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 24px;"></div>
+                <h1 class="heading">🎉 광고 영상이 완성되었습니다!</h1>
+                <p style="color: #718096; margin-bottom: 32px;">xBrush AI가 제작한 당신만의 전문 광고 영상을 확인해보세요.</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;">
+                    <!-- 영상 미리보기 -->
+                    <div>
+                        <video 
+                            style="width: 100%; height: auto; max-height: 400px; background: #000; border-radius: 12px; margin-bottom: 16px; object-fit: contain;"
+                            src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/1.mp4"
+                            autoplay
+                            controls
+                            loop
+                            muted>
+                        </video>
+                        
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-primary" style="flex: 1;" onclick="downloadVideo()">
+                                다운로드
+                            </button>
+                            <button class="btn btn-outline" onclick="shareVideo()">
+                                공유하기
+                            </button>
+                        </div>
+                    </div>
                     
-                    <h1 class="heading">영상을 제작하고 있습니다</h1>
-                    <p style="color: #718096; margin-bottom: 32px;">선택하신 설정으로 고품질 광고 영상을 생성하고 있습니다.<br>약 10-15분 정도 소요됩니다.</p>
+                    <!-- 영상 정보 -->
+                    <div>
+                        <div style="background: #f7fafc; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                            <h3 style="font-weight: 600; margin-bottom: 16px;">영상 정보</h3>
+                            <div style="margin-bottom: 12px;">
+                                <strong>제품:</strong> <span id="finalProduct">-</span>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <strong>타겟:</strong> <span id="finalTarget">-</span>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <strong>스타일:</strong> <span id="finalStyle">-</span>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <strong>형식:</strong> <span id="finalFormat">-</span>
+                            </div>
+                            <div>
+                                <strong>길이:</strong> <span id="finalDuration">-</span>초
+                            </div>
+                        </div>
+                        
+                        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+                            <h3 style="font-weight: 600; margin-bottom: 16px; color: #38a169;">만족도 평가</h3>
+                            <p style="color: #718096; margin-bottom: 16px; font-size: 14px;">이 영상을 광고로 사용하시겠습니까?</p>
+                            
+                            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                                <button class="btn btn-primary" onclick="satisfiedWithVideo()">
+                                    👍 만족합니다
+                                </button>
+                                <button class="btn btn-outline" onclick="showRegenerateOptions()">
+                                    🔄 수정 필요
+                                </button>
+                            </div>
+                            
+                            <p style="color: #718096; font-size: 12px;">
+                                더 세밀한 편집이 필요하시다면 
+                                <a href="#" style="color: #3182ce;">추천 편집 앱</a>을 
+                                확인해보세요.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 부분 재생성 옵션 (숨김 상태) -->
+                <div id="partialRegenerateSection" style="display: none; margin-top: 32px; background: #fffaf0; border-radius: 12px; padding: 32px; border-left: 4px solid #ed8936;">
+                    <h3 style="margin-bottom: 16px; color: #2d3748;">🎬 부분 재생성 옵션</h3>
+                    <p style="color: #718096; margin-bottom: 24px;">마음에 들지 않는 특정 장면만 다시 제작할 수 있습니다. 전체를 다시 만들 필요가 없어요!</p>
                     
-                    <div style="background: #f7fafc; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
-                        <div class="subheading" style="margin-bottom: 16px;">제작 진행 상황</div>
-                        <div style="text-align: left;">
-                            <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                                <div style="width: 20px; height: 20px; background: #38a169; border-radius: 50%; margin-right: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">✓</div>
-                                <span>시나리오 생성 완료</span>
+                    <!-- 3개 컷 선택 -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+                        <div class="card partial-regenerate-option" onclick="selectCutToRegenerate('cut1')" style="padding: 20px; text-align: center; cursor: pointer; border: 2px solid #e2e8f0; transition: all 0.2s ease;">
+                            <div style="aspect-ratio: 16/9; background: #000; border-radius: 8px; margin-bottom: 12px; position: relative; overflow: hidden;">
+                                <video style="width: 100%; height: 100%; object-fit: cover;" muted>
+                                    <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/2.mp4" type="video/mp4">
+                                </video>
+                                <div style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">0-5초</div>
                             </div>
-                            <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                                <div style="width: 20px; height: 20px; background: #3182ce; border-radius: 50%; margin-right: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; animation: pulse 2s infinite;">⋯</div>
-                                <span>영상 생성 중...</span>
+                            <h4 style="margin-bottom: 8px; font-size: 14px;">컷 1: 오프닝</h4>
+                            <p style="font-size: 12px; color: #718096;">제품 소개 장면</p>
+                            <div style="margin-top: 12px;">
+                                <span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px;">5 토큰</span>
                             </div>
-                            <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                                <div style="width: 20px; height: 20px; background: #e2e8f0; border-radius: 50%; margin-right: 12px;"></div>
-                                <span style="color: #a0aec0;">편집 및 후처리</span>
+                        </div>
+                        
+                        <div class="card partial-regenerate-option" onclick="selectCutToRegenerate('cut2')" style="padding: 20px; text-align: center; cursor: pointer; border: 2px solid #e2e8f0; transition: all 0.2s ease;">
+                            <div style="aspect-ratio: 16/9; background: #000; border-radius: 8px; margin-bottom: 12px; position: relative; overflow: hidden;">
+                                <video style="width: 100%; height: 100%; object-fit: cover;" muted>
+                                    <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/3.mp4" type="video/mp4">
+                                </video>
+                                <div style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">5-10초</div>
                             </div>
-                            <div style="display: flex; align-items: center;">
-                                <div style="width: 20px; height: 20px; background: #e2e8f0; border-radius: 50%; margin-right: 12px;"></div>
-                                <span style="color: #a0aec0;">최종 검토</span>
+                            <h4 style="margin-bottom: 8px; font-size: 14px;">컷 2: 제품 시연</h4>
+                            <p style="font-size: 12px; color: #718096;">핵심 기능 설명</p>
+                            <div style="margin-top: 12px;">
+                                <span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px;">5 토큰</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card partial-regenerate-option" onclick="selectCutToRegenerate('cut3')" style="padding: 20px; text-align: center; cursor: pointer; border: 2px solid #e2e8f0; transition: all 0.2s ease;">
+                            <div style="aspect-ratio: 16/9; background: #000; border-radius: 8px; margin-bottom: 12px; position: relative; overflow: hidden;">
+                                <video style="width: 100%; height: 100%; object-fit: cover;" muted>
+                                    <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/4.mp4" type="video/mp4">
+                                </video>
+                                <div style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">10-15초</div>
+                            </div>
+                            <h4 style="margin-bottom: 8px; font-size: 14px;">컷 3: 마무리</h4>
+                            <p style="font-size: 12px; color: #718096;">콜투액션 및 브랜딩</p>
+                            <div style="margin-top: 12px;">
+                                <span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px;">5 토큰</span>
                             </div>
                         </div>
                     </div>
                     
-                    <p style="color: #718096; font-size: 14px;">잠시만 기다려주세요. 곧 멋진 광고 영상이 완성됩니다! 🎬</p>
+                    <div style="display: flex; gap: 12px; justify-content: center;">
+                        <button class="btn btn-outline" onclick="hideRegenerateOptions()">취소</button>
+                        <button class="btn btn-outline" onclick="regenerateEntireVideo()" style="border-color: #e53e3e; color: #e53e3e;">
+                            🔄 전체 다시 제작 (15 토큰)
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- CTA 배너 간소화 -->
+                <div class="cta-banner" style="background: linear-gradient(135deg, #ed8936, #f6ad55);" onclick="applyAsModel()">
+                    <div class="shine"></div>
+                    <div style="position: relative; z-index: 1;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 600;">🌟 AI 모델로 활동하고 수익 창출하기</h3>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-outline" onclick="startOver()">새 광고 만들기</button>
+                    <button class="btn btn-primary" onclick="goToLibrary()">내 광고 보관함</button>
                 </div>
             </div>
 
-            <!-- 8단계: 결과 확인 -->
+            <!-- 영상 제작 중 화면 (별도 분리) -->
             <div class="step-content" id="step8">
                 <div class="progress-indicator">
                     <div class="progress-text">완성! - 결과 확인</div>
@@ -1783,6 +1919,145 @@
                     element.style.backgroundImage = `url('${MODEL_IMAGES[modelId]}')`;
                 }
             });
+        }
+
+        // 6단계 영상 제작 관련 함수들
+        function startDirectVideoCreation() {
+            // 바로 영상 제작 시작
+            showToast('영상 제작을 시작합니다! ⚡');
+            
+            // 진행 표시
+            document.getElementById('videoCreationProgress').style.display = 'block';
+            document.getElementById('step6Actions').style.display = 'none';
+            
+            // 진행률 시뮬레이션
+            let progress = 15;
+            const statuses = [
+                '시나리오 분석 중...',
+                'AI 모델 준비 중...',
+                '첫 번째 장면 생성 중...',
+                '두 번째 장면 생성 중...',
+                '세 번째 장면 생성 중...',
+                '영상 편집 중...',
+                '최종 검토 중...',
+                '완성!'
+            ];
+            
+            let statusIndex = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15 + 5;
+                if (progress > 100) progress = 100;
+                
+                document.getElementById('progressBar').style.width = progress + '%';
+                document.getElementById('progressPercentage').textContent = Math.round(progress) + '%';
+                
+                if (statusIndex < statuses.length - 1) {
+                    document.getElementById('progressStatus').textContent = statuses[statusIndex];
+                    statusIndex++;
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        nextStep(); // 7단계(결과 확인)로 이동
+                    }, 1000);
+                }
+            }, 800);
+        }
+
+        function showImagePreviewOption() {
+            // 이미지 시안 확인 옵션 선택
+            showToast('이미지 시안을 먼저 확인합니다 🖼️');
+            
+            // 옵션 선택 숨기고 이미지 시안 섹션 표시
+            document.querySelector('#step6 > div:nth-child(3)').style.display = 'none'; // 옵션 선택
+            document.getElementById('step6Actions').style.display = 'none';
+            document.getElementById('imagePreviewSection').style.display = 'block';
+        }
+
+        function backToVideoOptions() {
+            // 영상 제작 옵션으로 돌아가기
+            document.querySelector('#step6 > div:nth-child(3)').style.display = 'block'; // 옵션 선택
+            document.getElementById('step6Actions').style.display = 'block';
+            document.getElementById('imagePreviewSection').style.display = 'none';
+        }
+
+        // 7단계 부분 재생성 관련 함수들
+        function showRegenerateOptions() {
+            // 수정 옵션 표시
+            document.getElementById('partialRegenerateSection').style.display = 'block';
+            
+            // 부드러운 스크롤 애니메이션
+            setTimeout(() => {
+                document.getElementById('partialRegenerateSection').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 100);
+        }
+
+        function hideRegenerateOptions() {
+            // 수정 옵션 숨기기
+            document.getElementById('partialRegenerateSection').style.display = 'none';
+        }
+
+        function selectCutToRegenerate(cutId) {
+            // 특정 컷 재생성
+            const cutNames = {
+                'cut1': '오프닝 장면',
+                'cut2': '제품 시연 장면', 
+                'cut3': '마무리 장면'
+            };
+            
+            const cutName = cutNames[cutId];
+            
+            if (confirm(`${cutName}을 다시 제작하시겠습니까? (5 토큰 소모)`)) {
+                showToast(`${cutName} 재생성을 시작합니다... (5 토큰 차감) 🎬`);
+                
+                // 선택된 컷에 로딩 효과 추가
+                const selectedCard = document.querySelector(`[onclick="selectCutToRegenerate('${cutId}')"]`);
+                selectedCard.style.opacity = '0.6';
+                selectedCard.innerHTML += '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 8px 16px; border-radius: 8px; font-size: 12px;">재생성 중...</div>';
+                
+                // 3초 후 완료
+                setTimeout(() => {
+                    selectedCard.style.opacity = '1';
+                    selectedCard.querySelector('div:last-child').remove();
+                    showToast(`${cutName} 재생성이 완료되었습니다! ✨`);
+                    
+                    // 옵션 숨기기
+                    hideRegenerateOptions();
+                }, 3000);
+            }
+        }
+
+        function regenerateEntireVideo() {
+            // 전체 영상 재생성
+            if (confirm('전체 영상을 다시 제작하시겠습니까? (15 토큰 소모)')) {
+                showToast('전체 영상을 다시 제작합니다... (15 토큰 차감) 🎬');
+                
+                // 6단계로 돌아가서 영상 제작 다시 시작
+                hideRegenerateOptions();
+                goToStep(6);
+                setTimeout(() => {
+                    startDirectVideoCreation();
+                }, 500);
+            }
+        }
+
+        function satisfiedWithVideo() {
+            // 영상에 만족하는 경우
+            showToast('감사합니다! 영상이 저장되었습니다 🎉');
+            
+            // 만족도 섹션 업데이트
+            const satisfactionSection = document.querySelector('#step7 .border');
+            satisfactionSection.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">🎉</div>
+                    <h3 style="color: #38a169; margin-bottom: 8px;">완료되었습니다!</h3>
+                    <p style="color: #718096; font-size: 14px;">영상이 내 보관함에 저장되었습니다.</p>
+                </div>
+            `;
         }
     </script>
 </body>
