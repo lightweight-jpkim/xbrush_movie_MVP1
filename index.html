@@ -1012,12 +1012,78 @@
                 </div>
             </div>
 
-            <!-- 7단계: 결과 확인 (이전 8단계에서 변경) -->
+            <!-- 7단계: 영상 컷 선택 및 재생성 (NEW STEP) -->
             <div class="step-content" id="step7">
                 <div class="progress-indicator">
-                    <div class="progress-text">7/7 단계 - 결과 확인</div>
+                    <div class="progress-text">7/9 단계 - 영상 컷 선택</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 100%"></div>
+                        <div class="progress-fill" style="width: 78%"></div>
+                    </div>
+                </div>
+                
+                <h1 class="heading">🎬 생성된 영상 컷을 확인해주세요</h1>
+                <p style="color: #718096; margin-bottom: 32px;">각 컷을 검토하고 마음에 들지 않는 컷은 다시 생성할 수 있습니다. 선택된 컷들로 최종 영상이 제작됩니다.</p>
+                
+                <!-- 영상 컷 1: 오프닝 -->
+                <div class="subheading">컷 1: 오프닝 장면</div>
+                <div class="video-cut-container" style="margin-bottom: 24px;">
+                    <div class="video-preview" style="width: 100%; max-width: 600px; height: 300px; background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <div style="text-align: center; color: #718096;">
+                            <div style="font-size: 48px; margin-bottom: 8px;">🎬</div>
+                            <div>오프닝 영상 컷</div>
+                            <div style="font-size: 12px;">실제로는 생성된 영상이 표시됩니다</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <button class="btn btn-success" onclick="selectVideoCut('cut1')" style="background: #38a169;">✅ 이 컷 사용</button>
+                        <button class="btn btn-outline" onclick="regenerateVideoCut('cut1')">🔄 다시 생성 (10 토큰)</button>
+                    </div>
+                </div>
+                
+                <!-- 영상 컷 2: 제품 소개 -->
+                <div class="subheading">컷 2: 제품 소개 장면</div>
+                <div class="video-cut-container" style="margin-bottom: 24px;">
+                    <div class="video-preview" style="width: 100%; max-width: 600px; height: 300px; background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <div style="text-align: center; color: #718096;">
+                            <div style="font-size: 48px; margin-bottom: 8px;">🎬</div>
+                            <div>제품 소개 영상 컷</div>
+                            <div style="font-size: 12px;">실제로는 생성된 영상이 표시됩니다</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <button class="btn btn-success" onclick="selectVideoCut('cut2')" style="background: #38a169;">✅ 이 컷 사용</button>
+                        <button class="btn btn-outline" onclick="regenerateVideoCut('cut2')">🔄 다시 생성 (10 토큰)</button>
+                    </div>
+                </div>
+                
+                <!-- 영상 컷 3: 마무리 -->
+                <div class="subheading">컷 3: 마무리 장면</div>
+                <div class="video-cut-container" style="margin-bottom: 32px;">
+                    <div class="video-preview" style="width: 100%; max-width: 600px; height: 300px; background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <div style="text-align: center; color: #718096;">
+                            <div style="font-size: 48px; margin-bottom: 8px;">🎬</div>
+                            <div>마무리 영상 컷</div>
+                            <div style="font-size: 12px;">실제로는 생성된 영상이 표시됩니다</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <button class="btn btn-success" onclick="selectVideoCut('cut3')" style="background: #38a169;">✅ 이 컷 사용</button>
+                        <button class="btn btn-outline" onclick="regenerateVideoCut('cut3')">🔄 다시 생성 (10 토큰)</button>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-outline" onclick="prevStep()">이전 단계</button>
+                    <button class="btn btn-primary" id="step7Next" onclick="proceedToFinalAssembly()" disabled>선택된 컷으로 최종 영상 제작</button>
+                </div>
+            </div>
+
+            <!-- 8단계: 결과 확인 (이전 7단계) -->
+            <div class="step-content" id="step8">
+                <div class="progress-indicator">
+                    <div class="progress-text">8/9 단계 - 결과 확인</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 89%"></div>
                     </div>
                 </div>
                 
@@ -1161,10 +1227,10 @@
                 </div>
             </div>
 
-            <!-- 영상 제작 중 화면 (별도 분리) -->
-            <div class="step-content" id="step8">
+            <!-- 9단계: 최종 완성 (이전 step8) -->
+            <div class="step-content" id="step9">
                 <div class="progress-indicator">
-                    <div class="progress-text">완성! - 결과 확인</div>
+                    <div class="progress-text">9/9 단계 - 최종 완성!</div>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 100%"></div>
                     </div>
@@ -1423,6 +1489,7 @@
                 case 4: return selectedData.style !== null;
                 case 5: return selectedData.scenarioApproved === true;
                 case 6: return selectedData.selectedImages.cut1 !== null && selectedData.selectedImages.cut2 !== null && selectedData.selectedImages.cut3 !== null;
+                case 7: return selectedData.selectedVideoCuts && selectedData.selectedVideoCuts.cut1 && selectedData.selectedVideoCuts.cut2 && selectedData.selectedVideoCuts.cut3;
                 default: return true;
             }
         }
@@ -2153,7 +2220,107 @@
             }, 800);
         }
 
-        // 7단계 부분 재생성 관련 함수들
+        // 7단계: 영상 컷 선택 및 재생성 관련 함수들
+        function selectVideoCut(cut) {
+            // 영상 컷 선택
+            selectedData.selectedVideoCuts = selectedData.selectedVideoCuts || {};
+            selectedData.selectedVideoCuts[cut] = true;
+            
+            // 버튼 스타일 업데이트
+            const container = document.querySelector(`[onclick="selectVideoCut('${cut}')"]`).parentElement.parentElement;
+            const preview = container.querySelector('.video-preview');
+            preview.style.border = '3px solid #38a169';
+            preview.style.background = '#f0fff4';
+            
+            const selectButton = container.querySelector('.btn-success');
+            selectButton.textContent = '✅ 선택됨';
+            selectButton.disabled = true;
+            
+            showToast(`${cut === 'cut1' ? '오프닝' : cut === 'cut2' ? '제품 소개' : '마무리'} 컷이 선택되었습니다!`);
+            checkStep7Button();
+        }
+
+        function regenerateVideoCut(cut) {
+            const cutName = cut === 'cut1' ? '오프닝' : cut === 'cut2' ? '제품 소개' : '마무리';
+            if (confirm(`🎬 ${cutName} 컷을 다시 생성하시겠습니까?\n\n💰 비용: 10 토큰\n⏱️ 생성 시간: 약 2-3분\n\n※ 토큰이 차감되며, 기존 컷이 새로 생성됩니다.`)) {
+                showToast(`💰 10 토큰이 차감되고 ${cutName} 컷을 다시 생성합니다.`);
+                
+                // 재생성 시뮬레이션
+                const container = document.querySelector(`[onclick="regenerateVideoCut('${cut}')"]`).parentElement.parentElement;
+                const preview = container.querySelector('.video-preview');
+                const selectButton = container.querySelector('.btn-success');
+                const regenButton = container.querySelector('.btn-outline');
+                
+                // 로딩 상태 표시
+                preview.innerHTML = `
+                    <div style="text-align: center; color: #718096;">
+                        <div style="font-size: 48px; margin-bottom: 8px;">⏳</div>
+                        <div>${cutName} 컷 생성 중...</div>
+                        <div style="font-size: 12px;">잠시만 기다려주세요</div>
+                    </div>
+                `;
+                preview.style.border = '2px solid #e2e8f0';
+                preview.style.background = '#f7fafc';
+                selectButton.disabled = true;
+                regenButton.disabled = true;
+                
+                // 선택 상태 리셋
+                if (selectedData.selectedVideoCuts) {
+                    selectedData.selectedVideoCuts[cut] = false;
+                }
+                
+                // 생성 완료 시뮬레이션
+                setTimeout(() => {
+                    preview.innerHTML = `
+                        <div style="text-align: center; color: #718096;">
+                            <div style="font-size: 48px; margin-bottom: 8px;">🎬</div>
+                            <div>${cutName} 영상 컷 (새로 생성됨)</div>
+                            <div style="font-size: 12px;">실제로는 생성된 영상이 표시됩니다</div>
+                        </div>
+                    `;
+                    selectButton.textContent = '✅ 이 컷 사용';
+                    selectButton.disabled = false;
+                    regenButton.disabled = false;
+                    showToast(`${cutName} 컷이 새로 생성되었습니다! 🎉`);
+                    checkStep7Button();
+                }, 3000);
+            }
+        }
+
+        function checkStep7Button() {
+            // 모든 컷이 선택되었는지 확인
+            const requiredCuts = ['cut1', 'cut2', 'cut3'];
+            const allSelected = requiredCuts.every(cut => 
+                selectedData.selectedVideoCuts && selectedData.selectedVideoCuts[cut]
+            );
+            
+            const step7Button = document.getElementById('step7Next');
+            if (step7Button) {
+                step7Button.disabled = !allSelected;
+                if (allSelected) {
+                    step7Button.classList.remove('btn-disabled');
+                    step7Button.classList.add('btn-primary');
+                } else {
+                    step7Button.classList.add('btn-disabled');
+                    step7Button.classList.remove('btn-primary');
+                }
+            }
+        }
+
+        function proceedToFinalAssembly() {
+            // 최종 영상 조립 단계로 이동
+            showToast('선택된 컷들로 최종 영상을 조립합니다! 🎬');
+            
+            // Step 8로 이동하고 조립 프로세스 시작
+            nextStep();
+            
+            // 조립 프로세스 시뮬레이션 (기존 부분 재생성 로직 활용)
+            setTimeout(() => {
+                showRegenerateOptions();
+            }, 1000);
+        }
+
+        // 8단계 부분 재생성 관련 함수들 (이전 7단계 함수들)
         function showRegenerateOptions() {
             // 수정 옵션 표시
             document.getElementById('partialRegenerateSection').style.display = 'block';
