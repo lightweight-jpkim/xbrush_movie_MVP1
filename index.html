@@ -1976,31 +1976,45 @@
             // 이미지 시안 확인 옵션 선택
             showToast('이미지 시안을 먼저 확인합니다 🖼️');
             
-            // 이미지 시안 섹션 표시 (이미 step 6에 있으므로 navigation 불필요)
-            setTimeout(() => {
-                // 옵션 선택 그리드를 숨김 (더 정확한 selector 사용)
-                const optionGrid = document.querySelector('#step6 div[style*="display: grid"]');
-                if (optionGrid) optionGrid.style.display = 'none';
+            // 현재 스텝이 5라면 먼저 6으로 이동
+            if (currentStep === 5) {
+                goToStep(6);
                 
-                // 설명 문구도 숨김 (더 정확한 selector)
-                const descriptions = document.querySelectorAll('#step6 p');
-                descriptions.forEach(p => {
-                    if (p.textContent.includes('시나리오가 승인되었습니다') || p.textContent.includes('영상 제작 방식을 선택해주세요')) {
-                        p.style.display = 'none';
-                    }
-                });
-                
-                // 액션 버튼들 숨김
-                const actions = document.getElementById('step6Actions');
-                if (actions) actions.style.display = 'none';
-                
-                // 이미지 시안 섹션 표시
-                const imageSection = document.getElementById('imagePreviewSection');
-                if (imageSection) imageSection.style.display = 'block';
-                
-                // 이미지 선택 버튼 상태 확인
-                checkImageSelectionButton();
-            }, 300);
+                // Step 6으로 이동 후 이미지 섹션 표시
+                setTimeout(() => {
+                    showImageSelectionInterface();
+                }, 300);
+            } else {
+                // 이미 Step 6에 있다면 바로 이미지 섹션 표시
+                setTimeout(() => {
+                    showImageSelectionInterface();
+                }, 300);
+            }
+        }
+
+        function showImageSelectionInterface() {
+            // 옵션 선택 그리드를 숨김 (더 정확한 selector 사용)
+            const optionGrid = document.querySelector('#step6 div[style*="display: grid"]');
+            if (optionGrid) optionGrid.style.display = 'none';
+            
+            // 설명 문구도 숨김 (더 정확한 selector)
+            const descriptions = document.querySelectorAll('#step6 p');
+            descriptions.forEach(p => {
+                if (p.textContent.includes('시나리오가 승인되었습니다') || p.textContent.includes('영상 제작 방식을 선택해주세요')) {
+                    p.style.display = 'none';
+                }
+            });
+            
+            // 액션 버튼들 숨김
+            const actions = document.getElementById('step6Actions');
+            if (actions) actions.style.display = 'none';
+            
+            // 이미지 시안 섹션 표시
+            const imageSection = document.getElementById('imagePreviewSection');
+            if (imageSection) imageSection.style.display = 'block';
+            
+            // 이미지 선택 버튼 상태 확인
+            checkImageSelectionButton();
         }
 
         function checkImageSelectionButton() {
