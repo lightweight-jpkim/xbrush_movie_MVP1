@@ -1974,15 +1974,23 @@
             // 이미지 시안 확인 옵션 선택
             showToast('이미지 시안을 먼저 확인합니다 🖼️');
             
-            // 먼저 step 6으로 이동
-            currentStep = 6;
-            showStep(6);
-            
-            // 그 다음 이미지 시안 섹션 표시
+            // 이미지 시안 섹션 표시 (이미 step 6에 있으므로 navigation 불필요)
             setTimeout(() => {
-                document.querySelector('#step6 > div:nth-child(3)').style.display = 'none'; // 옵션 선택
-                document.getElementById('step6Actions').style.display = 'none';
-                document.getElementById('imagePreviewSection').style.display = 'block';
+                // 옵션 선택 그리드를 숨김 (더 정확한 selector 사용)
+                const optionGrid = document.querySelector('#step6 div[style*="display: grid"]');
+                if (optionGrid) optionGrid.style.display = 'none';
+                
+                // 설명 문구도 숨김
+                const description = document.querySelector('#step6 p[style*="color: #718096"]');
+                if (description) description.style.display = 'none';
+                
+                // 액션 버튼들 숨김
+                const actions = document.getElementById('step6Actions');
+                if (actions) actions.style.display = 'none';
+                
+                // 이미지 시안 섹션 표시
+                const imageSection = document.getElementById('imagePreviewSection');
+                if (imageSection) imageSection.style.display = 'block';
             }, 300);
         }
 
