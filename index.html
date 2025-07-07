@@ -903,7 +903,6 @@
                     </div>
                 </div>
                 
-                <h1 class="heading">🎬 영상 제작 옵션을 선택해주세요</h1>
                 <p style="color: #718096; margin-bottom: 32px;">시나리오가 승인되었습니다. 영상 제작 방식을 선택해주세요.</p>
                 
                 <!-- 영상 제작 옵션 선택 -->
@@ -2007,6 +2006,27 @@
         }
 
         function startVideoWithSelectedImages() {
+            // 선택된 이미지 검증
+            const requiredCuts = ['cut1', 'cut2', 'cut3'];
+            let unselectedCuts = [];
+            
+            requiredCuts.forEach(cut => {
+                if (!selectedData.selectedImages[cut]) {
+                    unselectedCuts.push(cut);
+                }
+            });
+            
+            if (unselectedCuts.length > 0) {
+                const cutNames = unselectedCuts.map(cut => {
+                    if (cut === 'cut1') return '컷 1 (오프닝 장면)';
+                    if (cut === 'cut2') return '컷 2 (제품 소개)';
+                    if (cut === 'cut3') return '컷 3 (마무리 장면)';
+                }).join(', ');
+                
+                showToast(`⚠️ ${unselectedCuts.length}개의 컷에 이미지가 선택되지 않았습니다: ${cutNames}`, 'error');
+                return;
+            }
+            
             // 선택된 이미지로 영상 제작 시작
             showToast('선택된 이미지로 영상 제작을 시작합니다! 🎬');
             
@@ -2049,7 +2069,7 @@
                     // 영상 완성 후 결과 확인 단계(step 7)로 이동
                     setTimeout(() => {
                         showToast('영상 제작이 완료되었습니다! 🎉');
-                        goToStep(7); // 결과 확인 단계로 이동
+                        nextStep(); // 다음 단계(step 7)로 이동
                     }, 1000);
                 }
             }, 800);
