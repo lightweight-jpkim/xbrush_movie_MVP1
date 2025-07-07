@@ -2030,8 +2030,29 @@
             const imageSection = document.getElementById('imagePreviewSection');
             if (imageSection) imageSection.style.display = 'none';
             
+            // Step 6 요소들을 원래 상태로 복원 (재진입을 위해)
+            restoreStep6Elements();
+            
             // Step 5로 이동
             goToStep(5);
+        }
+
+        function restoreStep6Elements() {
+            // 옵션 선택 그리드 다시 표시
+            const optionGrid = document.querySelector('#step6 div[style*="display: grid"]');
+            if (optionGrid) optionGrid.style.display = 'grid';
+            
+            // 설명 문구들 다시 표시
+            const descriptions = document.querySelectorAll('#step6 p');
+            descriptions.forEach(p => {
+                if (p.textContent.includes('시나리오가 승인되었습니다') || p.textContent.includes('영상 제작 방식을 선택해주세요')) {
+                    p.style.display = 'block';
+                }
+            });
+            
+            // 액션 버튼들 다시 표시
+            const actions = document.getElementById('step6Actions');
+            if (actions) actions.style.display = 'block';
         }
 
         function startVideoWithSelectedImages() {
