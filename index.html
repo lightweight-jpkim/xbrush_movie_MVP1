@@ -1530,6 +1530,9 @@
             element.classList.add('selected');
             selectedData.selectedImages[cut] = imageId;
             checkNextButton();
+            
+            // 이미지 선택 시 이미지 제작 버튼 상태 업데이트
+            checkImageSelectionButton();
         }
 
         function regenerateImages(cut) {
@@ -1979,9 +1982,13 @@
                 const optionGrid = document.querySelector('#step6 div[style*="display: grid"]');
                 if (optionGrid) optionGrid.style.display = 'none';
                 
-                // 설명 문구도 숨김
-                const description = document.querySelector('#step6 p[style*="color: #718096"]');
-                if (description) description.style.display = 'none';
+                // 설명 문구도 숨김 (더 정확한 selector)
+                const descriptions = document.querySelectorAll('#step6 p');
+                descriptions.forEach(p => {
+                    if (p.textContent.includes('시나리오가 승인되었습니다') || p.textContent.includes('영상 제작 방식을 선택해주세요')) {
+                        p.style.display = 'none';
+                    }
+                });
                 
                 // 액션 버튼들 숨김
                 const actions = document.getElementById('step6Actions');
@@ -1990,7 +1997,29 @@
                 // 이미지 시안 섹션 표시
                 const imageSection = document.getElementById('imagePreviewSection');
                 if (imageSection) imageSection.style.display = 'block';
+                
+                // 이미지 선택 버튼 상태 확인
+                checkImageSelectionButton();
             }, 300);
+        }
+
+        function checkImageSelectionButton() {
+            // 모든 컷에 이미지가 선택되었는지 확인
+            const requiredCuts = ['cut1', 'cut2', 'cut3'];
+            const allSelected = requiredCuts.every(cut => selectedData.selectedImages[cut]);
+            
+            // 이미지 제작 버튼 활성화/비활성화
+            const imageButton = document.getElementById('step6ImageNext');
+            if (imageButton) {
+                imageButton.disabled = !allSelected;
+                if (allSelected) {
+                    imageButton.classList.remove('btn-disabled');
+                    imageButton.classList.add('btn-primary');
+                } else {
+                    imageButton.classList.add('btn-disabled');
+                    imageButton.classList.remove('btn-primary');
+                }
+            }
         }
 
         function backToVideoOptions() {
