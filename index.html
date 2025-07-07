@@ -1008,7 +1008,7 @@
                     
                     <div class="action-buttons">
                         <button class="btn btn-outline" onclick="backToVideoOptions()">이전으로</button>
-                        <button class="btn btn-primary" id="step6ImageNext" onclick="nextStep()" disabled>선택된 이미지로 영상 제작</button>
+                        <button class="btn btn-primary" id="step6ImageNext" onclick="startVideoWithSelectedImages()" disabled>선택된 이미지로 영상 제작</button>
                     </div>
                 </div>
             </div>
@@ -1996,9 +1996,68 @@
 
         function backToVideoOptions() {
             // 영상 제작 옵션으로 돌아가기
-            document.querySelector('#step6 > div:nth-child(3)').style.display = 'block'; // 옵션 선택
-            document.getElementById('step6Actions').style.display = 'block';
+            // 옵션 선택 그리드를 다시 표시
+            const optionGrid = document.querySelector('#step6 div[style*="display: grid"]');
+            if (optionGrid) optionGrid.style.display = 'grid';
+            
+            // 설명 문구도 다시 표시
+            const description = document.querySelector('#step6 p[style*="color: #718096"]');
+            if (description) description.style.display = 'block';
+            
+            // 액션 버튼들 표시
+            const actions = document.getElementById('step6Actions');
+            if (actions) actions.style.display = 'block';
+            
+            // 이미지 시안 섹션 숨김
+            const imageSection = document.getElementById('imagePreviewSection');
+            if (imageSection) imageSection.style.display = 'none';
+        }
+
+        function startVideoWithSelectedImages() {
+            // 선택된 이미지로 영상 제작 시작
+            showToast('선택된 이미지로 영상 제작을 시작합니다! 🎬');
+            
+            // 이미지 시안 섹션 숨김
             document.getElementById('imagePreviewSection').style.display = 'none';
+            
+            // 진행 표시
+            document.getElementById('videoCreationProgress').style.display = 'block';
+            document.getElementById('step6Actions').style.display = 'none';
+            
+            // 진행률 시뮬레이션 (선택된 이미지 사용)
+            let progress = 15;
+            const statuses = [
+                '선택된 이미지 분석 중...',
+                'AI 모델 준비 중...',
+                '첫 번째 장면 처리 중...',
+                '두 번째 장면 처리 중...',
+                '세 번째 장면 처리 중...',
+                '장면들 연결 중...',
+                '오디오 추가 중...',
+                '최종 편집 중...',
+                '영상 완성!'
+            ];
+            
+            let statusIndex = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15 + 5;
+                if (progress > 100) progress = 100;
+                
+                document.getElementById('progressBar').style.width = progress + '%';
+                document.getElementById('progressPercentage').textContent = Math.round(progress) + '%';
+                
+                if (statusIndex < statuses.length) {
+                    document.getElementById('progressStatus').textContent = statuses[statusIndex];
+                    statusIndex++;
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    setTimeout(() => {
+                        nextStep(); // 영상 완성 후 다음 단계로
+                    }, 1000);
+                }
+            }, 800);
         }
 
         // 7단계 부분 재생성 관련 함수들
