@@ -432,9 +432,15 @@ class StepManager {
         try {
             switch(step) {
                 case STEPS.VIDEO_CREATION:
-                    // Auto-start video creation
+                    // Auto-start video creation (unless skip flag is set)
                     setTimeout(() => {
-                        this.startAutomaticVideoCreation();
+                        if (window.skipAutoVideoCreation) {
+                            // Reset the flag and don't auto-start
+                            window.skipAutoVideoCreation = false;
+                            console.log('Skipped automatic video creation for image regeneration');
+                        } else {
+                            this.startAutomaticVideoCreation();
+                        }
                     }, 500);
                     break;
                 case STEPS.RESULTS:
@@ -972,6 +978,55 @@ function hideAdvancedEdit() {
     }
 }
 
+function showVideoRegenerationProgress() {
+    // Show a visual indication that video is being regenerated
+    try {
+        const videoSection = document.querySelector('.video-info-grid video');
+        if (videoSection) {
+            // Add a loading overlay
+            const overlay = document.createElement('div');
+            overlay.id = 'regeneration-overlay';
+            overlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(49, 130, 206, 0.9);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 600;
+                border-radius: 12px;
+                z-index: 10;
+            `;
+            overlay.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">🎬</div>
+                    <div>영상 재생성 중...</div>
+                    <div style="font-size: 12px; opacity: 0.8; margin-top: 8px;">잠시만 기다려주세요</div>
+                </div>
+            `;
+            
+            const videoContainer = videoSection.parentElement;
+            if (videoContainer) {
+                videoContainer.style.position = 'relative';
+                videoContainer.appendChild(overlay);
+                
+                // Remove overlay after regeneration
+                setTimeout(() => {
+                    if (overlay && overlay.parentElement) {
+                        overlay.parentElement.removeChild(overlay);
+                    }
+                }, 3000);
+            }
+        }
+    } catch (error) {
+        console.error('Error showing regeneration progress:', error);
+    }
+}
+
 function selectEditOption(option) {
     try {
         let message = '';
@@ -1010,8 +1065,8 @@ function executeEditOption(option, cost) {
             case 'regenerate-video':
                 showToast(`영상 재생성을 시작합니다. (${cost} 토큰 소모)`, 'info');
                 
-                // Hide advanced edit mode
-                hideAdvancedEdit();
+                // Show regeneration progress
+                showVideoRegenerationProgress();
                 
                 // Simulate video regeneration
                 setTimeout(() => {
@@ -1023,19 +1078,31 @@ function executeEditOption(option, cost) {
                         video.currentTime = 0;
                         video.play();
                     }
+                    
+                    // Scroll back to video to show the result
+                    const videoSection = document.querySelector('.video-info-grid');
+                    if (videoSection) {
+                        videoSection.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'start' 
+                        });
+                    }
                 }, 3000);
                 break;
                 
             case 'regenerate-image':
                 showToast(`새 이미지로 제작을 시작합니다. (${cost} 토큰 소모)`, 'info');
                 
+                // Set a flag to prevent automatic video creation
+                window.skipAutoVideoCreation = true;
+                
                 // Navigate back to step 6 for image selection
                 setTimeout(() => {
-                    // Use the global goToStep function
-                    if (typeof goToStep === 'function') {
-                        goToStep(6);
+                    // Use direct step manager navigation to avoid auto-triggers
+                    if (app && app.stepManager) {
+                        app.stepManager.goToStep(6);
                         
-                        // After navigation, show image preview section
+                        // After navigation, force show image preview section
                         setTimeout(() => {
                             const videoCreationProgress = document.getElementById('videoCreationProgress');
                             const imagePreviewSection = document.getElementById('imagePreviewSection');
@@ -1044,19 +1111,15 @@ function executeEditOption(option, cost) {
                                 videoCreationProgress.style.display = 'none';
                             }
                             
-                            if (imagePreviewSection) {
-                                imagePreviewSection.style.display = 'block';
-                            } else {
-                                // If imagePreviewSection doesn't exist, trigger the image preview
-                                if (typeof showImagePreviewOption === 'function') {
-                                    showImagePreviewOption();
-                                }
+                            // Force trigger image preview
+                            if (typeof showImagePreviewOption === 'function') {
+                                showImagePreviewOption();
                             }
                             
-                            showToast('이미지 선택 단계로 돌아갑니다.', 'info');
-                        }, 500);
+                            showToast('이미지를 선택해주세요.', 'info');
+                        }, 300);
                     } else {
-                        console.error('goToStep function not found');
+                        console.error('App stepManager not found');
                         showToast('오류가 발생했습니다. 페이지를 새로고침 해주세요.', 'error');
                     }
                 }, 1000);
