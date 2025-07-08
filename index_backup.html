@@ -1,0 +1,2491 @@
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xBrush 동영상 광고 제작</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: #f7fafc;
+            color: #2d3748;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Chakra UI 스타일 상단 네비게이터 */
+        .progress-nav {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e2e8f0;
+            z-index: 1;
+        }
+
+        .progress-line-active {
+            height: 2px;
+            background: #3182ce;
+            transition: width 0.3s ease;
+            z-index: 2;
+            position: relative;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            min-width: 120px;
+            text-align: center;
+            position: relative;
+            z-index: 3;
+            background: white;
+        }
+
+        .step:hover:not(.active) {
+            background: #edf2f7;
+        }
+
+        .step.active {
+            color: #3182ce;
+        }
+
+        .step.completed {
+            color: #38a169;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .step.active .step-number {
+            background: #3182ce;
+            color: white;
+            border-color: #3182ce;
+        }
+
+        .step.completed .step-number {
+            background: #38a169;
+            color: white;
+            border-color: #38a169;
+        }
+
+        .step-label {
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* 메인 컨텐츠 영역 */
+        .content-area {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+            min-height: 500px;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        /* Chakra UI Button 스타일 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #3182ce;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2c5aa0;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #3182ce;
+            border: 1px solid #3182ce;
+        }
+
+        .btn-outline:hover {
+            background: #3182ce;
+            color: white;
+        }
+        
+        .btn-disabled {
+            background: #a0aec0 !important;
+            color: #718096 !important;
+            cursor: not-allowed !important;
+        }
+        
+        .btn-disabled:hover {
+            background: #a0aec0 !important;
+            transform: none !important;
+        }
+
+        /* 헤딩 스타일 */
+        .heading {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #1a202c;
+        }
+
+        .subheading {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #2d3748;
+        }
+
+        /* 폼 스타일 */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 1px #3182ce;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* 카드 그리드 */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .card:hover {
+            border-color: #3182ce;
+            box-shadow: 0 4px 12px rgba(49, 130, 206, 0.15);
+        }
+
+        .card.selected {
+            border-color: #3182ce;
+            background: #ebf8ff;
+        }
+
+        /* 액션 버튼 영역 */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* 진행률 표시 */
+        .progress-indicator {
+            margin-bottom: 16px;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3182ce;
+            transition: width 0.3s ease;
+        }
+
+        /* 스타일 선택 카드 */
+        .style-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .style-preview {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(45deg, #f7fafc, #edf2f7);
+            border-radius: 6px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .genre-action { background: linear-gradient(45deg, #ff6b6b, #ee5a24); }
+        .genre-romance { background: linear-gradient(45deg, #ff9ff3, #f368e0); }
+        .genre-thriller { background: linear-gradient(45deg, #54a0ff, #2e86de); }
+        .genre-comedy { background: linear-gradient(45deg, #ffa502, #ff6348); }
+        .genre-documentary { background: linear-gradient(45deg, #7bed9f, #70a1ff); }
+
+        /* 이미지 시안 그리드 */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .image-option {
+            aspect-ratio: 16/9;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .image-option:hover {
+            border-color: #3182ce;
+        }
+
+        .image-option.selected {
+            border-color: #3182ce;
+            background: #ebf8ff;
+        }
+
+        /* CTA 배너 스타일 */
+        .cta-banner {
+            margin: 32px 0;
+            padding: 24px;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-banner:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .cta-banner:hover .shine {
+            left: 100% !important;
+        }
+
+        .shine {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s ease;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .progress-steps {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .progress-line {
+                display: none;
+            }
+            
+            .step {
+                width: 100%;
+                flex-direction: row;
+                justify-content: flex-start;
+                min-width: auto;
+            }
+            
+            .step-number {
+                margin-bottom: 0;
+                margin-right: 12px;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .image-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 상단 진행률 네비게이터 -->
+        <div class="progress-nav">
+            <div class="progress-steps">
+                <div class="progress-line">
+                    <div class="progress-line-active" id="progressLine"></div>
+                </div>
+                
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">출연자 선택</div>
+                </div>
+                
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">기본 정보</div>
+                </div>
+                
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">형식 선택</div>
+                </div>
+                
+                <div class="step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">스타일 선택</div>
+                </div>
+                
+                <div class="step" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-label">시나리오 확인</div>
+                </div>
+                
+                <div class="step" data-step="6">
+                    <div class="step-number">6</div>
+                    <div class="step-label">영상 제작</div>
+                </div>
+                
+                <div class="step" data-step="7">
+                    <div class="step-number">7</div>
+                    <div class="step-label">결과 확인</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 메인 컨텐츠 영역 -->
+        <div class="content-area">
+            <!-- 1단계: 출연자 선택 -->
+            <div class="step-content active" id="step1">
+                <div class="progress-indicator">
+                    <div class="progress-text">1/7 단계 - 출연자 선택</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 14%"></div>
+                    </div>
+                </div>
+                
+                <h1 class="heading">출연자를 선택해주세요</h1>
+                <p style="color: #718096; margin-bottom: 32px;">광고에 출연할 모델을 선택하세요. 각 모델은 일관된 외모로 영상에 등장합니다.</p>
+                
+                <!-- 버츄얼 모델 섹션 -->
+                <div style="margin-bottom: 40px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                        <h2 class="subheading" style="margin-bottom: 0; margin-right: 12px;">AI 버츄얼 모델</h2>
+                        <span style="background: #38a169; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">무료</span>
+                    </div>
+                    <p style="color: #718096; margin-bottom: 16px; font-size: 14px;">AI로 생성된 가상의 모델들입니다. 무제한 사용 가능합니다.</p>
+                    
+                    <div class="card-grid">
+                        <div class="card" onclick="selectModel(this, 'virtual1', 'free')">
+                            <div class="model-image" data-model="virtual1" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/667eea/ffffff?text=AI+Model+A'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                                <div style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); color: #2d3748; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">FREE</div>
+                            </div>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">젊은 여성 모델</h3>
+                            <p style="font-size: 12px; color: #718096;">20대, 친근하고 활발한 이미지</p>
+                        </div>
+                        
+                        <div class="card" onclick="selectModel(this, 'virtual2', 'free')">
+                            <div class="model-image" data-model="virtual2" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/f093fb/ffffff?text=AI+Model+B'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                                <div style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); color: #2d3748; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">FREE</div>
+                            </div>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">성숙한 남성 모델</h3>
+                            <p style="font-size: 12px; color: #718096;">30대, 신뢰감 있는 전문적 이미지</p>
+                        </div>
+                        
+                        <div class="card" onclick="selectModel(this, 'virtual3', 'free')">
+                            <div class="model-image" data-model="virtual3" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/4facfe/ffffff?text=AI+Model+C'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                                <div style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); color: #2d3748; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">FREE</div>
+                            </div>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">중년 여성 모델</h3>
+                            <p style="font-size: 12px; color: #718096;">40대, 안정감 있는 프리미엄 이미지</p>
+                        </div>
+                        
+                        <div class="card" onclick="selectModel(this, 'virtual4', 'free')">
+                            <div class="model-image" data-model="virtual4" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/fa709a/ffffff?text=AI+Model+D'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                                <div style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); color: #2d3748; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">FREE</div>
+                            </div>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">젊은 남성 모델</h3>
+                            <p style="font-size: 12px; color: #718096;">20대, 역동적이고 트렌디한 이미지</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 실제 배우 섹션 -->
+                <div>
+                    <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                        <h2 class="subheading" style="margin-bottom: 0; margin-right: 12px;">실제 배우</h2>
+                        <span style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">+100 크레딧!</span>
+                    </div>
+                    <p style="color: #718096; margin-bottom: 16px; font-size: 14px;">실제 배우들의 딥페이크 기술을 활용한 프리미엄 모델입니다. 더욱 자연스럽고 전문적인 광고 제작이 가능합니다.</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+                        <div class="card" onclick="selectModel(this, 'actor1', 'premium')">
+                            <div class="model-image" data-model="actor1" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/2d3748/ffffff?text=공유'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                                <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
+                            </div>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">채연</h3>
+                            <p style="font-size: 12px; color: #718096;">상큼한 20대 채연의 모습 그대로</p>
+                        </div>
+                        
+                        <div class="card" onclick="selectModel(this, 'actor2', 'premium')">
+                            <div class="model-image" data-model="actor2" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/553c9a/ffffff?text=아이유'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                                <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
+                            </div>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">이상아</h3>
+                            <p style="font-size: 12px; color: #718096;">밝고 친근한 국민적 매력</p>
+                        </div>
+                        
+                        <div class="card" onclick="selectModel(this, 'actor3', 'premium')">
+                            <div class="model-image" data-model="actor3" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/1a202c/ffffff?text=이정재'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                                <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
+                            </div>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">이정재</h3>
+                            <p style="font-size: 12px; color: #718096;">카리스마 있고 믿음직한 리더십</p>
+                        </div>
+                        
+                        <div class="card" onclick="selectModel(this, 'actor4', 'premium')">
+                            <div class="model-image" data-model="actor4" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/c53030/ffffff?text=전지현'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                                <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
+                            </div>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">전지현</h3>
+                            <p style="font-size: 12px; color: #718096;">우아하고 세련된 여성 매력</p>
+                        </div>
+                        
+                        <div class="card" onclick="selectModel(this, 'actor5', 'premium')">
+                            <div class="model-image" data-model="actor5" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/065f46/ffffff?text=박서준'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                                <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
+                            </div>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">박서준</h3>
+                            <p style="font-size: 12px; color: #718096;">젊고 역동적인 현대적 매력</p>
+                        </div>
+                        
+                        <div class="card" onclick="selectModel(this, 'actor6', 'premium')">
+                            <div class="model-image" data-model="actor6" style="width: 100%; height: 120px; background-image: url('https://via.placeholder.com/300x300/7c2d12/ffffff?text=손예진'); background-size: cover; background-position: center; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                                <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #f6ad55, #ed8936); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600;">100💎</div>
+                            </div>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">손예진</h3>
+                            <p style="font-size: 12px; color: #718096;">로맨틱하고 품격 있는 매력</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CTA 배너 간소화 -->
+                <div class="cta-banner" style="background: linear-gradient(135deg, #667eea, #764ba2);" onclick="applyAsModel()">
+                    <div class="shine"></div>
+                    <div style="position: relative; z-index: 1;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 600;">💰 AI 모델 신청하고 수익 창출하기</h3>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <div></div>
+                    <button class="btn btn-primary" id="step1Next" onclick="nextStep()" disabled>다음 단계</button>
+                </div>
+            </div>
+
+            <!-- 2단계: 기본 정보 입력 -->
+            <div class="step-content" id="step2">
+                <div class="progress-indicator">
+                    <div class="progress-text">2/7 단계 - 기본 정보 입력</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 28%"></div>
+                    </div>
+                </div>
+                
+                <h1 class="heading">광고할 제품/서비스 정보</h1>
+                <p style="color: #718096; margin-bottom: 24px;">AI가 최적의 광고 시나리오를 생성하기 위한 기본 정보를 입력해주세요.</p>
+                
+                <div class="form-group">
+                    <label class="form-label">제품/서비스명 *</label>
+                    <input type="text" class="form-input" placeholder="예: 신선한 유기농 사과, 온라인 영어 강의 등" id="productName">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">타겟층 *</label>
+                    <select class="form-select" id="targetAudience">
+                        <option value="">선택해주세요</option>
+                        <option value="teens">10대 (13-19세)</option>
+                        <option value="twenties">20대 (20-29세)</option>
+                        <option value="thirties">30대 (30-39세)</option>
+                        <option value="forties">40대 (40-49세)</option>
+                        <option value="fifties">50대 이상</option>
+                        <option value="all">전 연령대</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">핵심 메시지 *</label>
+                    <input type="text" class="form-input" placeholder="예: 세상에서 가장 맛있는 사과입니다" id="coreMessage">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">광고 톤앤매너 *</label>
+                    <select class="form-select" id="tone">
+                        <option value="">선택해주세요</option>
+                        <option value="serious">진지하고 전문적인</option>
+                        <option value="friendly">친근하고 유쾌한</option>
+                        <option value="luxury">고급스럽고 세련된</option>
+                        <option value="energetic">역동적이고 활기찬</option>
+                        <option value="warm">따뜻하고 감성적인</option>
+                    </select>
+                </div>
+                
+                <!-- CTA 배너 간소화 -->
+                <div class="cta-banner" style="background: linear-gradient(135deg, #38a169, #68d391);" onclick="applyAsModel()">
+                    <div class="shine"></div>
+                    <div style="position: relative; z-index: 1;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 600;">🎬 AI 모델 신청하기</h3>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-outline" onclick="prevStep()">이전 단계</button>
+                    <button class="btn btn-primary" id="step2Next" onclick="nextStep()" disabled>다음 단계</button>
+                </div>
+            </div>
+
+            <!-- 3단계: 형식 선택 -->
+            <div class="step-content" id="step3">
+                <div class="progress-indicator">
+                    <div class="progress-text">3/7 단계 - 영상 형식 선택</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 42%"></div>
+                    </div>
+                </div>
+                
+                <h1 class="heading">영상 형식을 선택해주세요</h1>
+                <p style="color: #718096; margin-bottom: 24px;">어떤 플랫폼에서 사용할 광고인지 선택하시면 최적화된 형식으로 제작됩니다.</p>
+                
+                <div class="subheading">플랫폼별 포맷</div>
+                <div class="card-grid">
+                    <div class="card" onclick="selectFormat(this, 'youtube')">
+                        <div style="width: 100%; height: 80px; background: #ff0000; border-radius: 6px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 500;">YouTube</div>
+                        <h3 style="font-weight: 600; margin-bottom: 4px;">유튜브 광고</h3>
+                        <p style="font-size: 12px; color: #718096;">16:9 비율, 스킵 가능한 광고</p>
+                    </div>
+                    
+                    <div class="card" onclick="selectFormat(this, 'instagram')">
+                        <div style="width: 100%; height: 80px; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); border-radius: 6px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 500;">Instagram</div>
+                        <h3 style="font-weight: 600; margin-bottom: 4px;">인스타그램 피드</h3>
+                        <p style="font-size: 12px; color: #718096;">1:1 정사각형 비율</p>
+                    </div>
+                    
+                    <div class="card" onclick="selectFormat(this, 'reels')">
+                        <div style="width: 100%; height: 80px; background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045); border-radius: 6px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 500;">Reels</div>
+                        <h3 style="font-weight: 600; margin-bottom: 4px;">인스타그램 릴스</h3>
+                        <p style="font-size: 12px; color: #718096;">9:16 세로 비율</p>
+                    </div>
+                    
+                    <div class="card" onclick="selectFormat(this, 'shorts')">
+                        <div style="width: 100%; height: 80px; background: #ff0000; border-radius: 6px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 500;">Shorts</div>
+                        <h3 style="font-weight: 600; margin-bottom: 4px;">유튜브 쇼츠</h3>
+                        <p style="font-size: 12px; color: #718096;">9:16 세로 비율</p>
+                    </div>
+                </div>
+                
+                <div class="subheading" style="margin-top: 32px;">영상 길이</div>
+                <div style="display: flex; gap: 16px; margin-top: 16px;">
+                    <div class="card" style="flex: 1;" onclick="selectDuration(this, '10')">
+                        <h3 style="font-weight: 600; margin-bottom: 4px;">10초</h3>
+                        <p style="font-size: 12px; color: #718096;">짧고 임팩트 있는 메시지</p>
+                    </div>
+                    
+                    <div class="card" style="flex: 1;" onclick="selectDuration(this, '15')">
+                        <h3 style="font-weight: 600; margin-bottom: 4px;">15초</h3>
+                        <p style="font-size: 12px; color: #718096;">스토리가 있는 광고</p>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-outline" onclick="prevStep()">이전 단계</button>
+                    <button class="btn btn-primary" id="step3Next" onclick="nextStep()" disabled>다음 단계</button>
+                </div>
+            </div>
+
+            <!-- 4단계: 영상 스타일 선택 -->
+            <div class="step-content" id="step4">
+                <div class="progress-indicator">
+                    <div class="progress-text">4/7 단계 - 영상 스타일 선택</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 57%"></div>
+                    </div>
+                </div>
+                
+                <h1 class="heading">영상 스타일을 선택해주세요</h1>
+                <p style="color: #718096; margin-bottom: 24px;">영화 장르별 고유한 영상 문법을 적용하여 전문적인 광고를 제작합니다.</p>
+                
+                <div class="card-grid">
+                    <div class="card style-card" onclick="selectStyle(this, 'action')">
+                        <div class="style-preview" style="background-image: url('https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/11.png'); background-size: cover; background-position: center;">
+                        </div>
+                        <h3 style="font-weight: 600; margin-bottom: 4px;">액션 스타일</h3>
+                        <p style="font-size: 12px; color: #718096;">빠른 편집, 강렬한 움직임, 역동적인 카메라 워크</p>
+                    </div>
+                    
+                    <div class="card style-card" onclick="selectStyle(this, 'romance')">
+                        <div class="style-preview" style="background-image: url('https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/12.png'); background-size: cover; background-position: center;">
+                        </div>
+                        <h3 style="font-weight: 600; margin-bottom: 4px;">멜로드라마 스타일</h3>
+                        <p style="font-size: 12px; color: #718096;">부드러운 전환, 클로즈업, 감성적 분위기</p>
+                    </div>
+                    
+                    <div class="card style-card" onclick="selectStyle(this, 'thriller')">
+                        <div class="style-preview" style="background-image: url('https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/13.png'); background-size: cover; background-position: center;">
+                        </div>
+                        <h3 style="font-weight: 600; margin-bottom: 4px;">스릴러 스타일</h3>
+                        <p style="font-size: 12px; color: #718096;">긴장감, 앵글 변화, 미스터리한 분위기</p>
+                    </div>
+                    
+                    <div class="card style-card" onclick="selectStyle(this, 'comedy')">
+                        <div class="style-preview" style="background-image: url('https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/14.png'); background-size: cover; background-position: center;">
+                        </div>
+                        <h3 style="font-weight: 600; margin-bottom: 4px;">코미디 스타일</h3>
+                        <p style="font-size: 12px; color: #718096;">경쾌한 리듬, 유머러스한 구성, 밝은 분위기</p>
+                    </div>
+                    
+                    <div class="card style-card" onclick="selectStyle(this, 'documentary')">
+                        <div class="style-preview" style="background-image: url('https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/15.png'); background-size: cover; background-position: center;">
+                        </div>
+                        <h3 style="font-weight: 600; margin-bottom: 4px;">다큐멘터리 스타일</h3>
+                        <p style="font-size: 12px; color: #718096;">안정적 카메라, 현실적 톤, 신뢰감 있는 분위기</p>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-outline" onclick="prevStep()">이전 단계</button>
+                    <button class="btn btn-primary" id="step4Next" onclick="nextStep()" disabled>다음 단계</button>
+                </div>
+            </div>
+
+            <!-- 5단계: 시나리오 확인 -->
+            <div class="step-content" id="step5">
+                <div class="progress-indicator">
+                    <div class="progress-text">5/7 단계 - 시나리오 확인</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 71%"></div>
+                    </div>
+                </div>
+                
+                <h1 class="heading">🎬 AI가 생성한 시나리오를 확인해주세요</h1>
+                <p style="color: #718096; margin-bottom: 24px;">선택하신 정보를 바탕으로 최적화된 광고 시나리오를 생성했습니다. 그대로 사용하시거나 수정하실 수 있습니다.</p>
+                
+                <!-- 생성된 시나리오 -->
+                <div style="background: #f7fafc; border-radius: 12px; padding: 24px; margin-bottom: 24px; border-left: 4px solid #3182ce;">
+                    <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                        <h3 style="margin: 0; margin-right: 12px;">📝 생성된 시나리오</h3>
+                        <span style="background: #38a169; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">AI 추천</span>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+                        <div style="display: grid; grid-template-columns: 1fr 3fr; gap: 16px; margin-bottom: 16px;">
+                            <div>
+                                <strong>🎭 장면 1 (0-5초)</strong>
+                                <p style="font-size: 12px; color: #718096; margin: 4px 0;">오프닝</p>
+                            </div>
+                            <div>
+                                <div id="scene1Text" style="line-height: 1.6;">
+                                    매력적인 모델이 화면에 등장하며 밝은 미소를 지으며 제품을 소개합니다. "안녕하세요! 오늘 특별한 제품을 소개해드릴게요."
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 3fr; gap: 16px; margin-bottom: 16px;">
+                            <div>
+                                <strong>🏷️ 장면 2 (5-10초)</strong>
+                                <p style="font-size: 12px; color: #718096; margin: 4px 0;">제품 소개</p>
+                            </div>
+                            <div>
+                                <div id="scene2Text" style="line-height: 1.6;">
+                                    제품의 핵심 기능과 장점을 강조하며 실제 사용 모습을 보여줍니다. "이 제품의 놀라운 효과를 직접 확인해보세요!"
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 3fr; gap: 16px;">
+                            <div>
+                                <strong>✨ 장면 3 (10-15초)</strong>
+                                <p style="font-size: 12px; color: #718096; margin: 4px 0;">마무리</p>
+                            </div>
+                            <div>
+                                <div id="scene3Text" style="line-height: 1.6;">
+                                    강력한 콜투액션과 함께 제품명을 다시 한번 강조합니다. "지금 바로 구매하고 특별한 혜택을 받아보세요!"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 시나리오 수정 옵션 -->
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-outline" onclick="modifyScenario()">
+                            ✏️ 부분 수정
+                        </button>
+                        <button class="btn btn-outline" onclick="replaceScenario()" style="border-color: #ed8936; color: #ed8936;">
+                            🔄 전면 교체
+                        </button>
+                        <div style="flex: 1;"></div>
+                        <button class="btn btn-primary" onclick="approveScenario()">
+                            👍 이 시나리오로 진행
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 수정 모드 (숨김 상태) -->
+                <div id="editMode" style="display: none; background: #fff5f5; border-radius: 12px; padding: 24px; margin-bottom: 24px; border-left: 4px solid #e53e3e;">
+                    <h3 style="margin-bottom: 16px;">✏️ 시나리오 수정</h3>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label style="font-weight: 500; margin-bottom: 8px; display: block;">장면 1 (오프닝):</label>
+                        <textarea id="editScene1" class="form-input" rows="2" style="resize: vertical;">매력적인 모델이 화면에 등장하며 밝은 미소를 지으며 제품을 소개합니다. "안녕하세요! 오늘 특별한 제품을 소개해드릴게요."</textarea>
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label style="font-weight: 500; margin-bottom: 8px; display: block;">장면 2 (제품 소개):</label>
+                        <textarea id="editScene2" class="form-input" rows="2" style="resize: vertical;">제품의 핵심 기능과 장점을 강조하며 실제 사용 모습을 보여줍니다. "이 제품의 놀라운 효과를 직접 확인해보세요!"</textarea>
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label style="font-weight: 500; margin-bottom: 8px; display: block;">장면 3 (마무리):</label>
+                        <textarea id="editScene3" class="form-input" rows="2" style="resize: vertical;">강력한 콜투액션과 함께 제품명을 다시 한번 강조합니다. "지금 바로 구매하고 특별한 혜택을 받아보세요!"</textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-outline" onclick="cancelEdit()">취소</button>
+                        <button class="btn btn-primary" onclick="saveEdit()">수정 완료</button>
+                    </div>
+                </div>
+                
+                <!-- 교체 모드 (숨김 상태) -->
+                <div id="replaceMode" style="display: none; background: #fffaf0; border-radius: 12px; padding: 24px; margin-bottom: 24px; border-left: 4px solid #ed8936;">
+                    <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                        <h3 style="margin: 0; margin-right: 12px;">🔄 시나리오 전면 교체</h3>
+                        <span style="background: #ed8936; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">5 토큰 소모</span>
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label style="font-weight: 500; margin-bottom: 8px; display: block;">새로운 시나리오 요청사항:</label>
+                        <textarea id="newScenarioRequest" class="form-input" rows="3" placeholder="예: 더 감성적이고 따뜻한 느낌으로, 가족 중심의 메시지로 변경해주세요"></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-outline" onclick="cancelReplace()">취소</button>
+                        <button class="btn btn-primary" onclick="generateNewScenario()">새 시나리오 생성 (5 토큰)</button>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-outline" onclick="prevStep()">이전 단계</button>
+                    <button class="btn btn-primary" id="step5Next" onclick="nextStep()" disabled style="display: none;">시나리오 승인하고 다음 단계</button>
+                </div>
+            </div>
+
+            <!-- 6단계: 영상 제작 -->
+            <div class="step-content" id="step6">
+                <div class="progress-indicator">
+                    <div class="progress-text">6/7 단계 - 영상 제작</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 85%"></div>
+                    </div>
+                </div>
+                
+                <p style="color: #718096; margin-bottom: 32px;">선택하신 시나리오와 이미지로 AI가 최고 품질의 영상을 제작하고 있습니다.</p>
+                
+                <!-- 진행중 표시 -->
+                <div id="videoCreationProgress" style="display: block; background: #f0fff4; border-radius: 12px; padding: 32px; text-align: center; border-left: 4px solid #38a169;">
+                    <div style="font-size: 64px; margin-bottom: 16px;">🎬</div>
+                    <h2 style="margin-bottom: 16px; color: #2d3748;">영상 제작 중...</h2>
+                    <p style="color: #718096; margin-bottom: 24px;">AI가 최고 품질의 영상을 제작하고 있습니다. 잠시만 기다려주세요.</p>
+                    
+                    <div style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-weight: 500;">진행 상황</span>
+                            <span id="progressPercentage">15%</span>
+                        </div>
+                        <div style="background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div id="progressBar" style="background: linear-gradient(90deg, #38a169, #48bb78); height: 100%; width: 15%; transition: width 0.5s ease;"></div>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 14px; color: #718096;" id="progressStatus">시나리오 분석 중...</div>
+                    </div>
+                    
+                    <div style="font-size: 14px; color: #718096;">
+                        예상 완료 시간: <strong>약 3-5분</strong>
+                    </div>
+                </div>
+                
+                <div class="action-buttons" id="step6Actions">
+                    <button class="btn btn-outline" onclick="prevStep()">이전 단계</button>
+                    <button class="btn btn-primary" id="step6Next" onclick="nextStep()" disabled style="display: none;">다음 단계</button>
+                </div>
+                
+                <!-- 이미지 시안 선택 섹션 (숨김 상태) -->
+                <div id="imagePreviewSection" style="display: none;">
+                    <h2 style="margin-bottom: 24px; color: #2d3748;">🖼️ 이미지 시안을 선택해주세요</h2>
+                    <p style="color: #718096; margin-bottom: 24px;">각 컷별로 4개의 시안 중 마음에 드는 이미지를 선택하세요. 선택된 이미지들로 최종 영상이 제작됩니다.</p>
+                    
+                    <div class="subheading">컷 1: 오프닝 장면</div>
+                    <div class="image-grid">
+                        <div class="image-option" onclick="selectImage(this, 'cut1', 'img1')">
+                            <img src="https://picsum.photos/400/225?random=1" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 1-1">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut1', 'img2')">
+                            <img src="https://picsum.photos/400/225?random=2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 1-2">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut1', 'img3')">
+                            <img src="https://picsum.photos/400/225?random=3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 1-3">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut1', 'img4')">
+                            <img src="https://picsum.photos/400/225?random=4" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 1-4">
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" style="margin-top: 8px;" onclick="regenerateImages('cut1')">이 컷 다시 생성 (3 토큰)</button>
+                    
+                    <div class="subheading" style="margin-top: 32px;">컷 2: 제품 소개</div>
+                    <div class="image-grid">
+                        <div class="image-option" onclick="selectImage(this, 'cut2', 'img1')">
+                            <img src="https://picsum.photos/400/225?random=5" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 2-1">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut2', 'img2')">
+                            <img src="https://picsum.photos/400/225?random=6" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 2-2">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut2', 'img3')">
+                            <img src="https://picsum.photos/400/225?random=7" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 2-3">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut2', 'img4')">
+                            <img src="https://picsum.photos/400/225?random=8" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 2-4">
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" style="margin-top: 8px;" onclick="regenerateImages('cut2')">이 컷 다시 생성 (3 토큰)</button>
+                    
+                    <div class="subheading" style="margin-top: 32px;">컷 3: 마무리 장면</div>
+                    <div class="image-grid">
+                        <div class="image-option" onclick="selectImage(this, 'cut3', 'img1')">
+                            <img src="https://picsum.photos/400/225?random=9" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 3-1">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut3', 'img2')">
+                            <img src="https://picsum.photos/400/225?random=10" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 3-2">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut3', 'img3')">
+                            <img src="https://picsum.photos/400/225?random=11" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 3-3">
+                        </div>
+                        <div class="image-option" onclick="selectImage(this, 'cut3', 'img4')">
+                            <img src="https://picsum.photos/400/225?random=12" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="시안 3-4">
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" style="margin-top: 8px;" onclick="regenerateImages('cut3')">이 컷 다시 생성 (3 토큰)</button>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-outline" onclick="backToVideoOptions()">이전으로</button>
+                        <button class="btn btn-primary" id="step6ImageNext" onclick="startVideoWithSelectedImages()" disabled>선택된 이미지로 영상 제작</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7단계: 결과 확인 (이전 8단계, 간소화된 플로우) -->
+            <div class="step-content" id="step7">
+                <div class="progress-indicator">
+                    <div class="progress-text">7/7 단계 - 결과 확인</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <h1 class="heading">🎉 광고 영상이 완성되었습니다!</h1>
+                <p style="color: #718096; margin-bottom: 32px;">xBrush AI가 제작한 당신만의 전문 광고 영상을 확인해보세요.</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;">
+                    <!-- 영상 미리보기 -->
+                    <div>
+                        <video 
+                            style="width: 100%; height: auto; max-height: 400px; background: #000; border-radius: 12px; margin-bottom: 16px; object-fit: contain;"
+                            src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/1.mp4"
+                            autoplay
+                            controls
+                            loop
+                            muted>
+                        </video>
+                        
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-primary" style="flex: 1;" onclick="downloadVideo()">
+                                다운로드
+                            </button>
+                            <button class="btn btn-outline" onclick="shareVideo()">
+                                공유하기
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 영상 정보 -->
+                    <div>
+                        <div style="background: #f7fafc; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                            <h3 style="font-weight: 600; margin-bottom: 16px;">영상 정보</h3>
+                            <div style="margin-bottom: 12px;">
+                                <strong>제품:</strong> <span id="finalProduct">-</span>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <strong>타겟:</strong> <span id="finalTarget">-</span>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <strong>스타일:</strong> <span id="finalStyle">-</span>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <strong>형식:</strong> <span id="finalFormat">-</span>
+                            </div>
+                            <div>
+                                <strong>길이:</strong> <span id="finalDuration">-</span>초
+                            </div>
+                        </div>
+                        
+                        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+                            <h3 style="font-weight: 600; margin-bottom: 16px; color: #38a169;">만족도 평가</h3>
+                            <p style="color: #718096; margin-bottom: 16px; font-size: 14px;">이 영상을 광고로 사용하시겠습니까?</p>
+                            
+                            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                                <button class="btn btn-primary" onclick="satisfiedWithVideo()">
+                                    👍 만족합니다
+                                </button>
+                                <button class="btn btn-outline" onclick="showAdvancedEdit()">
+                                    🎨 고급 편집 모드
+                                </button>
+                            </div>
+                            
+                            <p style="color: #718096; font-size: 12px;">
+                                더 세밀한 편집이 필요하시다면 
+                                <a href="#" style="color: #3182ce;">추천 편집 앱</a>을 
+                                확인해보세요.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 부분 재생성 옵션 (숨김 상태) -->
+                <div id="partialRegenerateSection" style="display: none; margin-top: 32px; background: #fffaf0; border-radius: 12px; padding: 32px; border-left: 4px solid #ed8936;">
+                    <h3 style="margin-bottom: 16px; color: #2d3748;">🎬 부분 재생성 옵션</h3>
+                    <p style="color: #718096; margin-bottom: 24px;">마음에 들지 않는 특정 장면만 다시 제작할 수 있습니다. 전체를 다시 만들 필요가 없어요!</p>
+                    
+                    <!-- 3개 컷 선택 -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+                        <div class="card partial-regenerate-option" onclick="selectCutToRegenerate('cut1')" style="padding: 20px; text-align: center; cursor: pointer; border: 2px solid #e2e8f0; transition: all 0.2s ease;">
+                            <div style="aspect-ratio: 16/9; background: #000; border-radius: 8px; margin-bottom: 12px; position: relative; overflow: hidden;">
+                                <video style="width: 100%; height: 100%; object-fit: cover;" muted>
+                                    <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/2.mp4" type="video/mp4">
+                                </video>
+                                <div style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">0-5초</div>
+                            </div>
+                            <h4 style="margin-bottom: 8px; font-size: 14px;">컷 1: 오프닝</h4>
+                            <p style="font-size: 12px; color: #718096;">제품 소개 장면</p>
+                            <div style="margin-top: 12px;">
+                                <span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px;">5 토큰</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card partial-regenerate-option" onclick="selectCutToRegenerate('cut2')" style="padding: 20px; text-align: center; cursor: pointer; border: 2px solid #e2e8f0; transition: all 0.2s ease;">
+                            <div style="aspect-ratio: 16/9; background: #000; border-radius: 8px; margin-bottom: 12px; position: relative; overflow: hidden;">
+                                <video style="width: 100%; height: 100%; object-fit: cover;" muted>
+                                    <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/3.mp4" type="video/mp4">
+                                </video>
+                                <div style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">5-10초</div>
+                            </div>
+                            <h4 style="margin-bottom: 8px; font-size: 14px;">컷 2: 제품 시연</h4>
+                            <p style="font-size: 12px; color: #718096;">핵심 기능 설명</p>
+                            <div style="margin-top: 12px;">
+                                <span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px;">5 토큰</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card partial-regenerate-option" onclick="selectCutToRegenerate('cut3')" style="padding: 20px; text-align: center; cursor: pointer; border: 2px solid #e2e8f0; transition: all 0.2s ease;">
+                            <div style="aspect-ratio: 16/9; background: #000; border-radius: 8px; margin-bottom: 12px; position: relative; overflow: hidden;">
+                                <video style="width: 100%; height: 100%; object-fit: cover;" muted>
+                                    <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/4.mp4" type="video/mp4">
+                                </video>
+                                <div style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">10-15초</div>
+                            </div>
+                            <h4 style="margin-bottom: 8px; font-size: 14px;">컷 3: 마무리</h4>
+                            <p style="font-size: 12px; color: #718096;">콜투액션 및 브랜딩</p>
+                            <div style="margin-top: 12px;">
+                                <span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px;">5 토큰</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; justify-content: center;">
+                        <button class="btn btn-outline" onclick="hideRegenerateOptions()">취소</button>
+                        <button class="btn btn-outline" onclick="regenerateEntireVideo()" style="border-color: #e53e3e; color: #e53e3e;">
+                            🔄 전체 다시 제작 (15 토큰)
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Advanced Edit Mode Section -->
+                <div id="advancedEditSection" style="display: none; margin-top: 32px; background: #f8f9fa; border-radius: 12px; padding: 32px; border-left: 4px solid #6366f1;">
+                    <h3 style="margin-bottom: 16px; color: #2d3748;">🎨 고급 편집 모드</h3>
+                    <p style="color: #718096; margin-bottom: 24px;">영상의 특정 부분을 수정하거나 새로운 이미지로 다시 제작할 수 있습니다.</p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <!-- Option 1: Regenerate from Same Image -->
+                        <div class="card" style="padding: 24px; text-align: center; cursor: pointer;" onclick="selectEditOption('regenerate-video')">
+                            <div style="font-size: 48px; margin-bottom: 16px;">🎬</div>
+                            <h4 style="margin-bottom: 8px;">영상만 다시 제작</h4>
+                            <p style="color: #718096; font-size: 14px; margin-bottom: 16px;">같은 이미지로 영상 스타일이나 편집을 변경</p>
+                            <div style="background: #e3f2fd; padding: 8px 12px; border-radius: 6px; font-size: 12px; color: #1976d2;">
+                                비용: 5 토큰
+                            </div>
+                        </div>
+                        
+                        <!-- Option 2: Regenerate from New Image -->
+                        <div class="card" style="padding: 24px; text-align: center; cursor: pointer;" onclick="selectEditOption('regenerate-image')">
+                            <div style="font-size: 48px; margin-bottom: 16px;">🖼️</div>
+                            <h4 style="margin-bottom: 8px;">새 이미지로 제작</h4>
+                            <p style="color: #718096; font-size: 14px; margin-bottom: 16px;">이미지 선택부터 다시 시작</p>
+                            <div style="background: #fff3e0; padding: 8px 12px; border-radius: 6px; font-size: 12px; color: #f57c00;">
+                                비용: 10 토큰
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 24px; text-align: center;">
+                        <button class="btn btn-outline" onclick="hideAdvancedEdit()">취소</button>
+                    </div>
+                </div>
+                
+                <!-- CTA 배너 간소화 -->
+                <div class="cta-banner" style="background: linear-gradient(135deg, #ed8936, #f6ad55);" onclick="applyAsModel()">
+                    <div class="shine"></div>
+                    <div style="position: relative; z-index: 1;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 600;">🌟 AI 모델로 활동하고 수익 창출하기</h3>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-outline" onclick="startOver()">새 광고 만들기</button>
+                    <button class="btn btn-primary" onclick="goToLibrary()">내 광고 보관함</button>
+                </div>
+            </div>
+
+            <!-- 8단계: 최종 완성 (새로운 간소화된 완성 단계) -->
+            <div class="step-content" id="step8">
+                <div class="progress-indicator">
+                    <div class="progress-text">완성! - 최종 결과</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <h1 class="heading">🎉 광고 영상이 완성되었습니다!</h1>
+                <p style="color: #718096; margin-bottom: 32px;">xBrush AI가 제작한 당신만의 전문 광고 영상을 확인해보세요.</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;">
+                    <!-- 영상 미리보기 -->
+                    <div>
+                        <video 
+                            style="width: 100%; height: auto; max-height: 400px; background: #000; border-radius: 12px; margin-bottom: 16px; object-fit: contain;"
+                            src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/1.mp4"
+                            autoplay
+                            controls
+                            loop
+                            muted>
+                        </video>
+                        
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-primary" style="flex: 1;" onclick="downloadVideo()">
+                                다운로드
+                            </button>
+                            <button class="btn btn-outline" onclick="shareVideo()">
+                                공유하기
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 영상 정보 -->
+                    <div>
+                        <div style="background: #f7fafc; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                            <h3 style="font-weight: 600; margin-bottom: 16px;">영상 정보</h3>
+                            <div style="margin-bottom: 12px;">
+                                <strong>제품:</strong> <span id="finalProduct">-</span>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <strong>타겟:</strong> <span id="finalTarget">-</span>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <strong>스타일:</strong> <span id="finalStyle">-</span>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <strong>형식:</strong> <span id="finalFormat">-</span>
+                            </div>
+                            <div>
+                                <strong>길이:</strong> <span id="finalDuration">-</span>초
+                            </div>
+                        </div>
+                        
+                        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+                            <h3 style="font-weight: 600; margin-bottom: 16px; color: #38a169;">만족도 평가</h3>
+                            <p style="color: #718096; margin-bottom: 16px; font-size: 14px;">이 영상을 광고로 사용하시겠습니까?</p>
+                            
+                            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                                <button class="btn btn-primary" onclick="satisfiedWithVideo()">
+                                    👍 만족합니다
+                                </button>
+                                <button class="btn btn-outline" onclick="regenerateVideo()">
+                                    🔄 다시 제작
+                                </button>
+                            </div>
+                            
+                            <p style="color: #718096; font-size: 12px;">
+                                더 세밀한 편집이 필요하시다면 
+                                <a href="#" style="color: #3182ce;">추천 편집 앱</a>을 
+                                확인해보세요.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CTA 배너 간소화 -->
+                <div class="cta-banner" style="background: linear-gradient(135deg, #ed8936, #f6ad55);" onclick="applyAsModel()">
+                    <div class="shine"></div>
+                    <div style="position: relative; z-index: 1;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 600;">🌟 AI 모델로 활동하고 수익 창출하기</h3>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-outline" onclick="startOver()">새 광고 만들기</button>
+                    <button class="btn btn-primary" onclick="goToLibrary()">내 광고 보관함</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    </style>
+
+    <script>
+        // ========================================
+        // 이미지 URL 설정 (여기만 수정하면 됩니다!)
+        // ========================================
+        
+        const MODEL_IMAGES = {
+            // 버츄얼 모델 이미지 (4개)
+            virtual1: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/7.png',
+            virtual2: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/8.png', 
+            virtual3: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/9.png',
+            virtual4: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/10.png',
+            
+            // 실제 배우 이미지 (6개) - 임시로 랜덤 이미지 사용
+            actor1: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/chae.png',  // 채연
+            actor2: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/2.png',  // 아이유
+            actor3: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/3.png',  // 이정재
+            actor4: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/4.png',  // 전지현
+            actor5: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/5.png',  // 박서준
+            actor6: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/6.png'  // 손예진
+        };
+
+        let currentStep = 1;
+        let selectedData = {
+            model: null,
+            modelTier: null,
+            productName: '',
+            targetAudience: '',
+            coreMessage: '',
+            tone: '',
+            format: null,
+            duration: null,
+            style: null,
+            scenarioApproved: false,
+            selectedImages: {
+                cut1: null,
+                cut2: null,
+                cut3: null
+            },
+            videoCreated: false
+        };
+
+        // 단계 이동 함수
+        function goToStep(step) {
+            // 이전 단계들이 완료되었는지 확인
+            if (step > 1 && !isStepCompleted(step - 1)) {
+                return;
+            }
+            
+            // 현재 단계 비활성화
+            const currentStepElement = document.getElementById(`step${currentStep}`);
+            if (currentStepElement) currentStepElement.classList.remove('active');
+            
+            const currentStepNav = document.querySelector(`[data-step="${currentStep}"]`);
+            if (currentStepNav) currentStepNav.classList.remove('active');
+            
+            // 새 단계 활성화
+            currentStep = step;
+            const newStepElement = document.getElementById(`step${currentStep}`);
+            if (newStepElement) newStepElement.classList.add('active');
+            
+            const newStepNav = document.querySelector(`[data-step="${currentStep}"]`);
+            if (newStepNav) newStepNav.classList.add('active');
+            
+            // 완료된 단계들 표시
+            for (let i = 1; i < currentStep; i++) {
+                const stepNav = document.querySelector(`[data-step="${i}"]`);
+                if (stepNav) {
+                    stepNav.classList.add('completed');
+                    stepNav.classList.remove('active');
+                }
+            }
+            
+            // 진행률 바 업데이트
+            updateProgressLine();
+            
+            // Auto-trigger video creation when entering Step 6
+            if (step === 6) {
+                // Start video creation automatically
+                setTimeout(() => {
+                    startAutomaticVideoCreation();
+                }, 500); // Small delay for smooth UX
+            }
+            
+            // 7단계면 최종 정보 업데이트 (updated from step 8)
+            if (step === 7) {
+                updateFinalInfo();
+            }
+            
+            // 6단계 이후에는 이전 버튼 비활성화
+            updatePrevButtonState();
+        }
+        
+        // 이전 버튼 상태 업데이트
+        function updatePrevButtonState() {
+            const prevButtons = document.querySelectorAll('.action-buttons .btn-outline');
+            prevButtons.forEach(button => {
+                if (button.textContent.includes('이전 단계')) {
+                    if (currentStep >= 6) {
+                        button.disabled = true;
+                        button.classList.add('btn-disabled');
+                        button.title = '이미지 생성 이후에는 이전 단계로 돌아갈 수 없습니다';
+                    } else {
+                        button.disabled = false;
+                        button.classList.remove('btn-disabled');
+                        button.title = '';
+                    }
+                }
+            });
+        }
+
+        function nextStep() {
+            if (currentStep < 8) {
+                goToStep(currentStep + 1);
+            }
+        }
+
+        function prevStep() {
+            // 6단계(이미지 시안) 이후부터는 되돌아가기 제한
+            if (currentStep >= 6) {
+                showToast('⚠️ 이미지 생성 이후에는 이전 단계로 돌아갈 수 없습니다.');
+                return;
+            }
+            
+            if (currentStep > 1) {
+                goToStep(currentStep - 1);
+            }
+        }
+
+        // Automatic video creation function for streamlined Step 6
+        function startAutomaticVideoCreation() {
+            // Hide step 6 action buttons immediately
+            const step6Actions = document.getElementById('step6Actions');
+            if (step6Actions) {
+                step6Actions.style.display = 'none';
+            }
+            
+            // Start progress simulation
+            let progress = 15;
+            const statuses = [
+                '시나리오 분석 중...',
+                'AI 모델 준비 중...',
+                '첫 번째 장면 생성 중...',
+                '두 번째 장면 생성 중...',
+                '세 번째 장면 생성 중...',
+                '장면들 연결 중...',
+                '오디오 추가 중...',
+                '최종 편집 중...',
+                '영상 완성!'
+            ];
+            
+            let statusIndex = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 12 + 8;
+                if (progress > 100) progress = 100;
+                
+                const progressBar = document.getElementById('progressBar');
+                const progressPercentage = document.getElementById('progressPercentage');
+                const progressStatus = document.getElementById('progressStatus');
+                
+                if (progressBar) progressBar.style.width = progress + '%';
+                if (progressPercentage) progressPercentage.textContent = Math.round(progress) + '%';
+                
+                if (statusIndex < statuses.length && progressStatus) {
+                    progressStatus.textContent = statuses[statusIndex];
+                    statusIndex++;
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    // Mark video creation as completed
+                    selectedData.videoCreated = true;
+                    // Auto-navigate to Step 7 after completion
+                    setTimeout(() => {
+                        showToast('영상 제작이 완료되었습니다! 🎉');
+                        goToStep(7); // Auto-navigate to results
+                    }, 1000);
+                }
+            }, 800);
+        }
+
+        // 진행률 바 업데이트
+        function updateProgressLine() {
+            const progressLine = document.getElementById('progressLine');
+            let progress = ((currentStep - 1) / 7) * 100;
+            progressLine.style.width = progress + '%';
+        }
+
+        // 단계 완료 확인
+        function isStepCompleted(step) {
+            switch(step) {
+                case 1: return selectedData.model !== null;
+                case 2: return selectedData.productName !== '' && selectedData.targetAudience !== '' && selectedData.coreMessage !== '' && selectedData.tone !== '';
+                case 3: return selectedData.format !== null && selectedData.duration !== null;
+                case 4: return selectedData.style !== null;
+                case 5: return selectedData.scenarioApproved === true;
+                case 6: return selectedData.videoCreated === true; // Updated for streamlined flow
+                case 7: return true; // Step 7 is always accessible after Step 6
+                default: return true;
+            }
+        }
+
+        // 다음 버튼 활성화 확인
+        function checkNextButton() {
+            const isCompleted = isStepCompleted(currentStep);
+            const nextButton = document.getElementById(`step${currentStep}Next`);
+            if (nextButton) {
+                nextButton.disabled = !isCompleted;
+                
+                // 버튼 스타일 업데이트
+                if (isCompleted) {
+                    nextButton.classList.remove('btn-disabled');
+                    nextButton.classList.add('btn-primary');
+                } else {
+                    nextButton.classList.add('btn-disabled');
+                    nextButton.classList.remove('btn-primary');
+                }
+            }
+        }
+
+        // 1단계: 모델 선택 (크레딧 시스템 포함)
+        function selectModel(element, modelId, tier) {
+            // 기존 선택 해제
+            document.querySelectorAll('#step1 .card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // 새 선택 적용
+            element.classList.add('selected');
+            selectedData.model = modelId;
+            selectedData.modelTier = tier;
+            
+            // 프리미엄 모델 선택 시 크레딧 알림
+            if (tier === 'premium') {
+                showToast('🎬 프리미엄 배우가 선택되었습니다! 100 크레딧이 차감됩니다.');
+            }
+            
+            checkNextButton();
+        }
+
+        // 2단계: 입력 필드 감지
+        function setupFormValidation() {
+            const inputs = ['productName', 'targetAudience', 'coreMessage', 'tone'];
+            inputs.forEach(inputId => {
+                const element = document.getElementById(inputId);
+                element.addEventListener('input', () => {
+                    selectedData[inputId] = element.value;
+                    checkNextButton();
+                });
+                element.addEventListener('change', () => {
+                    selectedData[inputId] = element.value;
+                    checkNextButton();
+                });
+            });
+        }
+
+        // 3단계: 형식 선택
+        function selectFormat(element, formatId) {
+            // 기존 선택 해제
+            document.querySelectorAll('#step3 .card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // 새 선택 적용
+            element.classList.add('selected');
+            selectedData.format = formatId;
+            checkNextButton();
+        }
+
+        function selectDuration(element, duration) {
+            // 기존 선택 해제
+            element.parentElement.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // 새 선택 적용
+            element.classList.add('selected');
+            selectedData.duration = duration;
+            checkNextButton();
+        }
+
+        // 4단계: 스타일 선택
+        function selectStyle(element, styleId) {
+            // 기존 선택 해제
+            document.querySelectorAll('#step4 .card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // 새 선택 적용
+            element.classList.add('selected');
+            selectedData.style = styleId;
+            checkNextButton();
+        }
+
+        // 5단계: 이미지 선택
+        function selectImage(element, cut, imageId) {
+            // 해당 컷의 기존 선택 해제
+            element.parentElement.querySelectorAll('.image-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // 새 선택 적용
+            element.classList.add('selected');
+            selectedData.selectedImages[cut] = imageId;
+            checkNextButton();
+            
+            // 이미지 선택 시 이미지 제작 버튼 상태 업데이트
+            checkImageSelectionButton();
+        }
+
+        function regenerateImages(cut) {
+            // 유료 기능 확인
+            const cutName = cut.replace('cut', '컷 ');
+            if (!confirm(`🎨 ${cutName} 이미지를 다시 생성하시겠습니까?\n\n💰 비용: 3 토큰\n⏱️ 생성 시간: 약 30초\n\n※ 토큰이 차감되며, 기존 이미지들이 새로 생성됩니다.`)) {
+                return;
+            }
+            
+            showToast(`💰 3 토큰이 차감되고 ${cutName} 이미지를 다시 생성합니다.`);
+            
+            // 해당 컷의 컨테이너와 버튼을 정확히 찾기
+            const step6 = document.getElementById('step6');
+            let cutContainer;
+            let button;
+            
+            if (cut === 'cut1') {
+                // 첫 번째 "컷 1: 오프닝 장면" 섹션
+                const subheadings = step6.querySelectorAll('.subheading');
+                const firstSubheading = Array.from(subheadings).find(h => h.textContent.includes('컷 1'));
+                if (firstSubheading) {
+                    cutContainer = firstSubheading.nextElementSibling;
+                    button = cutContainer.nextElementSibling;
+                }
+            } else if (cut === 'cut2') {
+                // 두 번째 "컷 2: 제품 소개" 섹션
+                const subheadings = step6.querySelectorAll('.subheading');
+                const secondSubheading = Array.from(subheadings).find(h => h.textContent.includes('컷 2'));
+                if (secondSubheading) {
+                    cutContainer = secondSubheading.nextElementSibling;
+                    button = cutContainer.nextElementSibling;
+                }
+            } else if (cut === 'cut3') {
+                // 세 번째 "컷 3: 마무리 장면" 섹션
+                const subheadings = step6.querySelectorAll('.subheading');
+                const thirdSubheading = Array.from(subheadings).find(h => h.textContent.includes('컷 3'));
+                if (thirdSubheading) {
+                    cutContainer = thirdSubheading.nextElementSibling;
+                    button = cutContainer.nextElementSibling;
+                }
+            }
+            
+            if (!cutContainer || !button) {
+                console.error('Container or button not found for', cut);
+                console.log('cutContainer:', cutContainer);
+                console.log('button:', button);
+                return;
+            }
+            
+            // 버튼 비활성화 및 로딩 상태
+            button.disabled = true;
+            button.innerHTML = '<div style="width: 16px; height: 16px; border: 2px solid #e2e8f0; border-top: 2px solid #3182ce; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; display: inline-block;"></div>생성 중...';
+            
+            // 기존 이미지들 로딩 상태로 변경
+            const imageOptions = cutContainer.querySelectorAll('.image-option');
+            imageOptions.forEach((option, index) => {
+                option.classList.remove('selected');
+                option.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                        <div style="width: 24px; height: 24px; border: 2px solid #e2e8f0; border-top: 2px solid #3182ce; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 8px;"></div>
+                        <span style="font-size: 10px; color: #a0aec0;">생성 중...</span>
+                    </div>
+                `;
+            });
+            
+            // 선택된 이미지 초기화
+            selectedData.selectedImages[cut] = null;
+            checkNextButton();
+            
+            // 3초 후 새로운 이미지들 표시
+            setTimeout(() => {
+                imageOptions.forEach((option, index) => {
+                    const cutNumber = cut.replace('cut', '');
+                    const randomId = Date.now() + index; // 현재 시간 + 인덱스로 고유한 랜덤 ID 생성
+                    
+                    // 새로운 이미지 HTML 생성
+                    option.innerHTML = `
+                        <img src="https://picsum.photos/400/225?random=${randomId}" 
+                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" 
+                             alt="시안 ${cutNumber}-${index + 1}">
+                    `;
+                    
+                    // 클릭 이벤트 다시 연결
+                    option.onclick = function() {
+                        selectImage(this, cut, `img${index + 1}`);
+                    };
+                    
+                    // 애니메이션 효과
+                    option.style.transform = 'scale(0.9)';
+                    option.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        option.style.transition = 'all 0.3s ease';
+                        option.style.transform = 'scale(1)';
+                        option.style.opacity = '1';
+                    }, index * 100);
+                });
+                
+                // 버튼 복원
+                button.disabled = false;
+                button.innerHTML = '이 컷 다시 생성 (3 토큰)';
+                
+                // 성공 메시지
+                showToast(`${cutName} 새로운 이미지가 생성되었습니다! (3 토큰 차감) ✨`);
+                
+            }, 3000);
+        }
+        
+        function getRandomColor() {
+            const colors = [
+                '#667eea', '#764ba2', '#f093fb', '#f5576c', 
+                '#4facfe', '#00f2fe', '#fa709a', '#fee140',
+                '#a8edea', '#fed6e3', '#ffecd2', '#fcb69f',
+                '#ff9a9e', '#fecfef', '#ffeef0', '#d299c2'
+            ];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        function showToast(message) {
+            // 토스트 메시지 생성
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: white;
+                color: #2d3748;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                border: 1px solid #e2e8f0;
+                z-index: 1000;
+                animation: slideInRight 0.3s ease;
+                font-size: 14px;
+                font-weight: 500;
+            `;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            // 3초 후 제거
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // 7단계: 최종 정보 업데이트
+        function updateFinalInfo() {
+            document.getElementById('finalProduct').textContent = selectedData.productName || '-';
+            document.getElementById('finalTarget').textContent = getTargetText(selectedData.targetAudience);
+            document.getElementById('finalStyle').textContent = getStyleText(selectedData.style);
+            document.getElementById('finalFormat').textContent = getFormatText(selectedData.format);
+            document.getElementById('finalDuration').textContent = selectedData.duration || '-';
+        }
+
+        function getTargetText(target) {
+            const targets = {
+                'teens': '10대 (13-19세)',
+                'twenties': '20대 (20-29세)',
+                'thirties': '30대 (30-39세)',
+                'forties': '40대 (40-49세)',
+                'fifties': '50대 이상',
+                'all': '전 연령대'
+            };
+            return targets[target] || '-';
+        }
+
+        function getStyleText(style) {
+            const styles = {
+                'action': '액션 스타일',
+                'romance': '멜로드라마 스타일',
+                'thriller': '스릴러 스타일',
+                'comedy': '코미디 스타일',
+                'documentary': '다큐멘터리 스타일'
+            };
+            return styles[style] || '-';
+        }
+
+        function getFormatText(format) {
+            const formats = {
+                'youtube': '유튜브 광고',
+                'instagram': '인스타그램 피드',
+                'reels': '인스타그램 릴스',
+                'shorts': '유튜브 쇼츠'
+            };
+            return formats[format] || '-';
+        }
+
+        // 최종 단계 액션들
+        function downloadVideo() {
+            alert('영상을 다운로드합니다!');
+        }
+
+        function shareVideo() {
+            alert('영상을 공유합니다!');
+        }
+
+
+        function regenerateVideo() {
+            // 유료 기능 알림
+            if (confirm('🔄 영상을 다시 제작하시겠습니까?\n\n💰 비용: 10 토큰\n⏱️ 제작 시간: 약 10-15분\n\n※ 토큰이 차감되며, 기존 영상은 삭제됩니다.')) {
+                showToast('시나리오 확인 단계로 돌아갑니다. 원하시면 시나리오나 이미지를 수정한 후 다시 제작하세요.');
+                
+                // 이미지 시안 선택 플래그 리셋 (사용자가 다시 선택할 수 있도록)
+                selectedData.hasChosenImagePreview = false;
+                
+                // 항상 Step 5로 이동하여 사용자가 선택할 수 있도록
+                goToStep(5);
+            }
+        }
+
+        function startOver() {
+            // 데이터 초기화
+            selectedData = {
+                model: null,
+                modelTier: null,
+                productName: '',
+                targetAudience: '',
+                coreMessage: '',
+                tone: '',
+                format: null,
+                duration: null,
+                style: null,
+                scenarioApproved: false,
+                selectedImages: {
+                    cut1: null,
+                    cut2: null,
+                    cut3: null
+                }
+            };
+            
+            // 첫 단계로 이동
+            goToStep(1);
+            
+            // 모든 단계 초기화
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('completed');
+            });
+            
+            // 모든 선택 해제
+            document.querySelectorAll('.card.selected').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // 폼 초기화
+            document.querySelectorAll('.form-input, .form-select').forEach(input => {
+                input.value = '';
+            });
+        }
+
+        function goToLibrary() {
+            alert('광고 보관함으로 이동합니다!');
+        }
+
+        // CTA 배너 클릭 함수
+        function applyAsModel() {
+            alert('모델 신청 페이지로 이동합니다! 🌟\n\n✅ 신청 프로세스:\n1. 얼굴 스캔 업로드\n2. 개인정보 입력\n3. 계약서 작성\n4. AI 모델 생성\n\n💰 예상 수익: 월 50-200만원');
+        }
+
+        // 5단계: 시나리오 관련 함수들
+        function modifyScenario() {
+            document.getElementById('editMode').style.display = 'block';
+            document.getElementById('replaceMode').style.display = 'none';
+        }
+
+        function replaceScenario() {
+            document.getElementById('replaceMode').style.display = 'block';
+            document.getElementById('editMode').style.display = 'none';
+        }
+
+        function approveScenario() {
+            selectedData.scenarioApproved = true;
+            checkNextButton();
+            
+            // Show the next button for Step 5
+            document.getElementById('step5Next').style.display = 'block';
+            
+            // 사용자가 이미지 시안 경로를 선택했는지 확인
+            if (selectedData.hasChosenImagePreview) {
+                showToast('시나리오가 승인되었습니다! 이미지 선택 페이지로 이동합니다.');
+                
+                // 이미지 선택 페이지로 이동
+                setTimeout(() => {
+                    showImagePreviewOption();
+                }, 1000);
+            } else {
+                showToast('시나리오가 승인되었습니다! 영상 제작을 시작할 수 있습니다.');
+                
+                // 자동으로 다음 단계로 이동
+                setTimeout(() => {
+                    nextStep();
+                }, 1000);
+            }
+        }
+
+        function cancelEdit() {
+            document.getElementById('editMode').style.display = 'none';
+        }
+
+        function saveEdit() {
+            // 수정된 내용을 메인 시나리오에 반영
+            document.getElementById('scene1Text').textContent = document.getElementById('editScene1').value;
+            document.getElementById('scene2Text').textContent = document.getElementById('editScene2').value;
+            document.getElementById('scene3Text').textContent = document.getElementById('scene3').value;
+            
+            document.getElementById('editMode').style.display = 'none';
+            showToast('시나리오가 수정되었습니다!');
+        }
+
+        function cancelReplace() {
+            document.getElementById('replaceMode').style.display = 'none';
+            document.getElementById('newScenarioRequest').value = '';
+        }
+
+        function generateNewScenario() {
+            const request = document.getElementById('newScenarioRequest').value;
+            if (!request.trim()) {
+                alert('새로운 시나리오 요청사항을 입력해주세요.');
+                return;
+            }
+            
+            // 로딩 상태 표시
+            const button = event.target;
+            button.disabled = true;
+            button.innerHTML = '<div style="width: 16px; height: 16px; border: 2px solid #e2e8f0; border-top: 2px solid #3182ce; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; display: inline-block;"></div>생성 중...';
+            
+            // 3초 후 새로운 시나리오 표시 (시뮬레이션)
+            setTimeout(() => {
+                // 새로운 시나리오 내용 (예시)
+                document.getElementById('scene1Text').textContent = '따뜻한 가족의 모습과 함께 제품이 자연스럽게 등장합니다. "가족과 함께하는 소중한 순간을 더욱 특별하게 만들어보세요."';
+                document.getElementById('scene2Text').textContent = '제품을 사용하는 가족들의 행복한 모습을 통해 감성적인 메시지를 전달합니다. "우리 가족만의 특별한 경험을 선사합니다."';
+                document.getElementById('scene3Text').textContent = '가족의 미소와 함께 브랜드 메시지를 따뜻하게 마무리합니다. "사랑하는 가족과 함께, 지금 시작하세요."';
+                
+                document.getElementById('replaceMode').style.display = 'none';
+                document.getElementById('newScenarioRequest').value = '';
+                
+                button.disabled = false;
+                button.innerHTML = '새 시나리오 생성 (5 토큰)';
+                
+                showToast('새로운 시나리오가 생성되었습니다! (5 토큰 차감)');
+            }, 3000);
+        }
+
+        // 이미지 시안 건너뛰기 (바로 영상 제작)
+        function skipImagePreview() {
+            selectedData.skipImagePreview = true;
+            goToStep(7); // 바로 영상 제작 단계로
+            showToast('이미지 시안을 건너뛰고 바로 영상 제작을 시작합니다!');
+        }
+
+        // 이미지 시안 보기
+        function showImagePreview() {
+            selectedData.skipImagePreview = false;
+            goToStep(6); // 이미지 시안 단계로
+            showToast('이미지 시안을 먼저 확인합니다!');
+        }
+
+        // 단계 클릭 이벤트
+        document.querySelectorAll('.step').forEach(step => {
+            step.addEventListener('click', () => {
+                const stepNumber = parseInt(step.getAttribute('data-step'));
+                
+                // 현재 단계가 6 이상이고, 클릭한 단계가 현재보다 이전이면 제한
+                if (currentStep >= 6 && stepNumber < currentStep) {
+                    showToast('⚠️ 이미지 생성 이후에는 이전 단계로 돌아갈 수 없습니다.');
+                    return;
+                }
+                
+                goToStep(stepNumber);
+            });
+        });
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            setupFormValidation();
+            updateProgressLine();
+            loadModelImages(); // 이미지 로드
+            
+            // 7단계 진입 시 자동으로 8단계로 이동 (시뮬레이션)
+            const originalGoToStep = goToStep;
+            goToStep = function(step) {
+                originalGoToStep(step);
+                if (step === 7) {
+                    setTimeout(() => {
+                        originalGoToStep(8);
+                    }, 3000); // 3초 후 완성 단계로
+                }
+            };
+        });
+        
+        // ========================================
+        // 이미지 로드 함수 (자동으로 이미지 적용)
+        // ========================================
+        function loadModelImages() {
+            // 모든 model-image 요소를 찾아서 이미지 적용
+            document.querySelectorAll('.model-image').forEach(element => {
+                const modelId = element.getAttribute('data-model');
+                if (MODEL_IMAGES[modelId]) {
+                    element.style.backgroundImage = `url('${MODEL_IMAGES[modelId]}')`;
+                }
+            });
+        }
+
+        // 6단계 영상 제작 관련 함수들
+        function startDirectVideoCreation() {
+            // 바로 영상 제작 시작
+            showToast('영상 제작을 시작합니다! ⚡');
+            
+            // 진행 표시
+            document.getElementById('videoCreationProgress').style.display = 'block';
+            document.getElementById('step6Actions').style.display = 'none';
+            
+            // 진행률 시뮬레이션
+            let progress = 15;
+            const statuses = [
+                '시나리오 분석 중...',
+                'AI 모델 준비 중...',
+                '첫 번째 장면 생성 중...',
+                '두 번째 장면 생성 중...',
+                '세 번째 장면 생성 중...',
+                '영상 편집 중...',
+                '최종 검토 중...',
+                '완성!'
+            ];
+            
+            let statusIndex = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15 + 5;
+                if (progress > 100) progress = 100;
+                
+                document.getElementById('progressBar').style.width = progress + '%';
+                document.getElementById('progressPercentage').textContent = Math.round(progress) + '%';
+                
+                if (statusIndex < statuses.length - 1) {
+                    document.getElementById('progressStatus').textContent = statuses[statusIndex];
+                    statusIndex++;
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        nextStep(); // 7단계(결과 확인)로 이동
+                    }, 1000);
+                }
+            }, 800);
+        }
+
+        function showImagePreviewOption() {
+            // 이미지 시안 확인 옵션 선택
+            showToast('이미지 시안을 먼저 확인합니다 🖼️');
+            
+            // 사용자가 이미지 시안 경로를 선택했음을 기록
+            selectedData.hasChosenImagePreview = true;
+            
+            // 현재 스텝이 5라면 먼저 6으로 이동
+            if (currentStep === 5) {
+                goToStep(6);
+                
+                // Step 6으로 이동 후 이미지 섹션 표시
+                setTimeout(() => {
+                    showImageSelectionInterface();
+                }, 300);
+            } else {
+                // 이미 Step 6에 있다면 바로 이미지 섹션 표시
+                setTimeout(() => {
+                    showImageSelectionInterface();
+                }, 300);
+            }
+        }
+
+        function showImageSelectionInterface() {
+            // 옵션 선택 그리드를 숨김 (더 정확한 selector 사용)
+            const optionGrid = document.querySelector('#step6 div[style*="display: grid"]');
+            if (optionGrid) optionGrid.style.display = 'none';
+            
+            // 설명 문구도 숨김 (더 정확한 selector)
+            const descriptions = document.querySelectorAll('#step6 p');
+            descriptions.forEach(p => {
+                if (p.textContent.includes('시나리오가 승인되었습니다') || p.textContent.includes('영상 제작 방식을 선택해주세요')) {
+                    p.style.display = 'none';
+                }
+            });
+            
+            // 액션 버튼들 숨김
+            const actions = document.getElementById('step6Actions');
+            if (actions) actions.style.display = 'none';
+            
+            // 이미지 시안 섹션 표시
+            const imageSection = document.getElementById('imagePreviewSection');
+            if (imageSection) imageSection.style.display = 'block';
+            
+            // 이미지 선택 버튼 상태 확인
+            checkImageSelectionButton();
+        }
+
+        function checkImageSelectionButton() {
+            // 모든 컷에 이미지가 선택되었는지 확인
+            const requiredCuts = ['cut1', 'cut2', 'cut3'];
+            const allSelected = requiredCuts.every(cut => selectedData.selectedImages[cut]);
+            
+            // 이미지 제작 버튼 활성화/비활성화
+            const imageButton = document.getElementById('step6ImageNext');
+            if (imageButton) {
+                imageButton.disabled = !allSelected;
+                if (allSelected) {
+                    imageButton.classList.remove('btn-disabled');
+                    imageButton.classList.add('btn-primary');
+                } else {
+                    imageButton.classList.add('btn-disabled');
+                    imageButton.classList.remove('btn-primary');
+                }
+            }
+        }
+
+        function backToVideoOptions() {
+            // 이미지 시안에서 시나리오 확인 단계(step 5)로 돌아가기
+            showToast('시나리오 확인 단계로 돌아갑니다');
+            
+            // 이미지 시안 섹션 숨김
+            const imageSection = document.getElementById('imagePreviewSection');
+            if (imageSection) imageSection.style.display = 'none';
+            
+            // Step 6 요소들을 원래 상태로 복원 (재진입을 위해)
+            restoreStep6Elements();
+            
+            // Step 5로 이동
+            goToStep(5);
+        }
+
+        function restoreStep6Elements() {
+            // 옵션 선택 그리드 다시 표시
+            const optionGrid = document.querySelector('#step6 div[style*="display: grid"]');
+            if (optionGrid) optionGrid.style.display = 'grid';
+            
+            // 설명 문구들 다시 표시
+            const descriptions = document.querySelectorAll('#step6 p');
+            descriptions.forEach(p => {
+                if (p.textContent.includes('시나리오가 승인되었습니다') || p.textContent.includes('영상 제작 방식을 선택해주세요')) {
+                    p.style.display = 'block';
+                }
+            });
+            
+            // 액션 버튼들 다시 표시
+            const actions = document.getElementById('step6Actions');
+            if (actions) actions.style.display = 'block';
+        }
+
+        function startVideoWithSelectedImages() {
+            // 선택된 이미지 검증
+            const requiredCuts = ['cut1', 'cut2', 'cut3'];
+            let unselectedCuts = [];
+            
+            requiredCuts.forEach(cut => {
+                if (!selectedData.selectedImages[cut]) {
+                    unselectedCuts.push(cut);
+                }
+            });
+            
+            if (unselectedCuts.length > 0) {
+                const cutNames = unselectedCuts.map(cut => {
+                    if (cut === 'cut1') return '컷 1 (오프닝 장면)';
+                    if (cut === 'cut2') return '컷 2 (제품 소개)';
+                    if (cut === 'cut3') return '컷 3 (마무리 장면)';
+                }).join(', ');
+                
+                showToast(`⚠️ ${unselectedCuts.length}개의 컷에 이미지가 선택되지 않았습니다: ${cutNames}`, 'error');
+                return;
+            }
+            
+            // 선택된 이미지로 영상 제작 시작
+            showToast('선택된 이미지로 영상 제작을 시작합니다! 🎬');
+            
+            // 이미지 시안 섹션 숨김
+            document.getElementById('imagePreviewSection').style.display = 'none';
+            
+            // 진행 표시
+            document.getElementById('videoCreationProgress').style.display = 'block';
+            document.getElementById('step6Actions').style.display = 'none';
+            
+            // 진행률 시뮬레이션 (선택된 이미지 사용)
+            let progress = 15;
+            const statuses = [
+                '선택된 이미지 분석 중...',
+                'AI 모델 준비 중...',
+                '첫 번째 장면 처리 중...',
+                '두 번째 장면 처리 중...',
+                '세 번째 장면 처리 중...',
+                '장면들 연결 중...',
+                '오디오 추가 중...',
+                '최종 편집 중...',
+                '영상 완성!'
+            ];
+            
+            let statusIndex = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15 + 5;
+                if (progress > 100) progress = 100;
+                
+                document.getElementById('progressBar').style.width = progress + '%';
+                document.getElementById('progressPercentage').textContent = Math.round(progress) + '%';
+                
+                if (statusIndex < statuses.length) {
+                    document.getElementById('progressStatus').textContent = statuses[statusIndex];
+                    statusIndex++;
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    // 영상 완성 후 결과 확인 단계(step 7)로 이동
+                    setTimeout(() => {
+                        showToast('영상 제작이 완료되었습니다! 🎉');
+                        nextStep(); // 다음 단계(step 7)로 이동
+                    }, 1000);
+                }
+            }, 800);
+        }
+
+        // 7단계: 영상 컷 선택 및 재생성 관련 함수들
+        function selectVideoCut(cut) {
+            // 영상 컷 선택
+            selectedData.selectedVideoCuts = selectedData.selectedVideoCuts || {};
+            selectedData.selectedVideoCuts[cut] = true;
+            
+            // 버튼 스타일 업데이트
+            const container = document.querySelector(`[onclick="selectVideoCut('${cut}')"]`).parentElement.parentElement;
+            const preview = container.querySelector('.video-preview');
+            preview.style.border = '3px solid #38a169';
+            preview.style.background = '#f0fff4';
+            
+            const selectButton = container.querySelector('.btn-success');
+            selectButton.textContent = '✅ 선택됨';
+            selectButton.disabled = true;
+            
+            showToast(`${cut === 'cut1' ? '오프닝' : cut === 'cut2' ? '제품 소개' : '마무리'} 컷이 선택되었습니다!`);
+            checkStep7Button();
+        }
+
+        function regenerateVideoCut(cut) {
+            const cutName = cut === 'cut1' ? '오프닝' : cut === 'cut2' ? '제품 소개' : '마무리';
+            if (confirm(`🎬 ${cutName} 컷을 다시 생성하시겠습니까?\n\n💰 비용: 10 토큰\n⏱️ 생성 시간: 약 2-3분\n\n※ 토큰이 차감되며, 기존 컷이 새로 생성됩니다.`)) {
+                showToast(`💰 10 토큰이 차감되고 ${cutName} 컷을 다시 생성합니다.`);
+                
+                // 재생성 시뮬레이션
+                const container = document.querySelector(`[onclick="regenerateVideoCut('${cut}')"]`).parentElement.parentElement;
+                const preview = container.querySelector('.video-preview');
+                const selectButton = container.querySelector('.btn-success');
+                const regenButton = container.querySelector('.btn-outline');
+                
+                // 로딩 상태 표시
+                preview.innerHTML = `
+                    <div style="text-align: center; color: #718096;">
+                        <div style="font-size: 48px; margin-bottom: 8px;">⏳</div>
+                        <div>${cutName} 컷 생성 중...</div>
+                        <div style="font-size: 12px;">잠시만 기다려주세요</div>
+                    </div>
+                `;
+                preview.style.border = '2px solid #e2e8f0';
+                preview.style.background = '#f7fafc';
+                selectButton.disabled = true;
+                regenButton.disabled = true;
+                
+                // 선택 상태 리셋
+                if (selectedData.selectedVideoCuts) {
+                    selectedData.selectedVideoCuts[cut] = false;
+                }
+                
+                // 생성 완료 시뮬레이션
+                setTimeout(() => {
+                    preview.innerHTML = `
+                        <div style="text-align: center; color: #718096;">
+                            <div style="font-size: 48px; margin-bottom: 8px;">🎬</div>
+                            <div>${cutName} 영상 컷 (새로 생성됨)</div>
+                            <div style="font-size: 12px;">실제로는 생성된 영상이 표시됩니다</div>
+                        </div>
+                    `;
+                    selectButton.textContent = '✅ 이 컷 사용';
+                    selectButton.disabled = false;
+                    regenButton.disabled = false;
+                    showToast(`${cutName} 컷이 새로 생성되었습니다! 🎉`);
+                    checkStep7Button();
+                }, 3000);
+            }
+        }
+
+        function checkStep7Button() {
+            // 모든 컷이 선택되었는지 확인
+            const requiredCuts = ['cut1', 'cut2', 'cut3'];
+            const allSelected = requiredCuts.every(cut => 
+                selectedData.selectedVideoCuts && selectedData.selectedVideoCuts[cut]
+            );
+            
+            const step7Button = document.getElementById('step7Next');
+            if (step7Button) {
+                step7Button.disabled = !allSelected;
+                if (allSelected) {
+                    step7Button.classList.remove('btn-disabled');
+                    step7Button.classList.add('btn-primary');
+                } else {
+                    step7Button.classList.add('btn-disabled');
+                    step7Button.classList.remove('btn-primary');
+                }
+            }
+        }
+
+        function proceedToFinalAssembly() {
+            // 최종 영상 조립 단계로 이동
+            showToast('선택된 컷들로 최종 영상을 조립합니다! 🎬');
+            
+            // Step 8로 이동하고 조립 프로세스 시작
+            nextStep();
+            
+            // 조립 프로세스 시뮬레이션 (기존 부분 재생성 로직 활용)
+            setTimeout(() => {
+                showRegenerateOptions();
+            }, 1000);
+        }
+
+        // 8단계 부분 재생성 관련 함수들 (이전 7단계 함수들)
+        function showRegenerateOptions() {
+            // 수정 옵션 표시
+            document.getElementById('partialRegenerateSection').style.display = 'block';
+            
+            // 부드러운 스크롤 애니메이션
+            setTimeout(() => {
+                document.getElementById('partialRegenerateSection').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 100);
+        }
+
+        function hideRegenerateOptions() {
+            // 수정 옵션 숨기기
+            document.getElementById('partialRegenerateSection').style.display = 'none';
+        }
+
+        function selectCutToRegenerate(cutId) {
+            // 특정 컷 재생성
+            const cutNames = {
+                'cut1': '오프닝 장면',
+                'cut2': '제품 시연 장면', 
+                'cut3': '마무리 장면'
+            };
+            
+            const cutName = cutNames[cutId];
+            
+            if (confirm(`${cutName}을 다시 제작하시겠습니까? (5 토큰 소모)`)) {
+                showToast(`${cutName} 재생성을 시작합니다... (5 토큰 차감) 🎬`);
+                
+                // 선택된 컷에 로딩 효과 추가
+                const selectedCard = document.querySelector(`[onclick="selectCutToRegenerate('${cutId}')"]`);
+                selectedCard.style.opacity = '0.6';
+                selectedCard.innerHTML += '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 8px 16px; border-radius: 8px; font-size: 12px;">재생성 중...</div>';
+                
+                // 3초 후 완료
+                setTimeout(() => {
+                    selectedCard.style.opacity = '1';
+                    selectedCard.querySelector('div:last-child').remove();
+                    showToast(`${cutName} 재생성이 완료되었습니다! ✨`);
+                    
+                    // 옵션 숨기기
+                    hideRegenerateOptions();
+                }, 3000);
+            }
+        }
+
+        function regenerateEntireVideo() {
+            // 전체 영상 재생성
+            if (confirm('전체 영상을 다시 제작하시겠습니까? (15 토큰 소모)')) {
+                showToast('시나리오 확인 단계로 돌아갑니다. 원하시면 시나리오나 이미지를 수정한 후 다시 제작하세요.');
+                
+                // Step 5로 돌아가서 사용자가 시나리오/이미지 수정 가능
+                hideRegenerateOptions();
+                
+                // 이미지 시안 선택 플래그 리셋 (사용자가 다시 선택할 수 있도록)
+                selectedData.hasChosenImagePreview = false;
+                
+                goToStep(5);
+            }
+        }
+
+        function satisfiedWithVideo() {
+            // 영상에 만족하는 경우
+            showToast('감사합니다! 영상이 저장되었습니다 🎉');
+            
+            // 만족도 섹션 업데이트 - 버튼들을 유지하면서 만족 상태 표시
+            const satisfactionSection = document.querySelector('#step7 .border');
+            const existingButtons = satisfactionSection.querySelector('div[style*="display: flex"]');
+            
+            // 만족 메시지 추가하되 버튼들은 유지
+            satisfactionSection.innerHTML = `
+                <h3 style="font-weight: 600; margin-bottom: 16px; color: #38a169;">
+                    <div style="display: inline-block; margin-right: 8px;">🎉</div>
+                    완료되었습니다!
+                </h3>
+                <p style="color: #718096; margin-bottom: 16px; font-size: 14px;">영상이 내 보관함에 저장되었습니다. 추가 편집이 필요하시면 고급 편집 모드를 사용해보세요.</p>
+                
+                <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                    <button class="btn btn-primary" onclick="satisfiedWithVideo()" disabled style="opacity: 0.6;">
+                        👍 만족합니다 (완료)
+                    </button>
+                    <button class="btn btn-outline" onclick="showAdvancedEdit()">
+                        🎨 고급 편집 모드
+                    </button>
+                </div>
+                
+                <p style="color: #718096; font-size: 12px;">
+                    더 세밀한 편집이 필요하시다면 
+                    <a href="#" style="color: #3182ce;">추천 편집 앱</a>을 
+                    확인해보세요.
+                </p>
+            `;
+        }
+
+        // Advanced Edit Mode Functions
+        function showAdvancedEdit() {
+            document.getElementById('advancedEditSection').style.display = 'block';
+            // Hide regenerate options if showing
+            document.getElementById('partialRegenerateSection').style.display = 'none';
+            
+            // Smooth scroll to advanced edit section
+            setTimeout(() => {
+                document.getElementById('advancedEditSection').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 100);
+        }
+
+        function hideAdvancedEdit() {
+            document.getElementById('advancedEditSection').style.display = 'none';
+        }
+
+        // Handle edit option selection
+        function selectEditOption(option) {
+            if (option === 'regenerate-video') {
+                // Option 1: Regenerate video only
+                if (confirm('🎬 같은 이미지로 영상을 다시 제작하시겠습니까?\n\n💰 비용: 5 토큰\n⏱️ 제작 시간: 약 3-5분\n\n※ 영상 스타일이나 편집만 변경됩니다.')) {
+                    showToast('영상 재제작을 시작합니다... (5 토큰 차감) 🎬');
+                    hideAdvancedEdit();
+                    
+                    // Go back to step 6 with video creation
+                    goToStep(6);
+                }
+            } else if (option === 'regenerate-image') {
+                // Option 2: Regenerate from new image
+                if (confirm('🖼️ 새로운 이미지로 영상을 다시 제작하시겠습니까?\n\n💰 비용: 10 토큰\n⏱️ 제작 시간: 약 5-8분\n\n※ 이미지 선택부터 다시 시작합니다.')) {
+                    showToast('이미지 선택 단계로 돌아갑니다... (10 토큰 차감) 🖼️');
+                    hideAdvancedEdit();
+                    
+                    // Reset image selection and go back to step 6 with image preview
+                    selectedData.selectedImages = {
+                        cut1: null,
+                        cut2: null,
+                        cut3: null
+                    };
+                    
+                    goToStep(6);
+                    // Show image preview section
+                    setTimeout(() => {
+                        document.getElementById('videoCreationProgress').style.display = 'none';
+                        const imagePreviewSection = document.getElementById('imagePreviewSection');
+                        if (imagePreviewSection) {
+                            imagePreviewSection.style.display = 'block';
+                        }
+                        const step6Actions = document.getElementById('step6Actions');
+                        if (step6Actions) {
+                            step6Actions.style.display = 'none';
+                        }
+                    }, 500);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
