@@ -1810,9 +1810,6 @@
             alert('영상을 공유합니다!');
         }
 
-        function satisfiedWithVideo() {
-            alert('감사합니다! 영상이 저장되었습니다.');
-        }
 
         function regenerateVideo() {
             // 유료 기능 알림
@@ -1889,6 +1886,9 @@
         function approveScenario() {
             selectedData.scenarioApproved = true;
             checkNextButton();
+            
+            // Show the next button for Step 5
+            document.getElementById('step5Next').style.display = 'block';
             
             // 사용자가 이미지 시안 경로를 선택했는지 확인
             if (selectedData.hasChosenImagePreview) {
@@ -2398,14 +2398,32 @@
             // 영상에 만족하는 경우
             showToast('감사합니다! 영상이 저장되었습니다 🎉');
             
-            // 만족도 섹션 업데이트
+            // 만족도 섹션 업데이트 - 버튼들을 유지하면서 만족 상태 표시
             const satisfactionSection = document.querySelector('#step7 .border');
+            const existingButtons = satisfactionSection.querySelector('div[style*="display: flex"]');
+            
+            // 만족 메시지 추가하되 버튼들은 유지
             satisfactionSection.innerHTML = `
-                <div style="text-align: center; padding: 20px;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">🎉</div>
-                    <h3 style="color: #38a169; margin-bottom: 8px;">완료되었습니다!</h3>
-                    <p style="color: #718096; font-size: 14px;">영상이 내 보관함에 저장되었습니다.</p>
+                <h3 style="font-weight: 600; margin-bottom: 16px; color: #38a169;">
+                    <div style="display: inline-block; margin-right: 8px;">🎉</div>
+                    완료되었습니다!
+                </h3>
+                <p style="color: #718096; margin-bottom: 16px; font-size: 14px;">영상이 내 보관함에 저장되었습니다. 추가 편집이 필요하시면 고급 편집 모드를 사용해보세요.</p>
+                
+                <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                    <button class="btn btn-primary" onclick="satisfiedWithVideo()" disabled style="opacity: 0.6;">
+                        👍 만족합니다 (완료)
+                    </button>
+                    <button class="btn btn-outline" onclick="showAdvancedEdit()">
+                        🎨 고급 편집 모드
+                    </button>
                 </div>
+                
+                <p style="color: #718096; font-size: 12px;">
+                    더 세밀한 편집이 필요하시다면 
+                    <a href="#" style="color: #3182ce;">추천 편집 앱</a>을 
+                    확인해보세요.
+                </p>
             `;
         }
 
