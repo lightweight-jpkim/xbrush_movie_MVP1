@@ -771,14 +771,14 @@ class StepManager {
             // Show completion message
             showToast('영상 제작이 완료되었습니다! 다운로드하거나 새 광고를 만들어보세요.', 'success');
             
-            // Reset the completion flag after a delay
+            // Reset the completion flag and show advanced edit section immediately
             setTimeout(() => {
                 window.videoRegenerationCompleted = false;
-                // Show advanced edit section again for next time
+                // Show advanced edit section again
                 if (advancedEditSection) {
                     advancedEditSection.style.display = 'block';
                 }
-            }, 5000);
+            }, 1500); // Reduced from 5000ms to 1500ms
         } catch (error) {
             handleError(error, 'Advanced edit completion handling');
         }
@@ -1585,7 +1585,9 @@ function initializeVideoCuts() {
             const button = document.querySelector(`[data-cut="${cut}"]`);
             if (button) {
                 button.classList.add('selected');
-                button.innerHTML = '✅ 선택됨';
+                button.classList.remove('btn-success');
+                button.classList.add('btn-selected');
+                button.innerHTML = '✓ 선택됨';
             }
         });
         
@@ -1612,11 +1614,17 @@ function selectVideoCut(cutId) {
         if (button) {
             // Toggle selection
             if (button.classList.contains('selected')) {
+                // Deselect
                 button.classList.remove('selected');
-                button.innerHTML = '✅ 이 컷 사용';
+                button.classList.remove('btn-selected');
+                button.classList.add('btn-success');
+                button.innerHTML = '이 컷 사용';
             } else {
+                // Select
                 button.classList.add('selected');
-                button.innerHTML = '✅ 선택됨';
+                button.classList.remove('btn-success');
+                button.classList.add('btn-selected');
+                button.innerHTML = '✓ 선택됨';
             }
             
             // Check if at least one cut is selected
@@ -1688,7 +1696,7 @@ function regenerateVideoCut(cutId) {
 
 function updateProceedButton() {
     try {
-        const selectedCuts = document.querySelectorAll('[data-cut].selected');
+        const selectedCuts = document.querySelectorAll('[data-cut].selected, [data-cut].btn-selected');
         const proceedButton = document.getElementById('proceedWithCuts');
         
         console.log('Selected cuts:', selectedCuts.length); // Debug log
@@ -1713,7 +1721,7 @@ function updateProceedButton() {
 
 function proceedWithSelectedCuts() {
     try {
-        const selectedCuts = document.querySelectorAll('[data-cut].selected');
+        const selectedCuts = document.querySelectorAll('[data-cut].selected, [data-cut].btn-selected');
         
         console.log('Proceeding with selected cuts:', selectedCuts.length); // Debug log
         
