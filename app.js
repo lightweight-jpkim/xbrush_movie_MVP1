@@ -941,36 +941,53 @@ function applyAsModel() {
  * Advanced Edit Mode Functions
  */
 function showAdvancedEdit() {
+    console.log('showAdvancedEdit called'); // Debug log
     try {
-        const advancedEditSection = safeGetElement('advancedEditSection');
+        const advancedEditSection = document.getElementById('advancedEditSection');
+        console.log('Advanced edit section:', advancedEditSection); // Debug log
+        
         if (advancedEditSection) {
             advancedEditSection.classList.remove('hidden');
             
             // Smooth scroll to the advanced edit section
-            advancedEditSection.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start' 
-            });
+            setTimeout(() => {
+                advancedEditSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }, 100);
             
-            showToast('고급 편집 모드가 활성화되었습니다.', 'info');
+            // Try to show toast, but don't fail if it doesn't work
+            try {
+                showToast('고급 편집 모드가 활성화되었습니다.', 'info');
+            } catch (toastError) {
+                console.log('Toast failed, but continuing...');
+            }
         } else {
             console.error('Advanced edit section not found');
-            showToast('고급 편집 모드를 불러올 수 없습니다.', 'error');
+            alert('고급 편집 모드를 불러올 수 없습니다.');
         }
     } catch (error) {
-        handleError(error, 'Advanced edit mode display');
+        console.error('Error in showAdvancedEdit:', error);
+        alert('오류가 발생했습니다: ' + error.message);
     }
 }
 
 function hideAdvancedEdit() {
+    console.log('hideAdvancedEdit called'); // Debug log
     try {
-        const advancedEditSection = safeGetElement('advancedEditSection');
+        const advancedEditSection = document.getElementById('advancedEditSection');
         if (advancedEditSection) {
             advancedEditSection.classList.add('hidden');
-            showToast('고급 편집 모드가 비활성화되었습니다.', 'info');
+            try {
+                showToast('고급 편집 모드가 비활성화되었습니다.', 'info');
+            } catch (toastError) {
+                console.log('Toast failed, but continuing...');
+            }
         }
     } catch (error) {
-        handleError(error, 'Advanced edit mode hiding');
+        console.error('Error in hideAdvancedEdit:', error);
+        alert('오류가 발생했습니다: ' + error.message);
     }
 }
 
