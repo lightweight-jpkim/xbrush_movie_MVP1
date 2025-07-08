@@ -449,6 +449,10 @@ class StepManager {
                     break;
                 case STEPS.RESULTS:
                     this.updateFinalInfo();
+                    // Hide advanced edit mode if video regeneration was just completed
+                    if (window.videoRegenerationCompleted) {
+                        this.hideAdvancedEditAfterCompletion();
+                    }
                     break;
                 case STEPS.VIDEO_CUT_SELECTION:
                     // Initialize video cuts when entering step 8
@@ -647,8 +651,9 @@ class StepManager {
                 if (progress >= 100) {
                     clearInterval(progressInterval);
                     
-                    // Reset the regeneration flag
+                    // Reset the regeneration flag and mark as completed
                     window.videoRegenerationInProgress = false;
+                    window.videoRegenerationCompleted = true;
                     
                     setTimeout(() => {
                         showToast('영상 재생성이 완료되었습니다! 🎉', 'success');
@@ -677,6 +682,32 @@ class StepManager {
             this.uiController.updateElement('finalDuration', data.duration || '-');
         } catch (error) {
             handleError(error, 'Final info update');
+        }
+    }
+
+    /**
+     * Hide advanced edit mode after video regeneration completion
+     */
+    hideAdvancedEditAfterCompletion() {
+        try {
+            const advancedEditSection = document.getElementById('advancedEditSection');
+            if (advancedEditSection) {
+                advancedEditSection.style.display = 'none';
+            }
+            
+            // Show completion message
+            showToast('영상 제작이 완료되었습니다! 다운로드하거나 새 광고를 만들어보세요.', 'success');
+            
+            // Reset the completion flag after a delay
+            setTimeout(() => {
+                window.videoRegenerationCompleted = false;
+                // Show advanced edit section again for next time
+                if (advancedEditSection) {
+                    advancedEditSection.style.display = 'block';
+                }
+            }, 5000);
+        } catch (error) {
+            handleError(error, 'Advanced edit completion handling');
         }
     }
 
@@ -1531,18 +1562,22 @@ function regenerateVideoCut(cutId) {
 
 function updateProceedButton() {
     try {
-        const selectedCuts = document.querySelectorAll('.btn-success.selected');
+        const selectedCuts = document.querySelectorAll('[data-cut].selected');
         const proceedButton = document.getElementById('proceedWithCuts');
+        
+        console.log('Selected cuts:', selectedCuts.length); // Debug log
         
         if (proceedButton) {
             if (selectedCuts.length > 0) {
                 proceedButton.disabled = false;
                 proceedButton.classList.remove('btn-disabled');
                 proceedButton.classList.add('btn-primary');
+                proceedButton.textContent = `선택된 ${selectedCuts.length}개 컷으로 최종 영상 제작`;
             } else {
                 proceedButton.disabled = true;
                 proceedButton.classList.add('btn-disabled');
                 proceedButton.classList.remove('btn-primary');
+                proceedButton.textContent = '최소 1개 컷을 선택해주세요';
             }
         }
     } catch (error) {
@@ -1552,7 +1587,9 @@ function updateProceedButton() {
 
 function proceedWithSelectedCuts() {
     try {
-        const selectedCuts = document.querySelectorAll('.btn-success.selected');
+        const selectedCuts = document.querySelectorAll('[data-cut].selected');
+        
+        console.log('Proceeding with selected cuts:', selectedCuts.length); // Debug log
         
         if (selectedCuts.length === 0) {
             showToast('최소 하나의 컷을 선택해주세요.', 'warning');
