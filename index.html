@@ -903,27 +903,10 @@
                     </div>
                 </div>
                 
-                <p style="color: #718096; margin-bottom: 32px;">시나리오가 승인되었습니다. 영상 제작 방식을 선택해주세요.</p>
+                <p style="color: #718096; margin-bottom: 32px;">선택하신 시나리오와 이미지로 AI가 최고 품질의 영상을 제작하고 있습니다.</p>
                 
-                <!-- 영상 제작 옵션 선택 -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;">
-                    <div class="card" onclick="startDirectVideoCreation()" style="padding: 32px; text-align: center; cursor: pointer; border: 2px solid #e2e8f0; transition: all 0.2s ease;">
-                        <div style="font-size: 48px; margin-bottom: 16px;">⚡</div>
-                        <h3 style="margin-bottom: 12px; color: #2d3748;">바로 영상 제작</h3>
-                        <p style="font-size: 14px; color: #718096; margin-bottom: 16px;">승인된 시나리오로 즉시 영상을 제작합니다. 빠르고 간단한 방법입니다.</p>
-                        <div style="background: #38a169; color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block;">추천</div>
-                    </div>
-                    
-                    <div class="card" onclick="showImagePreviewOption()" style="padding: 32px; text-align: center; cursor: pointer; border: 2px solid #e2e8f0; transition: all 0.2s ease;">
-                        <div style="font-size: 48px; margin-bottom: 16px;">🖼️</div>
-                        <h3 style="margin-bottom: 12px; color: #2d3748;">이미지 시안 먼저 확인</h3>
-                        <p style="font-size: 14px; color: #718096; margin-bottom: 16px;">각 장면의 이미지를 미리 확인하고 수정한 후 영상을 제작합니다.</p>
-                        <div style="background: #3182ce; color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block;">정밀 제어</div>
-                    </div>
-                </div>
-                
-                <!-- 진행중 표시 (숨김 상태) -->
-                <div id="videoCreationProgress" style="display: none; background: #f0fff4; border-radius: 12px; padding: 32px; text-align: center; border-left: 4px solid #38a169;">
+                <!-- 진행중 표시 -->
+                <div id="videoCreationProgress" style="display: block; background: #f0fff4; border-radius: 12px; padding: 32px; text-align: center; border-left: 4px solid #38a169;">
                     <div style="font-size: 64px; margin-bottom: 16px;">🎬</div>
                     <h2 style="margin-bottom: 16px; color: #2d3748;">영상 제작 중...</h2>
                     <p style="color: #718096; margin-bottom: 24px;">AI가 최고 품질의 영상을 제작하고 있습니다. 잠시만 기다려주세요.</p>
@@ -1012,78 +995,12 @@
                 </div>
             </div>
 
-            <!-- 7단계: 영상 컷 선택 및 재생성 (NEW STEP) -->
+            <!-- 7단계: 결과 확인 (이전 8단계, 간소화된 플로우) -->
             <div class="step-content" id="step7">
                 <div class="progress-indicator">
-                    <div class="progress-text">7/9 단계 - 영상 컷 선택</div>
+                    <div class="progress-text">7/7 단계 - 결과 확인</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 78%"></div>
-                    </div>
-                </div>
-                
-                <h1 class="heading">🎬 생성된 영상 컷을 확인해주세요</h1>
-                <p style="color: #718096; margin-bottom: 32px;">각 컷을 검토하고 마음에 들지 않는 컷은 다시 생성할 수 있습니다. 선택된 컷들로 최종 영상이 제작됩니다.</p>
-                
-                <!-- 영상 컷 1: 오프닝 -->
-                <div class="subheading">컷 1: 오프닝 장면</div>
-                <div class="video-cut-container" style="margin-bottom: 24px;">
-                    <div class="video-preview" style="width: 100%; max-width: 600px; height: 300px; background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                        <div style="text-align: center; color: #718096;">
-                            <div style="font-size: 48px; margin-bottom: 8px;">🎬</div>
-                            <div>오프닝 영상 컷</div>
-                            <div style="font-size: 12px;">실제로는 생성된 영상이 표시됩니다</div>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 12px; align-items: center;">
-                        <button class="btn btn-success" onclick="selectVideoCut('cut1')" style="background: #38a169;">✅ 이 컷 사용</button>
-                        <button class="btn btn-outline" onclick="regenerateVideoCut('cut1')">🔄 다시 생성 (10 토큰)</button>
-                    </div>
-                </div>
-                
-                <!-- 영상 컷 2: 제품 소개 -->
-                <div class="subheading">컷 2: 제품 소개 장면</div>
-                <div class="video-cut-container" style="margin-bottom: 24px;">
-                    <div class="video-preview" style="width: 100%; max-width: 600px; height: 300px; background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                        <div style="text-align: center; color: #718096;">
-                            <div style="font-size: 48px; margin-bottom: 8px;">🎬</div>
-                            <div>제품 소개 영상 컷</div>
-                            <div style="font-size: 12px;">실제로는 생성된 영상이 표시됩니다</div>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 12px; align-items: center;">
-                        <button class="btn btn-success" onclick="selectVideoCut('cut2')" style="background: #38a169;">✅ 이 컷 사용</button>
-                        <button class="btn btn-outline" onclick="regenerateVideoCut('cut2')">🔄 다시 생성 (10 토큰)</button>
-                    </div>
-                </div>
-                
-                <!-- 영상 컷 3: 마무리 -->
-                <div class="subheading">컷 3: 마무리 장면</div>
-                <div class="video-cut-container" style="margin-bottom: 32px;">
-                    <div class="video-preview" style="width: 100%; max-width: 600px; height: 300px; background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                        <div style="text-align: center; color: #718096;">
-                            <div style="font-size: 48px; margin-bottom: 8px;">🎬</div>
-                            <div>마무리 영상 컷</div>
-                            <div style="font-size: 12px;">실제로는 생성된 영상이 표시됩니다</div>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 12px; align-items: center;">
-                        <button class="btn btn-success" onclick="selectVideoCut('cut3')" style="background: #38a169;">✅ 이 컷 사용</button>
-                        <button class="btn btn-outline" onclick="regenerateVideoCut('cut3')">🔄 다시 생성 (10 토큰)</button>
-                    </div>
-                </div>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-outline" onclick="prevStep()">이전 단계</button>
-                    <button class="btn btn-primary" id="step7Next" onclick="proceedToFinalAssembly()" disabled>선택된 컷으로 최종 영상 제작</button>
-                </div>
-            </div>
-
-            <!-- 8단계: 결과 확인 (이전 7단계) -->
-            <div class="step-content" id="step8">
-                <div class="progress-indicator">
-                    <div class="progress-text">8/9 단계 - 결과 확인</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 89%"></div>
+                        <div class="progress-fill" style="width: 100%"></div>
                     </div>
                 </div>
                 
@@ -1141,8 +1058,8 @@
                                 <button class="btn btn-primary" onclick="satisfiedWithVideo()">
                                     👍 만족합니다
                                 </button>
-                                <button class="btn btn-outline" onclick="showRegenerateOptions()">
-                                    🔄 수정 필요
+                                <button class="btn btn-outline" onclick="showAdvancedEdit()">
+                                    🎨 고급 편집 모드
                                 </button>
                             </div>
                             
@@ -1213,6 +1130,38 @@
                     </div>
                 </div>
                 
+                <!-- Advanced Edit Mode Section -->
+                <div id="advancedEditSection" style="display: none; margin-top: 32px; background: #f8f9fa; border-radius: 12px; padding: 32px; border-left: 4px solid #6366f1;">
+                    <h3 style="margin-bottom: 16px; color: #2d3748;">🎨 고급 편집 모드</h3>
+                    <p style="color: #718096; margin-bottom: 24px;">영상의 특정 부분을 수정하거나 새로운 이미지로 다시 제작할 수 있습니다.</p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <!-- Option 1: Regenerate from Same Image -->
+                        <div class="card" style="padding: 24px; text-align: center; cursor: pointer;" onclick="selectEditOption('regenerate-video')">
+                            <div style="font-size: 48px; margin-bottom: 16px;">🎬</div>
+                            <h4 style="margin-bottom: 8px;">영상만 다시 제작</h4>
+                            <p style="color: #718096; font-size: 14px; margin-bottom: 16px;">같은 이미지로 영상 스타일이나 편집을 변경</p>
+                            <div style="background: #e3f2fd; padding: 8px 12px; border-radius: 6px; font-size: 12px; color: #1976d2;">
+                                비용: 5 토큰
+                            </div>
+                        </div>
+                        
+                        <!-- Option 2: Regenerate from New Image -->
+                        <div class="card" style="padding: 24px; text-align: center; cursor: pointer;" onclick="selectEditOption('regenerate-image')">
+                            <div style="font-size: 48px; margin-bottom: 16px;">🖼️</div>
+                            <h4 style="margin-bottom: 8px;">새 이미지로 제작</h4>
+                            <p style="color: #718096; font-size: 14px; margin-bottom: 16px;">이미지 선택부터 다시 시작</p>
+                            <div style="background: #fff3e0; padding: 8px 12px; border-radius: 6px; font-size: 12px; color: #f57c00;">
+                                비용: 10 토큰
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 24px; text-align: center;">
+                        <button class="btn btn-outline" onclick="hideAdvancedEdit()">취소</button>
+                    </div>
+                </div>
+                
                 <!-- CTA 배너 간소화 -->
                 <div class="cta-banner" style="background: linear-gradient(135deg, #ed8936, #f6ad55);" onclick="applyAsModel()">
                     <div class="shine"></div>
@@ -1227,10 +1176,10 @@
                 </div>
             </div>
 
-            <!-- 9단계: 최종 완성 (이전 step8) -->
-            <div class="step-content" id="step9">
+            <!-- 8단계: 최종 완성 (새로운 간소화된 완성 단계) -->
+            <div class="step-content" id="step8">
                 <div class="progress-indicator">
-                    <div class="progress-text">9/9 단계 - 최종 완성!</div>
+                    <div class="progress-text">완성! - 최종 결과</div>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 100%"></div>
                     </div>
@@ -1428,8 +1377,16 @@
             // 진행률 바 업데이트
             updateProgressLine();
             
-            // 8단계면 최종 정보 업데이트
-            if (step === 8) {
+            // Auto-trigger video creation when entering Step 6
+            if (step === 6) {
+                // Start video creation automatically
+                setTimeout(() => {
+                    startAutomaticVideoCreation();
+                }, 500); // Small delay for smooth UX
+            }
+            
+            // 7단계면 최종 정보 업데이트 (updated from step 8)
+            if (step === 7) {
                 updateFinalInfo();
             }
             
@@ -1471,6 +1428,56 @@
             if (currentStep > 1) {
                 goToStep(currentStep - 1);
             }
+        }
+
+        // Automatic video creation function for streamlined Step 6
+        function startAutomaticVideoCreation() {
+            // Hide step 6 action buttons immediately
+            const step6Actions = document.getElementById('step6Actions');
+            if (step6Actions) {
+                step6Actions.style.display = 'none';
+            }
+            
+            // Start progress simulation
+            let progress = 15;
+            const statuses = [
+                '시나리오 분석 중...',
+                'AI 모델 준비 중...',
+                '첫 번째 장면 생성 중...',
+                '두 번째 장면 생성 중...',
+                '세 번째 장면 생성 중...',
+                '장면들 연결 중...',
+                '오디오 추가 중...',
+                '최종 편집 중...',
+                '영상 완성!'
+            ];
+            
+            let statusIndex = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 12 + 8;
+                if (progress > 100) progress = 100;
+                
+                const progressBar = document.getElementById('progressBar');
+                const progressPercentage = document.getElementById('progressPercentage');
+                const progressStatus = document.getElementById('progressStatus');
+                
+                if (progressBar) progressBar.style.width = progress + '%';
+                if (progressPercentage) progressPercentage.textContent = Math.round(progress) + '%';
+                
+                if (statusIndex < statuses.length && progressStatus) {
+                    progressStatus.textContent = statuses[statusIndex];
+                    statusIndex++;
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    // Auto-navigate to Step 7 after completion
+                    setTimeout(() => {
+                        showToast('영상 제작이 완료되었습니다! 🎉');
+                        goToStep(7); // Auto-navigate to results
+                    }, 1000);
+                }
+            }, 800);
         }
 
         // 진행률 바 업데이트
@@ -2397,6 +2404,66 @@
                     <p style="color: #718096; font-size: 14px;">영상이 내 보관함에 저장되었습니다.</p>
                 </div>
             `;
+        }
+
+        // Advanced Edit Mode Functions
+        function showAdvancedEdit() {
+            document.getElementById('advancedEditSection').style.display = 'block';
+            // Hide regenerate options if showing
+            document.getElementById('partialRegenerateSection').style.display = 'none';
+            
+            // Smooth scroll to advanced edit section
+            setTimeout(() => {
+                document.getElementById('advancedEditSection').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 100);
+        }
+
+        function hideAdvancedEdit() {
+            document.getElementById('advancedEditSection').style.display = 'none';
+        }
+
+        // Handle edit option selection
+        function selectEditOption(option) {
+            if (option === 'regenerate-video') {
+                // Option 1: Regenerate video only
+                if (confirm('🎬 같은 이미지로 영상을 다시 제작하시겠습니까?\n\n💰 비용: 5 토큰\n⏱️ 제작 시간: 약 3-5분\n\n※ 영상 스타일이나 편집만 변경됩니다.')) {
+                    showToast('영상 재제작을 시작합니다... (5 토큰 차감) 🎬');
+                    hideAdvancedEdit();
+                    
+                    // Go back to step 6 with video creation
+                    goToStep(6);
+                }
+            } else if (option === 'regenerate-image') {
+                // Option 2: Regenerate from new image
+                if (confirm('🖼️ 새로운 이미지로 영상을 다시 제작하시겠습니까?\n\n💰 비용: 10 토큰\n⏱️ 제작 시간: 약 5-8분\n\n※ 이미지 선택부터 다시 시작합니다.')) {
+                    showToast('이미지 선택 단계로 돌아갑니다... (10 토큰 차감) 🖼️');
+                    hideAdvancedEdit();
+                    
+                    // Reset image selection and go back to step 6 with image preview
+                    selectedData.selectedImages = {
+                        cut1: null,
+                        cut2: null,
+                        cut3: null
+                    };
+                    
+                    goToStep(6);
+                    // Show image preview section
+                    setTimeout(() => {
+                        document.getElementById('videoCreationProgress').style.display = 'none';
+                        const imagePreviewSection = document.getElementById('imagePreviewSection');
+                        if (imagePreviewSection) {
+                            imagePreviewSection.style.display = 'block';
+                        }
+                        const step6Actions = document.getElementById('step6Actions');
+                        if (step6Actions) {
+                            step6Actions.style.display = 'none';
+                        }
+                    }, 500);
+                }
+            }
         }
     </script>
 </body>
