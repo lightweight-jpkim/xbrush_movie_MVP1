@@ -1243,22 +1243,50 @@ function regenerateImages(cut) {
     try {
         showToast(`${cut} 이미지를 다시 생성합니다. (3 토큰)`, 'info');
         
-        // Find the specific cut element and show loading
-        const cutElement = document.querySelector(`[data-cut="${cut}"]`);
-        if (cutElement) {
-            cutElement.innerHTML = `
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-                    <div style="width: 24px; height: 24px; border: 2px solid #e2e8f0; border-top: 2px solid #3182ce; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 8px;"></div>
-                    <span style="font-size: 10px; color: #a0aec0;">생성 중...</span>
-                </div>
-            `;
-            
-            // Simulate regeneration
-            setTimeout(() => {
-                showToast(`${cut} 이미지가 새로 생성되었습니다!`, 'success');
-                // In real app, this would update with new image
-            }, 2000);
+        // Find the image grid for this cut
+        const cutSection = document.querySelector(`[data-cut-section="${cut}"]`);
+        if (!cutSection) {
+            console.error(`Cut section for ${cut} not found`);
+            return;
         }
+        
+        const imageGrid = cutSection.querySelector('.image-grid');
+        if (!imageGrid) {
+            console.error(`Image grid for ${cut} not found`);
+            return;
+        }
+        
+        // Show loading state
+        imageGrid.style.opacity = '0.5';
+        imageGrid.style.pointerEvents = 'none';
+        
+        // Generate new random image URLs for this cut
+        setTimeout(() => {
+            const imageOptions = imageGrid.querySelectorAll('.image-option');
+            imageOptions.forEach((option, index) => {
+                // Clear previous selection
+                option.classList.remove('selected');
+                
+                // Generate new random image
+                const randomId = Math.floor(Math.random() * 1000) + Date.now();
+                const img = option.querySelector('img');
+                if (img) {
+                    img.src = `https://picsum.photos/400/225?random=${randomId}_${index}`;
+                }
+                
+                // Update onclick to use new image ID
+                const newImageId = `${cut}_img${index + 1}_${randomId}`;
+                option.setAttribute('onclick', `selectImage(this, '${cut}', '${newImageId}')`);
+                option.setAttribute('onkeydown', `if(event.key==='Enter') selectImage(this, '${cut}', '${newImageId}')`);
+            });
+            
+            // Restore interaction
+            imageGrid.style.opacity = '1';
+            imageGrid.style.pointerEvents = 'auto';
+            
+            showToast(`${cut} 이미지가 새로 생성되었습니다!`, 'success');
+        }, 2000);
+        
     } catch (error) {
         console.error('Error in regenerateImages:', error);
         showToast('이미지 재생성에 실패했습니다.', 'error');
@@ -1281,9 +1309,11 @@ function checkImageSelectionButton() {
             if (allSelected) {
                 button.classList.remove('btn-disabled');
                 button.classList.add('btn-primary');
+                button.textContent = '선택된 이미지로 제작';
             } else {
                 button.classList.add('btn-disabled');
                 button.classList.remove('btn-primary');
+                button.textContent = '모든 컷 선택 필요';
             }
         }
     } catch (error) {
@@ -1303,6 +1333,42 @@ function startVideoWithSelectedImages() {
     } catch (error) {
         console.error('Error in startVideoWithSelectedImages:', error);
         showToast('영상 제작을 시작하는데 실패했습니다.', 'error');
+    }
+}
+
+function proceedToVideoCutSelection() {
+    try {
+        const data = app ? app.dataService.getData() : null;
+        if (!data) {
+            showToast('데이터를 불러올 수 없습니다.', 'error');
+            return;
+        }
+        
+        // Check if all cuts have selected images
+        const allSelected = data.selectedImages.cut1 && 
+                           data.selectedImages.cut2 && 
+                           data.selectedImages.cut3;
+        
+        if (!allSelected) {
+            showToast('모든 컷의 이미지를 선택해주세요.', 'warning');
+            return;
+        }
+        
+        showToast('선택된 이미지로 영상 컷 선택 화면으로 이동합니다!', 'info');
+        
+        // Navigate to Step 8 (Video Cut Selection)
+        setTimeout(() => {
+            if (app && app.stepManager) {
+                app.stepManager.goToStep(8);
+                // Initialize video cuts after navigation
+                setTimeout(() => {
+                    initializeVideoCuts();
+                }, 300);
+            }
+        }, 1000);
+    } catch (error) {
+        console.error('Error in proceedToVideoCutSelection:', error);
+        showToast('영상 컷 선택으로 이동하는데 실패했습니다.', 'error');
     }
 }
 
