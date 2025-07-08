@@ -68,6 +68,16 @@
             </div>
         </nav>
 
+        <!-- AI Model CTA Banner -->
+        <div class="cta-banner cta-banner-gradient-blue" onclick="applyAsModel()" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter') applyAsModel()" aria-label="AI 모델 신청하기"
+             style="margin-bottom: 32px;">
+            <div class="shine"></div>
+            <div class="cta-content">
+                <h3>💰 AI 모델 신청하고 수익 창출하기</h3>
+            </div>
+        </div>
+
         <!-- Main Content Area -->
         <main class="content-area">
             <!-- Step 1: Model Selection -->
@@ -204,15 +214,6 @@
                     </div>
                 </section>
                 
-                <!-- CTA Banner -->
-                <div class="cta-banner cta-banner-gradient-blue" onclick="applyAsModel()" role="button" tabindex="0"
-                     onkeydown="if(event.key==='Enter') applyAsModel()" aria-label="AI 모델 신청하기">
-                    <div class="shine"></div>
-                    <div class="cta-content">
-                        <h3>💰 AI 모델 신청하고 수익 창출하기</h3>
-                    </div>
-                </div>
-                
                 <div class="action-buttons">
                     <div></div>
                     <button class="btn btn-primary" id="step1Next" onclick="nextStep()" disabled 
@@ -269,15 +270,6 @@
                         <option value="energetic">역동적이고 활기찬</option>
                         <option value="warm">따뜻하고 감성적인</option>
                     </select>
-                </div>
-                
-                <!-- CTA Banner -->
-                <div class="cta-banner cta-banner-gradient-green" onclick="applyAsModel()" role="button" tabindex="0"
-                     onkeydown="if(event.key==='Enter') applyAsModel()" aria-label="AI 모델 신청하기">
-                    <div class="shine"></div>
-                    <div class="cta-content">
-                        <h3>🎬 AI 모델 신청하기</h3>
-                    </div>
                 </div>
                 
                 <div class="action-buttons">
@@ -742,8 +734,8 @@
                             <div class="satisfaction-buttons">
                                 <button class="btn btn-primary" onclick="satisfiedWithVideo()" 
                                         aria-label="영상에 만족함">👍 만족합니다</button>
-                                <button class="btn btn-outline" onclick="showAdvancedEdit()" 
-                                        aria-label="고급 편집 모드 열기">🎨 고급 편집 모드</button>
+                                <button class="btn btn-outline" onclick="downloadVideo()" 
+                                        aria-label="영상 다운로드">💾 다운로드</button>
                             </div>
                             
                             <p class="satisfaction-note">
@@ -755,8 +747,8 @@
                     </div>
                 </div>
                 
-                <!-- Advanced Edit Section (Hidden) -->
-                <div id="advancedEditSection" class="advanced-edit-section hidden">
+                <!-- Advanced Edit Section (Visible by Default) -->
+                <div id="advancedEditSection" class="advanced-edit-section">
                     <h3>🎨 고급 편집 모드</h3>
                     <p class="mb-3">영상의 특정 부분을 수정하거나 새로운 이미지로 다시 제작할 수 있습니다.</p>
                     
@@ -785,15 +777,6 @@
                     <div class="text-center mt-3">
                         <button class="btn btn-outline" onclick="hideAdvancedEdit()" 
                                 aria-label="고급 편집 모드 닫기">취소</button>
-                    </div>
-                </div>
-                
-                <!-- CTA Banner -->
-                <div class="cta-banner cta-banner-gradient-orange" onclick="applyAsModel()" role="button" tabindex="0"
-                     onkeydown="if(event.key==='Enter') applyAsModel()" aria-label="AI 모델로 활동하기">
-                    <div class="shine"></div>
-                    <div class="cta-content">
-                        <h3>🌟 AI 모델로 활동하고 수익 창출하기</h3>
                     </div>
                 </div>
                 

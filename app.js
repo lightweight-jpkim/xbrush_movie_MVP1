@@ -941,53 +941,34 @@ function applyAsModel() {
  * Advanced Edit Mode Functions
  */
 function showAdvancedEdit() {
-    console.log('showAdvancedEdit called'); // Debug log
+    // Advanced Edit Mode is now always visible, so just scroll to it
     try {
         const advancedEditSection = document.getElementById('advancedEditSection');
-        console.log('Advanced edit section:', advancedEditSection); // Debug log
-        
         if (advancedEditSection) {
-            advancedEditSection.classList.remove('hidden');
-            
-            // Smooth scroll to the advanced edit section
-            setTimeout(() => {
-                advancedEditSection.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-            }, 100);
-            
-            // Try to show toast, but don't fail if it doesn't work
-            try {
-                showToast('고급 편집 모드가 활성화되었습니다.', 'info');
-            } catch (toastError) {
-                console.log('Toast failed, but continuing...');
-            }
-        } else {
-            console.error('Advanced edit section not found');
-            alert('고급 편집 모드를 불러올 수 없습니다.');
+            advancedEditSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+            showToast('고급 편집 옵션을 확인해보세요!', 'info');
         }
     } catch (error) {
         console.error('Error in showAdvancedEdit:', error);
-        alert('오류가 발생했습니다: ' + error.message);
     }
 }
 
 function hideAdvancedEdit() {
-    console.log('hideAdvancedEdit called'); // Debug log
+    // Since Advanced Edit Mode is always visible, just scroll back to video
     try {
-        const advancedEditSection = document.getElementById('advancedEditSection');
-        if (advancedEditSection) {
-            advancedEditSection.classList.add('hidden');
-            try {
-                showToast('고급 편집 모드가 비활성화되었습니다.', 'info');
-            } catch (toastError) {
-                console.log('Toast failed, but continuing...');
-            }
+        const videoSection = document.querySelector('.video-info-grid');
+        if (videoSection) {
+            videoSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
         }
+        showToast('고급 편집을 취소했습니다.', 'info');
     } catch (error) {
         console.error('Error in hideAdvancedEdit:', error);
-        alert('오류가 발생했습니다: ' + error.message);
     }
 }
 
@@ -1048,24 +1029,35 @@ function executeEditOption(option, cost) {
             case 'regenerate-image':
                 showToast(`새 이미지로 제작을 시작합니다. (${cost} 토큰 소모)`, 'info');
                 
-                // Hide advanced edit mode
-                hideAdvancedEdit();
-                
-                // Navigate back to step 6 (image selection)
+                // Navigate back to step 6 for image selection
                 setTimeout(() => {
-                    if (app && app.stepManager) {
-                        app.stepManager.goToStep(STEPS.VIDEO_CREATION);
+                    // Use the global goToStep function
+                    if (typeof goToStep === 'function') {
+                        goToStep(6);
                         
-                        // Show image preview section
-                        const imagePreviewSection = safeGetElement('imagePreviewSection');
-                        const videoCreationProgress = safeGetElement('videoCreationProgress');
-                        
-                        if (imagePreviewSection && videoCreationProgress) {
-                            imagePreviewSection.classList.remove('hidden');
-                            videoCreationProgress.classList.add('hidden');
-                        }
-                        
-                        showToast('이미지 선택 단계로 돌아갑니다.', 'info');
+                        // After navigation, show image preview section
+                        setTimeout(() => {
+                            const videoCreationProgress = document.getElementById('videoCreationProgress');
+                            const imagePreviewSection = document.getElementById('imagePreviewSection');
+                            
+                            if (videoCreationProgress) {
+                                videoCreationProgress.style.display = 'none';
+                            }
+                            
+                            if (imagePreviewSection) {
+                                imagePreviewSection.style.display = 'block';
+                            } else {
+                                // If imagePreviewSection doesn't exist, trigger the image preview
+                                if (typeof showImagePreviewOption === 'function') {
+                                    showImagePreviewOption();
+                                }
+                            }
+                            
+                            showToast('이미지 선택 단계로 돌아갑니다.', 'info');
+                        }, 500);
+                    } else {
+                        console.error('goToStep function not found');
+                        showToast('오류가 발생했습니다. 페이지를 새로고침 해주세요.', 'error');
                     }
                 }, 1000);
                 break;
