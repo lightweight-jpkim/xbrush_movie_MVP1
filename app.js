@@ -937,12 +937,148 @@ function applyAsModel() {
     }
 }
 
+/**
+ * Advanced Edit Mode Functions
+ */
+function showAdvancedEdit() {
+    try {
+        const advancedEditSection = safeGetElement('advancedEditSection');
+        if (advancedEditSection) {
+            advancedEditSection.classList.remove('hidden');
+            
+            // Smooth scroll to the advanced edit section
+            advancedEditSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+            
+            showToast('고급 편집 모드가 활성화되었습니다.', 'info');
+        } else {
+            console.error('Advanced edit section not found');
+            showToast('고급 편집 모드를 불러올 수 없습니다.', 'error');
+        }
+    } catch (error) {
+        handleError(error, 'Advanced edit mode display');
+    }
+}
+
+function hideAdvancedEdit() {
+    try {
+        const advancedEditSection = safeGetElement('advancedEditSection');
+        if (advancedEditSection) {
+            advancedEditSection.classList.add('hidden');
+            showToast('고급 편집 모드가 비활성화되었습니다.', 'info');
+        }
+    } catch (error) {
+        handleError(error, 'Advanced edit mode hiding');
+    }
+}
+
+function selectEditOption(option) {
+    try {
+        let message = '';
+        let confirmMessage = '';
+        let cost = 0;
+        
+        switch(option) {
+            case 'regenerate-video':
+                message = '영상만 다시 제작하시겠습니까?';
+                confirmMessage = '같은 이미지로 영상 스타일이나 편집을 변경합니다.';
+                cost = 5;
+                break;
+            case 'regenerate-image':
+                message = '새 이미지로 제작하시겠습니까?';
+                confirmMessage = '이미지 선택부터 다시 시작합니다.';
+                cost = 10;
+                break;
+            default:
+                console.warn(`Unknown edit option: ${option}`);
+                return;
+        }
+        
+        const confirmed = confirm(`${message}\n\n${confirmMessage}\n\n비용: ${cost} 토큰이 소모됩니다.`);
+        
+        if (confirmed) {
+            executeEditOption(option, cost);
+        }
+    } catch (error) {
+        handleError(error, 'Edit option selection');
+    }
+}
+
+function executeEditOption(option, cost) {
+    try {
+        switch(option) {
+            case 'regenerate-video':
+                showToast(`영상 재생성을 시작합니다. (${cost} 토큰 소모)`, 'info');
+                
+                // Hide advanced edit mode
+                hideAdvancedEdit();
+                
+                // Simulate video regeneration
+                setTimeout(() => {
+                    showToast('영상이 재생성되었습니다! 🎬', 'success');
+                    
+                    // Refresh the video (in a real app, this would load the new video)
+                    const video = document.querySelector('.video-preview');
+                    if (video) {
+                        video.currentTime = 0;
+                        video.play();
+                    }
+                }, 3000);
+                break;
+                
+            case 'regenerate-image':
+                showToast(`새 이미지로 제작을 시작합니다. (${cost} 토큰 소모)`, 'info');
+                
+                // Hide advanced edit mode
+                hideAdvancedEdit();
+                
+                // Navigate back to step 6 (image selection)
+                setTimeout(() => {
+                    if (app && app.stepManager) {
+                        app.stepManager.goToStep(STEPS.VIDEO_CREATION);
+                        
+                        // Show image preview section
+                        const imagePreviewSection = safeGetElement('imagePreviewSection');
+                        const videoCreationProgress = safeGetElement('videoCreationProgress');
+                        
+                        if (imagePreviewSection && videoCreationProgress) {
+                            imagePreviewSection.classList.remove('hidden');
+                            videoCreationProgress.classList.add('hidden');
+                        }
+                        
+                        showToast('이미지 선택 단계로 돌아갑니다.', 'info');
+                    }
+                }, 1000);
+                break;
+        }
+    } catch (error) {
+        handleError(error, 'Edit option execution');
+    }
+}
+
+function satisfiedWithVideo() {
+    try {
+        showToast('영상이 마음에 드신다니 기쁩니다! 🎉', 'success');
+        
+        // You could add additional logic here, such as:
+        // - Saving the video to user's library
+        // - Updating user preferences
+        // - Showing download/share options
+        
+        setTimeout(() => {
+            showToast('영상을 다운로드하거나 공유해보세요!', 'info');
+        }, 2000);
+    } catch (error) {
+        handleError(error, 'Video satisfaction');
+    }
+}
+
 // Placeholder functions for advanced features
 function regenerateImages(cut) { /* Implementation would go here */ }
 function checkImageSelectionButton() { /* Implementation would go here */ }
 function startVideoWithSelectedImages() { /* Implementation would go here */ }
-function showAdvancedEdit() { /* Implementation would go here */ }
-function satisfiedWithVideo() { /* Implementation would go here */ }
 
 // ========================================
 // Application Entry Point
