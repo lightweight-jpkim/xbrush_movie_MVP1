@@ -1,0 +1,369 @@
+/* ========================================
+ * Navigation Option 2: Floating Action Style
+ * ========================================
+ * 
+ * Design Philosophy:
+ * - Fixed/sticky navigation always visible at bottom
+ * - Material Design inspired with elevation and shadows
+ * - Circular/pill-shaped buttons for modern look
+ * - Consistent visibility as user scrolls
+ * - Clean, minimal design with focus on functionality
+ * 
+ * Pros:
+ * - Always visible, never lost while scrolling
+ * - Clean, modern Material Design aesthetic
+ * - Excellent mobile experience
+ * - Consistent positioning across all steps
+ * - Minimal interference with content
+ * 
+ * Cons:
+ * - Takes up permanent screen space
+ * - Might not work well with bottom navigation apps
+ * - Fixed positioning can have z-index conflicts
+ * - Less prominent than traditional button layouts
+ */
+
+/* Floating Navigation Container */
+.action-buttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 16px 24px;
+    z-index: 1000;
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Inner container for centering */
+.action-buttons-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Add margin to content area to prevent overlap */
+.content-area {
+    margin-bottom: 100px; /* Space for floating navigation */
+}
+
+/* Enhanced Button Styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: 28px; /* Pill shape */
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.5;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    min-width: 120px;
+    min-height: 48px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Primary Button - Next Step (Floating Action Button Style) */
+.btn-primary {
+    background: linear-gradient(135deg, #3182ce, #2c5aa0);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 8px -2px rgba(49, 130, 206, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2c5aa0, #2a4d8a);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -4px rgba(49, 130, 206, 0.5), 0 4px 8px -2px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px -1px rgba(49, 130, 206, 0.3);
+    transition: all 0.1s ease;
+}
+
+/* Outline Button - Previous Step (Subtle Style) */
+.btn-outline {
+    background: white;
+    color: #4a5568;
+    border: 1px solid #cbd5e0;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.btn-outline:hover {
+    background: #f7fafc;
+    border-color: #a0aec0;
+    color: #2d3748;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.1);
+}
+
+.btn-outline:active {
+    transform: translateY(0);
+    background: #edf2f7;
+    transition: all 0.1s ease;
+}
+
+/* Disabled State */
+.btn-disabled {
+    background: #f7fafc !important;
+    color: #a0aec0 !important;
+    cursor: not-allowed !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+}
+
+.btn-disabled:hover {
+    background: #f7fafc !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Focus State for Accessibility */
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.5);
+}
+
+.btn-outline:focus {
+    box-shadow: 0 0 0 3px rgba(74, 85, 104, 0.2);
+}
+
+/* Directional Icons */
+.btn-primary::after {
+    content: '→';
+    font-size: 16px;
+    margin-left: 6px;
+    transition: transform 0.3s ease;
+}
+
+.btn-outline::before {
+    content: '←';
+    font-size: 16px;
+    margin-right: 6px;
+    transition: transform 0.3s ease;
+}
+
+.btn-primary:hover::after {
+    transform: translateX(2px);
+}
+
+.btn-outline:hover::before {
+    transform: translateX(-2px);
+}
+
+/* Remove arrows for disabled state */
+.btn-disabled::after,
+.btn-disabled::before {
+    content: '';
+    margin: 0;
+}
+
+/* Circular Step Indicator (Optional) */
+.step-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(49, 130, 206, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #3182ce;
+    margin-right: 8px;
+}
+
+/* Progress Dots */
+.navigation-progress {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #cbd5e0;
+    transition: all 0.3s ease;
+}
+
+.progress-dot.active {
+    background: #3182ce;
+    transform: scale(1.2);
+}
+
+.progress-dot.completed {
+    background: #38a169;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .action-buttons {
+        padding: 12px 16px;
+    }
+    
+    .action-buttons-inner {
+        gap: 12px;
+    }
+    
+    .btn {
+        min-width: 100px;
+        padding: 10px 20px;
+        font-size: 13px;
+        min-height: 44px;
+    }
+    
+    .content-area {
+        margin-bottom: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .action-buttons {
+        padding: 8px 12px;
+    }
+    
+    .btn {
+        min-width: 80px;
+        padding: 8px 16px;
+        font-size: 12px;
+        min-height: 40px;
+    }
+    
+    .btn-primary::after,
+    .btn-outline::before {
+        font-size: 14px;
+    }
+    
+    .content-area {
+        margin-bottom: 70px;
+    }
+}
+
+/* Hide default action buttons positioning */
+.step-content .action-buttons {
+    position: static;
+    background: none;
+    backdrop-filter: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* Floating Action Button Variants */
+.btn-fab {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    padding: 0;
+    min-width: auto;
+    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12);
+}
+
+.btn-fab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+/* Loading State */
+.btn-loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 4px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Enhanced Focus Visible for Keyboard Navigation */
+.btn:focus-visible {
+    outline: 2px solid #3182ce;
+    outline-offset: 2px;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .action-buttons {
+        background: white;
+        border-top: 2px solid #000;
+    }
+    
+    .btn-primary {
+        background: #000;
+        border: 2px solid #000;
+        color: #fff;
+    }
+    
+    .btn-outline {
+        background: #fff;
+        border: 2px solid #000;
+        color: #000;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .btn {
+        transition: none;
+    }
+    
+    .btn:hover {
+        transform: none;
+    }
+    
+    .btn-primary:hover::after,
+    .btn-outline:hover::before {
+        transform: none;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .action-buttons {
+        background: rgba(26, 32, 44, 0.95);
+        border-top: 1px solid rgba(74, 85, 104, 0.8);
+    }
+    
+    .btn-outline {
+        background: #2d3748;
+        color: #e2e8f0;
+        border-color: #4a5568;
+    }
+    
+    .btn-outline:hover {
+        background: #4a5568;
+        color: #f7fafc;
+    }
+}

@@ -1,0 +1,459 @@
+/* ========================================
+ * Navigation Option 3: Gradient & Glassmorphism
+ * ========================================
+ * 
+ * Design Philosophy:
+ * - Modern gradient backgrounds with glass morphism effects
+ * - Premium feel with subtle shadows and depth
+ * - Backdrop blur effects for sophisticated look
+ * - Smooth transitions and premium interactions
+ * - High-end aesthetic with attention to detail
+ * 
+ * Pros:
+ * - Premium, high-end aesthetic
+ * - Modern glassmorphism trend
+ * - Subtle but effective visual hierarchy
+ * - Smooth, polished animations
+ * - Works well with light and dark themes
+ * 
+ * Cons:
+ * - Browser compatibility issues with backdrop-filter
+ * - Can be resource-intensive on low-end devices
+ * - Might be too subtle for accessibility requirements
+ * - Complex implementation with multiple layers
+ */
+
+/* Enhanced Action Buttons Container */
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 48px;
+    padding: 24px 32px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    position: relative;
+    overflow: hidden;
+    gap: 24px;
+}
+
+/* Glassmorphism background effect */
+.action-buttons::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(10px);
+    z-index: -1;
+}
+
+/* Base Button Styles - Glassmorphism Enhanced */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 32px;
+    border-radius: 16px;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.5;
+    border: none;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    letter-spacing: 0.025em;
+    min-width: 160px;
+    min-height: 56px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+/* Primary Button - Gradient Glassmorphism */
+.btn-primary {
+    background: linear-gradient(135deg, 
+        rgba(49, 130, 206, 0.9), 
+        rgba(44, 90, 160, 0.9), 
+        rgba(56, 178, 172, 0.9)
+    );
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+        0 8px 32px 0 rgba(49, 130, 206, 0.3),
+        0 4px 16px 0 rgba(49, 130, 206, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.1), 
+        transparent, 
+        rgba(255, 255, 255, 0.1)
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 12px 40px 0 rgba(49, 130, 206, 0.4),
+        0 8px 20px 0 rgba(49, 130, 206, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, 
+        rgba(49, 130, 206, 1), 
+        rgba(44, 90, 160, 1), 
+        rgba(56, 178, 172, 1)
+    );
+}
+
+.btn-primary:hover::before {
+    opacity: 1;
+}
+
+.btn-primary:active {
+    transform: translateY(-1px);
+    box-shadow: 
+        0 4px 16px 0 rgba(49, 130, 206, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.1s ease;
+}
+
+/* Outline Button - Glassmorphism */
+.btn-outline {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.1), 
+        rgba(255, 255, 255, 0.05)
+    );
+    color: #4a5568;
+    border: 1px solid rgba(203, 213, 224, 0.3);
+    box-shadow: 
+        0 4px 16px 0 rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-outline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.1), 
+        transparent
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.btn-outline:hover {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.2), 
+        rgba(255, 255, 255, 0.1)
+    );
+    border-color: rgba(160, 174, 192, 0.4);
+    color: #2d3748;
+    transform: translateY(-2px);
+    box-shadow: 
+        0 8px 24px 0 rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-outline:hover::before {
+    opacity: 1;
+}
+
+.btn-outline:active {
+    transform: translateY(0);
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.15), 
+        rgba(255, 255, 255, 0.08)
+    );
+    transition: all 0.1s ease;
+}
+
+/* Disabled State */
+.btn-disabled {
+    background: linear-gradient(135deg, 
+        rgba(247, 250, 252, 0.5), 
+        rgba(237, 242, 247, 0.5)
+    ) !important;
+    color: #a0aec0 !important;
+    cursor: not-allowed !important;
+    border: 1px solid rgba(226, 232, 240, 0.5) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+
+.btn-disabled:hover {
+    background: linear-gradient(135deg, 
+        rgba(247, 250, 252, 0.5), 
+        rgba(237, 242, 247, 0.5)
+    ) !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Focus State for Accessibility */
+.btn:focus {
+    outline: none;
+    box-shadow: 
+        0 0 0 3px rgba(49, 130, 206, 0.5),
+        0 8px 32px 0 rgba(49, 130, 206, 0.3);
+}
+
+.btn-outline:focus {
+    box-shadow: 
+        0 0 0 3px rgba(74, 85, 104, 0.3),
+        0 4px 16px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Directional Arrows with Glow */
+.btn-primary::after {
+    content: '→';
+    font-size: 18px;
+    margin-left: 8px;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.btn-outline::before {
+    content: '←';
+    font-size: 18px;
+    margin-right: 8px;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 4px rgba(74, 85, 104, 0.3);
+}
+
+.btn-primary:hover::after {
+    transform: translateX(4px);
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+}
+
+.btn-outline:hover::before {
+    transform: translateX(-4px);
+    text-shadow: 0 0 8px rgba(74, 85, 104, 0.5);
+}
+
+/* Remove arrows for disabled state */
+.btn-disabled::after,
+.btn-disabled::before {
+    content: '';
+    margin: 0;
+    text-shadow: none;
+}
+
+/* Shimmer Effect */
+.btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: left 0.5s ease;
+}
+
+.btn-primary:hover::after {
+    left: 100%;
+}
+
+/* Floating particles effect */
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 32px;
+        padding: 20px 24px;
+    }
+    
+    .btn {
+        width: 100%;
+        min-width: auto;
+        padding: 14px 24px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .action-buttons {
+        padding: 16px 20px;
+        margin-top: 24px;
+        border-radius: 16px;
+    }
+    
+    .btn {
+        padding: 12px 20px;
+        font-size: 14px;
+        min-height: 48px;
+    }
+}
+
+/* Loading State with Glassmorphism */
+.btn-loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 8px;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Enhanced Focus Visible for Keyboard Navigation */
+.btn:focus-visible {
+    outline: 2px solid rgba(49, 130, 206, 0.8);
+    outline-offset: 2px;
+    box-shadow: 
+        0 0 0 4px rgba(49, 130, 206, 0.3),
+        0 8px 32px 0 rgba(49, 130, 206, 0.4);
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .action-buttons {
+        background: white;
+        border: 2px solid #000;
+        backdrop-filter: none;
+    }
+    
+    .btn-primary {
+        background: #000;
+        border: 2px solid #000;
+        color: #fff;
+        backdrop-filter: none;
+    }
+    
+    .btn-outline {
+        background: #fff;
+        border: 2px solid #000;
+        color: #000;
+        backdrop-filter: none;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .btn {
+        transition: none;
+    }
+    
+    .btn:hover {
+        transform: none;
+    }
+    
+    .btn-primary:hover::after,
+    .btn-outline:hover::before {
+        transform: none;
+    }
+    
+    .btn-primary::before {
+        animation: none;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .action-buttons {
+        background: linear-gradient(135deg, 
+            rgba(26, 32, 44, 0.2), 
+            rgba(45, 55, 72, 0.1)
+        );
+        border-color: rgba(74, 85, 104, 0.3);
+    }
+    
+    .btn-outline {
+        background: linear-gradient(135deg, 
+            rgba(45, 55, 72, 0.2), 
+            rgba(26, 32, 44, 0.1)
+        );
+        color: #e2e8f0;
+        border-color: rgba(74, 85, 104, 0.4);
+    }
+    
+    .btn-outline:hover {
+        background: linear-gradient(135deg, 
+            rgba(74, 85, 104, 0.3), 
+            rgba(45, 55, 72, 0.2)
+        );
+        color: #f7fafc;
+    }
+}
+
+/* Safari-specific fixes for backdrop-filter */
+@supports (-webkit-backdrop-filter: blur(10px)) {
+    .action-buttons,
+    .btn {
+        -webkit-backdrop-filter: blur(10px);
+    }
+}
+
+/* Fallback for browsers without backdrop-filter support */
+@supports not (backdrop-filter: blur(10px)) {
+    .action-buttons {
+        background: rgba(255, 255, 255, 0.9);
+    }
+    
+    .btn {
+        backdrop-filter: none;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #3182ce, #2c5aa0);
+    }
+    
+    .btn-outline {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #cbd5e0;
+    }
+}
