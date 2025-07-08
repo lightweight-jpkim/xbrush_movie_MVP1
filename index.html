@@ -1340,7 +1340,8 @@
                 cut1: null,
                 cut2: null,
                 cut3: null
-            }
+            },
+            videoCreated: false
         };
 
         // 단계 이동 함수
@@ -1471,6 +1472,8 @@
                 
                 if (progress >= 100) {
                     clearInterval(progressInterval);
+                    // Mark video creation as completed
+                    selectedData.videoCreated = true;
                     // Auto-navigate to Step 7 after completion
                     setTimeout(() => {
                         showToast('영상 제작이 완료되었습니다! 🎉');
@@ -1495,8 +1498,8 @@
                 case 3: return selectedData.format !== null && selectedData.duration !== null;
                 case 4: return selectedData.style !== null;
                 case 5: return selectedData.scenarioApproved === true;
-                case 6: return selectedData.selectedImages.cut1 !== null && selectedData.selectedImages.cut2 !== null && selectedData.selectedImages.cut3 !== null;
-                case 7: return selectedData.selectedVideoCuts && selectedData.selectedVideoCuts.cut1 && selectedData.selectedVideoCuts.cut2 && selectedData.selectedVideoCuts.cut3;
+                case 6: return selectedData.videoCreated === true; // Updated for streamlined flow
+                case 7: return true; // Step 7 is always accessible after Step 6
                 default: return true;
             }
         }
