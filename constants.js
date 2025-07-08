@@ -21,14 +21,15 @@ const MODEL_IMAGES = {
 
 // Step configuration
 const STEPS = {
-    TOTAL: 7,
+    TOTAL: 8,
     MODEL_SELECTION: 1,
     BASIC_INFO: 2,
     FORMAT_SELECTION: 3,
     STYLE_SELECTION: 4,
     SCENARIO_REVIEW: 5,
     VIDEO_CREATION: 6,
-    RESULTS: 7
+    RESULTS: 7,
+    VIDEO_CUT_SELECTION: 8
 };
 
 // Progress status messages for video creation

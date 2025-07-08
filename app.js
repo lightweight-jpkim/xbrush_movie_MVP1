@@ -432,19 +432,29 @@ class StepManager {
         try {
             switch(step) {
                 case STEPS.VIDEO_CREATION:
-                    // Auto-start video creation (unless skip flag is set)
-                    setTimeout(() => {
-                        if (window.skipAutoVideoCreation) {
-                            // Reset the flag and don't auto-start
-                            window.skipAutoVideoCreation = false;
-                            console.log('Skipped automatic video creation for image regeneration');
-                        } else {
+                    // Check if this is video regeneration from cut selection
+                    if (window.videoRegenerationInProgress) {
+                        // Don't auto-start, let startVideoRegenerationProgress handle it
+                        console.log('Video regeneration in progress, skipping auto-start');
+                    } else if (window.skipAutoVideoCreation) {
+                        // Reset the flag and don't auto-start
+                        window.skipAutoVideoCreation = false;
+                        console.log('Skipped automatic video creation for image regeneration');
+                    } else {
+                        // Normal video creation flow
+                        setTimeout(() => {
                             this.startAutomaticVideoCreation();
-                        }
-                    }, 500);
+                        }, 500);
+                    }
                     break;
                 case STEPS.RESULTS:
                     this.updateFinalInfo();
+                    break;
+                case STEPS.VIDEO_CUT_SELECTION:
+                    // Initialize video cuts when entering step 8
+                    setTimeout(() => {
+                        initializeVideoCuts();
+                    }, 300);
                     break;
             }
 
@@ -585,6 +595,71 @@ class StepManager {
             
         } catch (error) {
             handleError(error, 'Video creation process');
+        }
+    }
+
+    /**
+     * Start video regeneration progress (after cut selection)
+     */
+    startVideoRegenerationProgress() {
+        try {
+            // Show video creation progress section
+            const videoCreationProgress = document.getElementById('videoCreationProgress');
+            const imagePreviewSection = document.getElementById('imagePreviewSection');
+            
+            if (videoCreationProgress) {
+                videoCreationProgress.style.display = 'block';
+            }
+            if (imagePreviewSection) {
+                imagePreviewSection.style.display = 'none';
+            }
+            
+            // Hide step 6 action buttons
+            this.uiController.toggleElement('step6Actions', false);
+            
+            // Start progress simulation for regeneration
+            let progress = VIDEO_CONFIG.INITIAL_PROGRESS;
+            let statusIndex = 0;
+            
+            // Custom status messages for regeneration
+            const regenerationStatuses = [
+                '선택된 컷 분석 중...',
+                '영상 스타일 적용 중...',
+                '첫 번째 컷 재생성 중...',
+                '두 번째 컷 재생성 중...',
+                '세 번째 컷 재생성 중...',
+                '컷들 연결 중...',
+                '오디오 동기화 중...',
+                '최종 편집 중...',
+                '영상 재생성 완료!'
+            ];
+            
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * VIDEO_CONFIG.MAX_PROGRESS_STEP + VIDEO_CONFIG.MIN_PROGRESS_STEP;
+                if (progress > 100) progress = 100;
+                
+                this.uiController.updateProgress(progress, regenerationStatuses[statusIndex]);
+                
+                if (statusIndex < regenerationStatuses.length - 1) {
+                    statusIndex++;
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    
+                    // Reset the regeneration flag
+                    window.videoRegenerationInProgress = false;
+                    
+                    setTimeout(() => {
+                        showToast('영상 재생성이 완료되었습니다! 🎉', 'success');
+                        // Navigate to Step 7 (Results)
+                        this.goToStep(7);
+                    }, VIDEO_CONFIG.COMPLETION_DELAY);
+                }
+            }, VIDEO_CONFIG.PROGRESS_INTERVAL);
+            
+        } catch (error) {
+            handleError(error, 'Video regeneration process');
         }
     }
 
@@ -805,6 +880,15 @@ function prevStep() {
 
 function goToStep(step) {
     if (app) app.stepManager.goToStep(step);
+}
+
+/**
+ * Video regeneration function
+ */
+function startVideoRegenerationProgress() {
+    if (app && app.stepManager) {
+        app.stepManager.startVideoRegenerationProgress();
+    }
 }
 
 /**
@@ -1065,8 +1149,16 @@ function executeEditOption(option, cost) {
             case 'regenerate-video':
                 showToast(`영상 컷 선택 화면으로 이동합니다.`, 'info');
                 
-                // Show video cut selection interface
-                showVideoCutSelection();
+                // Navigate to Step 8 (Video Cut Selection)
+                setTimeout(() => {
+                    if (app && app.stepManager) {
+                        app.stepManager.goToStep(8);
+                        // Initialize video cuts after navigation
+                        setTimeout(() => {
+                            initializeVideoCuts();
+                        }, 300);
+                    }
+                }, 500);
                 break;
                 
             case 'regenerate-image':
@@ -1260,52 +1352,7 @@ function backToVideoOptions() {
     }
 }
 
-// Video Cut Selection Functions
-function showVideoCutSelection() {
-    try {
-        const videoCutSection = document.getElementById('videoCutSelectionSection');
-        if (videoCutSection) {
-            videoCutSection.classList.remove('hidden');
-            
-            // Initialize all cuts as selected by default
-            initializeVideoCuts();
-            
-            // Scroll to video cut section
-            setTimeout(() => {
-                videoCutSection.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-            }, 100);
-            
-            showToast('각 컷을 검토하고 필요하면 다시 생성해보세요.', 'info');
-        }
-    } catch (error) {
-        console.error('Error in showVideoCutSelection:', error);
-        showToast('영상 컷 선택 화면을 불러오는데 실패했습니다.', 'error');
-    }
-}
-
-function hideVideoCutSelection() {
-    try {
-        const videoCutSection = document.getElementById('videoCutSelectionSection');
-        if (videoCutSection) {
-            videoCutSection.classList.add('hidden');
-            
-            // Scroll back to main video
-            const videoSection = document.querySelector('.video-info-grid');
-            if (videoSection) {
-                videoSection.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-            }
-        }
-        showToast('영상 컷 선택을 취소했습니다.', 'info');
-    } catch (error) {
-        console.error('Error in hideVideoCutSelection:', error);
-    }
-}
+// Video Cut Selection Functions (Step 8)
 
 function initializeVideoCuts() {
     try {
@@ -1448,13 +1495,20 @@ function proceedWithSelectedCuts() {
         
         showToast(`선택된 ${selectedCuts.length}개 컷으로 최종 영상을 제작합니다!`, 'success');
         
-        // Hide video cut selection and return to results
-        hideVideoCutSelection();
-        
-        // Show completion message
+        // Navigate to Step 6 to show progress bar for video regeneration
         setTimeout(() => {
-            showToast('영상 편집이 완료되었습니다! 🎉', 'success');
-        }, 1500);
+            if (app && app.stepManager) {
+                app.stepManager.goToStep(6);
+                
+                // Set flag to trigger video regeneration progress
+                window.videoRegenerationInProgress = true;
+                
+                // Start the video regeneration progress
+                setTimeout(() => {
+                    startVideoRegenerationProgress();
+                }, 500);
+            }
+        }, 1000);
     } catch (error) {
         console.error('Error in proceedWithSelectedCuts:', error);
         showToast('영상 제작에 실패했습니다.', 'error');
@@ -1468,16 +1522,20 @@ function regenerateEntireVideo() {
         if (confirmed) {
             showToast('전체 영상을 다시 제작합니다... (15 토큰 소모)', 'info');
             
-            // Hide video cut selection
-            hideVideoCutSelection();
-            
-            // Show main video regeneration progress
-            showVideoRegenerationProgress();
-            
-            // Simulate full regeneration
+            // Navigate to Step 6 to show progress bar for full regeneration
             setTimeout(() => {
-                showToast('전체 영상이 새로 제작되었습니다! 🎬', 'success');
-            }, 5000);
+                if (app && app.stepManager) {
+                    app.stepManager.goToStep(6);
+                    
+                    // Set flag to trigger video regeneration progress
+                    window.videoRegenerationInProgress = true;
+                    
+                    // Start the video regeneration progress
+                    setTimeout(() => {
+                        startVideoRegenerationProgress();
+                    }, 500);
+                }
+            }, 1000);
         }
     } catch (error) {
         console.error('Error in regenerateEntireVideo:', error);
