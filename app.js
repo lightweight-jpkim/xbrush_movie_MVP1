@@ -436,6 +436,9 @@ class StepManager {
                     if (window.videoRegenerationInProgress) {
                         // Don't auto-start, let startVideoRegenerationProgress handle it
                         console.log('Video regeneration in progress, skipping auto-start');
+                    } else if (window.imageToVideoInProgress) {
+                        // Don't auto-start, let startImageToVideoProgress handle it
+                        console.log('Image-to-video generation in progress, skipping auto-start');
                     } else if (window.skipAutoVideoCreation) {
                         // Reset the flag and don't auto-start
                         window.skipAutoVideoCreation = false;
@@ -665,6 +668,76 @@ class StepManager {
             
         } catch (error) {
             handleError(error, 'Video regeneration process');
+        }
+    }
+
+    /**
+     * Start image-to-video generation progress (after image selection)
+     */
+    startImageToVideoProgress() {
+        try {
+            // Show video creation progress section
+            const videoCreationProgress = document.getElementById('videoCreationProgress');
+            const imagePreviewSection = document.getElementById('imagePreviewSection');
+            
+            if (videoCreationProgress) {
+                videoCreationProgress.style.display = 'block';
+            }
+            if (imagePreviewSection) {
+                imagePreviewSection.style.display = 'none';
+            }
+            
+            // Hide step 6 action buttons
+            this.uiController.toggleElement('step6Actions', false);
+            
+            // Start progress simulation for image-to-video generation
+            let progress = VIDEO_CONFIG.INITIAL_PROGRESS;
+            let statusIndex = 0;
+            
+            // Custom status messages for image-to-video generation
+            const imageToVideoStatuses = [
+                '선택된 이미지 분석 중...',
+                '이미지 품질 최적화 중...',
+                '첫 번째 컷 영상 생성 중...',
+                '두 번째 컷 영상 생성 중...',
+                '세 번째 컷 영상 생성 중...',
+                '컷들 연결 및 시퀀싱 중...',
+                '오디오 트랙 생성 중...',
+                '최종 영상 편집 중...',
+                '영상 컷 준비 완료!'
+            ];
+            
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * VIDEO_CONFIG.MAX_PROGRESS_STEP + VIDEO_CONFIG.MIN_PROGRESS_STEP;
+                if (progress > 100) progress = 100;
+                
+                this.uiController.updateProgress(progress, imageToVideoStatuses[statusIndex]);
+                
+                if (statusIndex < imageToVideoStatuses.length - 1) {
+                    statusIndex++;
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    
+                    // Reset the image-to-video flag
+                    window.imageToVideoInProgress = false;
+                    
+                    setTimeout(() => {
+                        showToast('영상 생성이 완료되었습니다! 컷을 선택해주세요. 🎬', 'success');
+                        // Navigate to Step 8 (Video Cut Selection)
+                        this.goToStep(8);
+                        
+                        // Initialize video cuts after navigation
+                        setTimeout(() => {
+                            initializeVideoCuts();
+                        }, 300);
+                    }, VIDEO_CONFIG.COMPLETION_DELAY);
+                }
+            }, VIDEO_CONFIG.PROGRESS_INTERVAL);
+            
+        } catch (error) {
+            handleError(error, 'Image-to-video generation process');
         }
     }
 
@@ -919,6 +992,15 @@ function goToStep(step) {
 function startVideoRegenerationProgress() {
     if (app && app.stepManager) {
         app.stepManager.startVideoRegenerationProgress();
+    }
+}
+
+/**
+ * Image-to-video generation function
+ */
+function startImageToVideoProgress() {
+    if (app && app.stepManager) {
+        app.stepManager.startImageToVideoProgress();
     }
 }
 
@@ -1425,21 +1507,25 @@ function proceedToVideoCutSelection() {
             return;
         }
         
-        showToast('선택된 이미지로 영상 컷 선택 화면으로 이동합니다!', 'info');
+        showToast('선택된 이미지로 영상을 생성하고 있습니다...', 'info');
         
-        // Navigate to Step 8 (Video Cut Selection)
+        // Navigate to Step 6 to show progress for video generation from selected images
         setTimeout(() => {
             if (app && app.stepManager) {
-                app.stepManager.goToStep(8);
-                // Initialize video cuts after navigation
+                app.stepManager.goToStep(6);
+                
+                // Set flag to trigger image-to-video generation progress
+                window.imageToVideoInProgress = true;
+                
+                // Start the image-to-video generation progress
                 setTimeout(() => {
-                    initializeVideoCuts();
-                }, 300);
+                    startImageToVideoProgress();
+                }, 500);
             }
         }, 1000);
     } catch (error) {
         console.error('Error in proceedToVideoCutSelection:', error);
-        showToast('영상 컷 선택으로 이동하는데 실패했습니다.', 'error');
+        showToast('영상 생성으로 이동하는데 실패했습니다.', 'error');
     }
 }
 
