@@ -1147,10 +1147,139 @@ function satisfiedWithVideo() {
     }
 }
 
-// Placeholder functions for advanced features
-function regenerateImages(cut) { /* Implementation would go here */ }
-function checkImageSelectionButton() { /* Implementation would go here */ }
-function startVideoWithSelectedImages() { /* Implementation would go here */ }
+// Image Selection and Management Functions
+function showImagePreviewOption() {
+    try {
+        const imagePreviewSection = document.getElementById('imagePreviewSection');
+        const videoCreationProgress = document.getElementById('videoCreationProgress');
+        
+        if (videoCreationProgress) {
+            videoCreationProgress.style.display = 'none';
+        }
+        if (imagePreviewSection) {
+            imagePreviewSection.style.display = 'block';
+        } else {
+            // If imagePreviewSection doesn't exist, show a placeholder
+            showToast('이미지 선택 인터페이스를 로드하고 있습니다...', 'info');
+        }
+    } catch (error) {
+        console.error('Error in showImagePreviewOption:', error);
+        showToast('이미지 선택 화면을 불러오는데 실패했습니다.', 'error');
+    }
+}
+
+function regenerateImages(cut) {
+    try {
+        showToast(`${cut} 이미지를 다시 생성합니다. (3 토큰)`, 'info');
+        
+        // Find the specific cut element and show loading
+        const cutElement = document.querySelector(`[data-cut="${cut}"]`);
+        if (cutElement) {
+            cutElement.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                    <div style="width: 24px; height: 24px; border: 2px solid #e2e8f0; border-top: 2px solid #3182ce; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 8px;"></div>
+                    <span style="font-size: 10px; color: #a0aec0;">생성 중...</span>
+                </div>
+            `;
+            
+            // Simulate regeneration
+            setTimeout(() => {
+                showToast(`${cut} 이미지가 새로 생성되었습니다!`, 'success');
+                // In real app, this would update with new image
+            }, 2000);
+        }
+    } catch (error) {
+        console.error('Error in regenerateImages:', error);
+        showToast('이미지 재생성에 실패했습니다.', 'error');
+    }
+}
+
+function checkImageSelectionButton() {
+    try {
+        // Check if all cuts have selected images
+        const data = app ? app.dataService.getData() : null;
+        if (!data) return;
+        
+        const allSelected = data.selectedImages.cut1 && 
+                           data.selectedImages.cut2 && 
+                           data.selectedImages.cut3;
+        
+        const button = document.getElementById('step6ImageNext');
+        if (button) {
+            button.disabled = !allSelected;
+            if (allSelected) {
+                button.classList.remove('btn-disabled');
+                button.classList.add('btn-primary');
+            } else {
+                button.classList.add('btn-disabled');
+                button.classList.remove('btn-primary');
+            }
+        }
+    } catch (error) {
+        console.error('Error in checkImageSelectionButton:', error);
+    }
+}
+
+function startVideoWithSelectedImages() {
+    try {
+        showToast('선택된 이미지로 영상을 제작합니다!', 'info');
+        if (app && app.stepManager) {
+            app.stepManager.nextStep();
+        } else {
+            // Fallback
+            goToStep(7);
+        }
+    } catch (error) {
+        console.error('Error in startVideoWithSelectedImages:', error);
+        showToast('영상 제작을 시작하는데 실패했습니다.', 'error');
+    }
+}
+
+// Scenario Management Functions  
+function cancelReplace() {
+    try {
+        const replaceMode = document.getElementById('replaceMode');
+        if (replaceMode) {
+            replaceMode.style.display = 'none';
+        }
+        showToast('수정을 취소했습니다.', 'info');
+    } catch (error) {
+        console.error('Error in cancelReplace:', error);
+    }
+}
+
+function generateNewScenario() {
+    try {
+        showToast('새 시나리오를 생성하고 있습니다... (5 토큰)', 'info');
+        
+        // Simulate scenario generation
+        setTimeout(() => {
+            showToast('새 시나리오가 생성되었습니다!', 'success');
+            // In real app, this would update the scenario content
+        }, 2000);
+    } catch (error) {
+        console.error('Error in generateNewScenario:', error);
+        showToast('시나리오 생성에 실패했습니다.', 'error');
+    }
+}
+
+function backToVideoOptions() {
+    try {
+        const imagePreviewSection = document.getElementById('imagePreviewSection');
+        const videoCreationProgress = document.getElementById('videoCreationProgress');
+        
+        if (imagePreviewSection) {
+            imagePreviewSection.style.display = 'none';
+        }
+        if (videoCreationProgress) {
+            videoCreationProgress.style.display = 'block';
+        }
+        
+        showToast('영상 제작 옵션으로 돌아갑니다.', 'info');
+    } catch (error) {
+        console.error('Error in backToVideoOptions:', error);
+    }
+}
 
 // ========================================
 // Application Entry Point
