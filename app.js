@@ -1272,18 +1272,31 @@ function showImagePreviewOption() {
 
 function regenerateImages(cut) {
     try {
+        console.log(`Regenerating images for cut: ${cut}`); // Debug log
         showToast(`${cut} 이미지를 다시 생성합니다. (3 토큰)`, 'info');
         
-        // Find the image grid for this cut
-        const cutSection = document.querySelector(`[data-cut-section="${cut}"]`);
-        if (!cutSection) {
-            console.error(`Cut section for ${cut} not found`);
-            return;
+        // Try multiple methods to find the image grid
+        let imageGrid = document.querySelector(`[data-cut-section="${cut}"]`);
+        
+        // Fallback: if data-cut-section doesn't work, try direct selection
+        if (!imageGrid) {
+            console.warn(`Primary selector failed, trying fallback for ${cut}`);
+            // Try to find by the structure pattern
+            const allImageGrids = document.querySelectorAll('.image-grid');
+            if (cut === 'cut1' && allImageGrids[0]) {
+                imageGrid = allImageGrids[0];
+            } else if (cut === 'cut2' && allImageGrids[1]) {
+                imageGrid = allImageGrids[1];
+            } else if (cut === 'cut3' && allImageGrids[2]) {
+                imageGrid = allImageGrids[2];
+            }
         }
         
-        const imageGrid = cutSection.querySelector('.image-grid');
+        console.log(`Image grid found:`, imageGrid); // Debug log
+        
         if (!imageGrid) {
-            console.error(`Image grid for ${cut} not found`);
+            console.error(`Image grid for ${cut} not found with any method`);
+            showToast(`${cut} 이미지 그리드를 찾을 수 없습니다.`, 'error');
             return;
         }
         
@@ -1294,15 +1307,39 @@ function regenerateImages(cut) {
         // Generate new random image URLs for this cut
         setTimeout(() => {
             const imageOptions = imageGrid.querySelectorAll('.image-option');
+            console.log(`Found ${imageOptions.length} image options`); // Debug log
+            
             imageOptions.forEach((option, index) => {
                 // Clear previous selection
                 option.classList.remove('selected');
                 
-                // Generate new random image
-                const randomId = Math.floor(Math.random() * 1000) + Date.now();
+                // Generate new random image with higher randomness
+                const randomId = Math.floor(Math.random() * 10000) + Date.now() + Math.floor(Math.random() * 1000);
                 const img = option.querySelector('img');
+                
                 if (img) {
-                    img.src = `https://picsum.photos/400/225?random=${randomId}_${index}`;
+                    // Force browser to reload image by adding cache-busting parameter
+                    const newImageUrl = `https://picsum.photos/400/225?random=${randomId}_${index}&t=${Date.now()}`;
+                    console.log(`Setting new image URL: ${newImageUrl}`); // Debug log
+                    
+                    // Clear the current src first to force reload
+                    img.src = '';
+                    
+                    // Set new src after a brief delay
+                    setTimeout(() => {
+                        img.src = newImageUrl;
+                        
+                        // Add onload event to verify image loads
+                        img.onload = () => {
+                            console.log(`Image ${index + 1} loaded successfully`);
+                        };
+                        
+                        img.onerror = () => {
+                            console.error(`Failed to load image ${index + 1}`);
+                            // Fallback to different image service if picsum fails
+                            img.src = `https://source.unsplash.com/400x225/?random&sig=${randomId}_${index}`;
+                        };
+                    }, 50);
                 }
                 
                 // Update onclick to use new image ID
@@ -1314,6 +1351,9 @@ function regenerateImages(cut) {
             // Restore interaction
             imageGrid.style.opacity = '1';
             imageGrid.style.pointerEvents = 'auto';
+            
+            // Update selection status
+            checkImageSelectionButton();
             
             showToast(`${cut} 이미지가 새로 생성되었습니다!`, 'success');
         }, 2000);
