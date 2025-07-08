@@ -1063,31 +1063,10 @@ function executeEditOption(option, cost) {
     try {
         switch(option) {
             case 'regenerate-video':
-                showToast(`영상 재생성을 시작합니다. (${cost} 토큰 소모)`, 'info');
+                showToast(`영상 컷 선택 화면으로 이동합니다.`, 'info');
                 
-                // Show regeneration progress
-                showVideoRegenerationProgress();
-                
-                // Simulate video regeneration
-                setTimeout(() => {
-                    showToast('영상이 재생성되었습니다! 🎬', 'success');
-                    
-                    // Refresh the video (in a real app, this would load the new video)
-                    const video = document.querySelector('.video-preview');
-                    if (video) {
-                        video.currentTime = 0;
-                        video.play();
-                    }
-                    
-                    // Scroll back to video to show the result
-                    const videoSection = document.querySelector('.video-info-grid');
-                    if (videoSection) {
-                        videoSection.scrollIntoView({ 
-                            behavior: 'smooth', 
-                            block: 'start' 
-                        });
-                    }
-                }, 3000);
+                // Show video cut selection interface
+                showVideoCutSelection();
                 break;
                 
             case 'regenerate-image':
@@ -1278,6 +1257,231 @@ function backToVideoOptions() {
         showToast('영상 제작 옵션으로 돌아갑니다.', 'info');
     } catch (error) {
         console.error('Error in backToVideoOptions:', error);
+    }
+}
+
+// Video Cut Selection Functions
+function showVideoCutSelection() {
+    try {
+        const videoCutSection = document.getElementById('videoCutSelectionSection');
+        if (videoCutSection) {
+            videoCutSection.classList.remove('hidden');
+            
+            // Initialize all cuts as selected by default
+            initializeVideoCuts();
+            
+            // Scroll to video cut section
+            setTimeout(() => {
+                videoCutSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }, 100);
+            
+            showToast('각 컷을 검토하고 필요하면 다시 생성해보세요.', 'info');
+        }
+    } catch (error) {
+        console.error('Error in showVideoCutSelection:', error);
+        showToast('영상 컷 선택 화면을 불러오는데 실패했습니다.', 'error');
+    }
+}
+
+function hideVideoCutSelection() {
+    try {
+        const videoCutSection = document.getElementById('videoCutSelectionSection');
+        if (videoCutSection) {
+            videoCutSection.classList.add('hidden');
+            
+            // Scroll back to main video
+            const videoSection = document.querySelector('.video-info-grid');
+            if (videoSection) {
+                videoSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+        }
+        showToast('영상 컷 선택을 취소했습니다.', 'info');
+    } catch (error) {
+        console.error('Error in hideVideoCutSelection:', error);
+    }
+}
+
+function initializeVideoCuts() {
+    try {
+        // Mark all cuts as selected initially
+        const cuts = ['cut1', 'cut2', 'cut3'];
+        cuts.forEach(cut => {
+            const button = document.querySelector(`[data-cut="${cut}"]`);
+            if (button) {
+                button.classList.add('selected');
+                button.innerHTML = '✅ 선택됨';
+            }
+        });
+        
+        // Enable proceed button
+        const proceedButton = document.getElementById('proceedWithCuts');
+        if (proceedButton) {
+            proceedButton.disabled = false;
+            proceedButton.classList.remove('btn-disabled');
+        }
+        
+        // Auto-play videos
+        const videos = document.querySelectorAll('.cut-video');
+        videos.forEach(video => {
+            video.play().catch(e => console.log('Video autoplay prevented:', e));
+        });
+    } catch (error) {
+        console.error('Error in initializeVideoCuts:', error);
+    }
+}
+
+function selectVideoCut(cutId) {
+    try {
+        const button = document.querySelector(`[data-cut="${cutId}"]`);
+        if (button) {
+            // Toggle selection
+            if (button.classList.contains('selected')) {
+                button.classList.remove('selected');
+                button.innerHTML = '✅ 이 컷 사용';
+            } else {
+                button.classList.add('selected');
+                button.innerHTML = '✅ 선택됨';
+            }
+            
+            // Check if at least one cut is selected
+            updateProceedButton();
+            showToast(`${cutId}이(가) ${button.classList.contains('selected') ? '선택' : '선택 해제'}되었습니다.`, 'info');
+        }
+    } catch (error) {
+        console.error('Error in selectVideoCut:', error);
+    }
+}
+
+function regenerateVideoCut(cutId) {
+    try {
+        const confirmed = confirm(`${cutId}를 다시 생성하시겠습니까?\n\n비용: 5 토큰\n시간: 약 2-3분`);
+        
+        if (confirmed) {
+            showToast(`${cutId}를 다시 생성합니다... (5 토큰 소모)`, 'info');
+            
+            // Find the video element and show loading
+            const cutContainer = document.querySelector(`[data-cut="${cutId}"]`).closest('.video-cut-container');
+            const videoPreview = cutContainer.querySelector('.video-cut-preview');
+            
+            if (videoPreview) {
+                // Create loading overlay
+                const overlay = document.createElement('div');
+                overlay.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(49, 130, 206, 0.9);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-weight: 600;
+                    border-radius: 8px;
+                    z-index: 10;
+                `;
+                overlay.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 32px; margin-bottom: 12px;">🎬</div>
+                        <div>${cutId} 재생성 중...</div>
+                        <div style="font-size: 12px; opacity: 0.8; margin-top: 8px;">잠시만 기다려주세요</div>
+                    </div>
+                `;
+                
+                videoPreview.style.position = 'relative';
+                videoPreview.appendChild(overlay);
+                
+                // Simulate regeneration
+                setTimeout(() => {
+                    if (overlay && overlay.parentElement) {
+                        overlay.parentElement.removeChild(overlay);
+                    }
+                    showToast(`${cutId}가 새로 생성되었습니다! 🎬`, 'success');
+                    
+                    // Auto-select the regenerated cut
+                    selectVideoCut(cutId);
+                }, 3000);
+            }
+        }
+    } catch (error) {
+        console.error('Error in regenerateVideoCut:', error);
+        showToast('영상 컷 재생성에 실패했습니다.', 'error');
+    }
+}
+
+function updateProceedButton() {
+    try {
+        const selectedCuts = document.querySelectorAll('.btn-success.selected');
+        const proceedButton = document.getElementById('proceedWithCuts');
+        
+        if (proceedButton) {
+            if (selectedCuts.length > 0) {
+                proceedButton.disabled = false;
+                proceedButton.classList.remove('btn-disabled');
+                proceedButton.classList.add('btn-primary');
+            } else {
+                proceedButton.disabled = true;
+                proceedButton.classList.add('btn-disabled');
+                proceedButton.classList.remove('btn-primary');
+            }
+        }
+    } catch (error) {
+        console.error('Error in updateProceedButton:', error);
+    }
+}
+
+function proceedWithSelectedCuts() {
+    try {
+        const selectedCuts = document.querySelectorAll('.btn-success.selected');
+        
+        if (selectedCuts.length === 0) {
+            showToast('최소 하나의 컷을 선택해주세요.', 'warning');
+            return;
+        }
+        
+        showToast(`선택된 ${selectedCuts.length}개 컷으로 최종 영상을 제작합니다!`, 'success');
+        
+        // Hide video cut selection and return to results
+        hideVideoCutSelection();
+        
+        // Show completion message
+        setTimeout(() => {
+            showToast('영상 편집이 완료되었습니다! 🎉', 'success');
+        }, 1500);
+    } catch (error) {
+        console.error('Error in proceedWithSelectedCuts:', error);
+        showToast('영상 제작에 실패했습니다.', 'error');
+    }
+}
+
+function regenerateEntireVideo() {
+    try {
+        const confirmed = confirm('전체 영상을 다시 제작하시겠습니까?\n\n비용: 15 토큰\n시간: 약 5-8분\n\n모든 컷이 새로 생성됩니다.');
+        
+        if (confirmed) {
+            showToast('전체 영상을 다시 제작합니다... (15 토큰 소모)', 'info');
+            
+            // Hide video cut selection
+            hideVideoCutSelection();
+            
+            // Show main video regeneration progress
+            showVideoRegenerationProgress();
+            
+            // Simulate full regeneration
+            setTimeout(() => {
+                showToast('전체 영상이 새로 제작되었습니다! 🎬', 'success');
+            }, 5000);
+        }
+    } catch (error) {
+        console.error('Error in regenerateEntireVideo:', error);
+        showToast('전체 영상 재생성에 실패했습니다.', 'error');
     }
 }
 

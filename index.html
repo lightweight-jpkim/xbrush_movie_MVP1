@@ -780,6 +780,73 @@
                     </div>
                 </div>
                 
+                <!-- Video Cut Selection Section (Hidden by Default) -->
+                <div id="videoCutSelectionSection" class="video-cut-selection-section hidden">
+                    <h3>🎬 영상 컷 선택 및 재생성</h3>
+                    <p class="mb-3">각 컷을 검토하고 마음에 들지 않는 컷은 다시 생성할 수 있습니다. 선택된 컷들로 최종 영상이 제작됩니다.</p>
+                    
+                    <!-- Video Cut 1: Opening -->
+                    <div class="video-cut-container">
+                        <h4 class="cut-title">컷 1: 오프닝 장면</h4>
+                        <div class="video-cut-preview">
+                            <video class="cut-video" muted loop>
+                                <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/2.mp4" type="video/mp4">
+                            </video>
+                            <div class="cut-duration">0-5초</div>
+                        </div>
+                        <div class="cut-actions">
+                            <button class="btn btn-success" onclick="selectVideoCut('cut1')" 
+                                    data-cut="cut1" aria-label="컷 1 사용">✅ 이 컷 사용</button>
+                            <button class="btn btn-outline" onclick="regenerateVideoCut('cut1')" 
+                                    aria-label="컷 1 다시 생성">🔄 다시 생성 (5 토큰)</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Cut 2: Product Demo -->
+                    <div class="video-cut-container">
+                        <h4 class="cut-title">컷 2: 제품 소개 장면</h4>
+                        <div class="video-cut-preview">
+                            <video class="cut-video" muted loop>
+                                <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/3.mp4" type="video/mp4">
+                            </video>
+                            <div class="cut-duration">5-10초</div>
+                        </div>
+                        <div class="cut-actions">
+                            <button class="btn btn-success" onclick="selectVideoCut('cut2')" 
+                                    data-cut="cut2" aria-label="컷 2 사용">✅ 이 컷 사용</button>
+                            <button class="btn btn-outline" onclick="regenerateVideoCut('cut2')" 
+                                    aria-label="컷 2 다시 생성">🔄 다시 생성 (5 토큰)</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Cut 3: Closing -->
+                    <div class="video-cut-container">
+                        <h4 class="cut-title">컷 3: 마무리 장면</h4>
+                        <div class="video-cut-preview">
+                            <video class="cut-video" muted loop>
+                                <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/4.mp4" type="video/mp4">
+                            </video>
+                            <div class="cut-duration">10-15초</div>
+                        </div>
+                        <div class="cut-actions">
+                            <button class="btn btn-success" onclick="selectVideoCut('cut3')" 
+                                    data-cut="cut3" aria-label="컷 3 사용">✅ 이 컷 사용</button>
+                            <button class="btn btn-outline" onclick="regenerateVideoCut('cut3')" 
+                                    aria-label="컷 3 다시 생성">🔄 다시 생성 (5 토큰)</button>
+                        </div>
+                    </div>
+                    
+                    <div class="video-cut-actions">
+                        <button class="btn btn-outline" onclick="hideVideoCutSelection()" 
+                                aria-label="영상 컷 선택 취소">취소</button>
+                        <button class="btn btn-outline" onclick="regenerateEntireVideo()" 
+                                style="border-color: #e53e3e; color: #e53e3e;"
+                                aria-label="전체 영상 다시 제작">🔄 전체 다시 제작 (15 토큰)</button>
+                        <button class="btn btn-primary" id="proceedWithCuts" onclick="proceedWithSelectedCuts()" 
+                                aria-label="선택된 컷으로 최종 영상 제작">선택된 컷으로 최종 영상 제작</button>
+                    </div>
+                </div>
+                
                 <div class="action-buttons">
                     <button class="btn btn-outline" onclick="startOver()" 
                             aria-label="새 광고 만들기">새 광고 만들기</button>
