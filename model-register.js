@@ -6,7 +6,7 @@
 class ModelRegistrationApp {
     constructor() {
         this.currentStep = 0;
-        this.totalSteps = 6;
+        this.totalSteps = 4;
         this.registrationData = {};
         this.mediaStream = null;
         this.mediaRecorder = null;
@@ -238,6 +238,10 @@ class ModelRegistrationApp {
      */
     nextModelStep() {
         if (this.validateCurrentStep()) {
+            // Special handling for completing step 3 (portfolio)
+            if (this.currentStep === 3) {
+                this.completeRegistration();
+            }
             this.goToStep(this.currentStep + 1);
         }
     }
@@ -1008,6 +1012,45 @@ class ModelRegistrationApp {
         
         this.registrationData.portfolio = this.uploadedImages;
         return true;
+    }
+
+    // ==========================================
+    // REGISTRATION COMPLETION
+    // ==========================================
+
+    /**
+     * Complete the registration process
+     */
+    completeRegistration() {
+        try {
+            // Save all registration data
+            const registrationSummary = {
+                submittedAt: new Date().toISOString(),
+                kycData: this.registrationData.ocrData || {},
+                facePhoto: !!this.registrationData.facePhoto,
+                verificationVideo: !!this.registrationData.verificationVideo,
+                contract: this.registrationData.contract || {},
+                portfolio: {
+                    imageCount: this.uploadedImages.length,
+                    images: this.uploadedImages.map(img => ({
+                        name: img.name,
+                        size: img.size
+                    }))
+                },
+                status: 'submitted'
+            };
+            
+            // Save to localStorage for demonstration
+            localStorage.setItem('modelRegistration', JSON.stringify(registrationSummary));
+            
+            this.showToast('모델 등록이 성공적으로 완료되었습니다! 🎉', 'success');
+            
+            console.log('Registration completed:', registrationSummary);
+            
+        } catch (error) {
+            console.error('Error completing registration:', error);
+            this.showToast('등록 완료 중 오류가 발생했습니다.', 'error');
+        }
     }
 
     // ==========================================
