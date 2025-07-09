@@ -573,6 +573,30 @@ class StepManager {
      */
     startAutomaticVideoCreation() {
         try {
+            // Update step description for final video creation
+            const progressText = document.querySelector('#step6 .progress-text');
+            if (progressText) {
+                progressText.textContent = '6/8 단계 - 최종 영상 제작';
+            }
+            
+            // Update main heading for final video creation
+            const mainHeading = document.querySelector('#step6 .heading');
+            if (mainHeading) {
+                mainHeading.innerHTML = '🎬 최종 영상 제작 중...';
+            }
+            
+            // Update description for final video creation
+            const description = document.querySelector('#step6 p');
+            if (description) {
+                description.textContent = '선택하신 시나리오와 설정으로 최종 광고 영상을 제작하고 있습니다.';
+            }
+            
+            // Ensure progress bar color is blue for final video creation
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.background = 'linear-gradient(90deg, #3182ce, #2c5aa0)';
+            }
+            
             // Hide step 6 action buttons
             this.uiController.toggleElement('step6Actions', false);
             
@@ -580,13 +604,26 @@ class StepManager {
             let progress = VIDEO_CONFIG.INITIAL_PROGRESS;
             let statusIndex = 0;
             
+            // Custom status messages for final video creation
+            const finalVideoStatuses = [
+                '시나리오 분석 중...',
+                'AI 모델 준비 중...',
+                '첫 번째 장면 생성 중...',
+                '두 번째 장면 생성 중...',
+                '세 번째 장면 생성 중...',
+                '장면들 연결 중...',
+                '오디오 추가 중...',
+                '최종 편집 중...',
+                '최종 영상 완성!'
+            ];
+            
             const progressInterval = setInterval(() => {
                 progress += Math.random() * VIDEO_CONFIG.MAX_PROGRESS_STEP + VIDEO_CONFIG.MIN_PROGRESS_STEP;
                 if (progress > 100) progress = 100;
                 
-                this.uiController.updateProgress(progress, PROGRESS_STATUSES[statusIndex]);
+                this.uiController.updateProgress(progress, finalVideoStatuses[statusIndex]);
                 
-                if (statusIndex < PROGRESS_STATUSES.length - 1) {
+                if (statusIndex < finalVideoStatuses.length - 1) {
                     statusIndex++;
                 }
                 
@@ -595,7 +632,7 @@ class StepManager {
                     this.dataService.updateField('videoCreated', true);
                     
                     setTimeout(() => {
-                        showToast('영상 제작이 완료되었습니다! 🎉', 'success');
+                        showToast('최종 영상 제작이 완료되었습니다! 🎬', 'success');
                         this.nextStep();
                     }, VIDEO_CONFIG.COMPLETION_DELAY);
                 }
@@ -622,6 +659,30 @@ class StepManager {
                 imagePreviewSection.style.display = 'none';
             }
             
+            // Update step description for final video creation
+            const progressText = document.querySelector('#step6 .progress-text');
+            if (progressText) {
+                progressText.textContent = '6/8 단계 - 최종 영상 제작';
+            }
+            
+            // Update main heading for final video creation
+            const mainHeading = document.querySelector('#step6 .heading');
+            if (mainHeading) {
+                mainHeading.innerHTML = '🎬 최종 영상 제작 중...';
+            }
+            
+            // Update description for final video creation
+            const description = document.querySelector('#step6 p');
+            if (description) {
+                description.textContent = '선택하신 영상 컷으로 최종 광고 영상을 제작하고 있습니다. 완성된 영상을 확인하실 수 있습니다.';
+            }
+            
+            // Change progress bar color to blue for final video creation
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.background = 'linear-gradient(90deg, #3182ce, #2c5aa0)';
+            }
+            
             // Hide step 6 action buttons
             this.uiController.toggleElement('step6Actions', false);
             
@@ -629,17 +690,17 @@ class StepManager {
             let progress = VIDEO_CONFIG.INITIAL_PROGRESS;
             let statusIndex = 0;
             
-            // Custom status messages for regeneration
+            // Custom status messages for final video creation
             const regenerationStatuses = [
                 '선택된 컷 분석 중...',
-                '영상 스타일 적용 중...',
-                '첫 번째 컷 재생성 중...',
-                '두 번째 컷 재생성 중...',
-                '세 번째 컷 재생성 중...',
-                '컷들 연결 중...',
-                '오디오 동기화 중...',
-                '최종 편집 중...',
-                '영상 재생성 완료!'
+                '최종 영상 스타일 적용 중...',
+                '첫 번째 컷 최종 편집 중...',
+                '두 번째 컷 최종 편집 중...',
+                '세 번째 컷 최종 편집 중...',
+                '컷들 연결 및 시퀀싱 중...',
+                '오디오 동기화 및 믹싱 중...',
+                '최종 광고 영상 완성 중...',
+                '최종 영상 제작 완료!'
             ];
             
             const progressInterval = setInterval(() => {
@@ -661,7 +722,7 @@ class StepManager {
                     window.videoCompletionTime = Date.now(); // Track completion time
                     
                     setTimeout(() => {
-                        showToast('영상 재생성이 완료되었습니다! 🎉', 'success');
+                        showToast('최종 영상 제작이 완료되었습니다! 🎬', 'success');
                         // Navigate to Step 7 (Results)
                         this.goToStep(7);
                     }, VIDEO_CONFIG.COMPLETION_DELAY);
@@ -689,6 +750,30 @@ class StepManager {
                 imagePreviewSection.style.display = 'none';
             }
             
+            // Update step description for video cut generation
+            const progressText = document.querySelector('#step6 .progress-text');
+            if (progressText) {
+                progressText.textContent = '6/8 단계 - 영상 컷 생성';
+            }
+            
+            // Update main heading for video cut generation
+            const mainHeading = document.querySelector('#step6 .heading');
+            if (mainHeading) {
+                mainHeading.innerHTML = '✂️ 영상 컷 생성 중...';
+            }
+            
+            // Update description for video cut generation
+            const description = document.querySelector('#step6 p');
+            if (description) {
+                description.textContent = '선택하신 이미지로 개별 영상 컷을 생성하고 있습니다. 생성된 컷들 중에서 선택할 수 있습니다.';
+            }
+            
+            // Change progress bar color to orange for video cut generation
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.background = 'linear-gradient(90deg, #ed8936, #f56500)';
+            }
+            
             // Hide step 6 action buttons
             this.uiController.toggleElement('step6Actions', false);
             
@@ -696,16 +781,16 @@ class StepManager {
             let progress = VIDEO_CONFIG.INITIAL_PROGRESS;
             let statusIndex = 0;
             
-            // Custom status messages for image-to-video generation
+            // Custom status messages for video cut generation
             const imageToVideoStatuses = [
                 '선택된 이미지 분석 중...',
                 '이미지 품질 최적화 중...',
-                '첫 번째 컷 영상 생성 중...',
-                '두 번째 컷 영상 생성 중...',
-                '세 번째 컷 영상 생성 중...',
-                '컷들 연결 및 시퀀싱 중...',
-                '오디오 트랙 생성 중...',
-                '최종 영상 편집 중...',
+                '첫 번째 영상 컷 생성 중...',
+                '두 번째 영상 컷 생성 중...',
+                '세 번째 영상 컷 생성 중...',
+                '개별 컷 후처리 중...',
+                '컷 선택지 준비 중...',
+                '영상 컷 최적화 중...',
                 '영상 컷 준비 완료!'
             ];
             
@@ -726,7 +811,7 @@ class StepManager {
                     window.imageToVideoInProgress = false;
                     
                     setTimeout(() => {
-                        showToast('영상 생성이 완료되었습니다! 컷을 선택해주세요. 🎬', 'success');
+                        showToast('영상 컷 생성이 완료되었습니다! 컷을 선택해주세요. ✂️', 'success');
                         // Navigate to Step 8 (Video Cut Selection)
                         this.goToStep(8);
                         
@@ -1472,7 +1557,7 @@ function checkImageSelectionButton() {
             if (allSelected) {
                 button.classList.remove('btn-disabled');
                 button.classList.add('btn-primary');
-                button.textContent = '선택된 이미지로 제작';
+                button.textContent = '선택된 이미지로 영상 컷 생성';
             } else {
                 button.classList.add('btn-disabled');
                 button.classList.remove('btn-primary');
@@ -1517,7 +1602,7 @@ function proceedToVideoCutSelection() {
             return;
         }
         
-        showToast('선택된 이미지로 영상을 생성하고 있습니다...', 'info');
+        showToast('선택된 이미지로 영상 컷을 생성하고 있습니다...', 'info');
         
         // Navigate to Step 6 to show progress for video generation from selected images
         setTimeout(() => {
