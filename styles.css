@@ -710,17 +710,22 @@ body {
     position: relative;
     width: 100%;
     max-width: 600px;
-    height: 300px;
+    aspect-ratio: 16/9;
     background: #000;
     border-radius: 8px;
     margin-bottom: 16px;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .cut-video {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    background: #000;
+    border-radius: 8px;
 }
 
 .cut-duration {
@@ -1575,13 +1580,21 @@ body {
 .video-cut-preview {
     position: relative;
     margin-bottom: 20px;
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .cut-video {
     width: 100%;
-    max-width: 400px;
-    height: 225px;
-    object-fit: cover;
+    height: 100%;
+    object-fit: contain;
     border-radius: 8px;
     background: #000;
 }
@@ -1742,8 +1755,15 @@ body {
         padding: 16px;
     }
     
+    .video-cut-preview {
+        max-width: 100%;
+        aspect-ratio: 16/9;
+    }
+    
     .cut-video {
-        height: 180px;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
     }
     
     .video-cut-actions {
@@ -1764,6 +1784,151 @@ body {
     background: #f8fafc;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
+}
+
+/* Current Image Comparison Area */
+.current-image-comparison {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.current-image-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.current-image-label::before {
+    content: '📸';
+    font-size: 16px;
+}
+
+.current-image-container {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 16/9;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.current-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.current-image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #a0aec0;
+    text-align: center;
+    padding: 20px;
+    height: 100%;
+}
+
+.placeholder-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+    opacity: 0.7;
+}
+
+.placeholder-text {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: #718096;
+}
+
+/* Enhanced current image when selected */
+.current-image-container.has-image {
+    border-color: #38a169;
+    background: #f0fff4;
+}
+
+.current-image-container.has-image::after {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #38a169;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 10;
+}
+
+/* Make comparison area more prominent */
+.current-image-comparison {
+    border-left: 4px solid #3182ce;
+    background: linear-gradient(135deg, #ffffff, #f8fafc);
+}
+
+/* Different styling when keeping original */
+.current-image-comparison.keeping-original {
+    border-left: 4px solid #38a169;
+    background: linear-gradient(135deg, #f0fff4, #e6fffa);
+}
+
+.current-image-comparison.keeping-original .current-image-label {
+    color: #38a169;
+}
+
+.current-image-comparison.keeping-original .current-image-container {
+    border-color: #38a169;
+    background: #f0fff4;
+}
+
+.current-image-comparison.keeping-original .placeholder-text {
+    color: #38a169;
+    font-weight: 600;
+}
+
+/* Responsive design for current image comparison */
+@media (max-width: 768px) {
+    .current-image-container {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+    
+    .current-image-comparison {
+        padding: 12px;
+        margin-bottom: 16px;
+    }
+    
+    .placeholder-text {
+        font-size: 11px;
+    }
+    
+    .current-image-label {
+        font-size: 13px;
+    }
+    
+    .placeholder-icon {
+        font-size: 28px;
+    }
 }
 
 .cut-option-toggle {
@@ -1942,6 +2107,40 @@ body {
     border-color: #38a169;
 }
 
+/* Enhanced Video Sizing for Step 8 */
+.video-cut-container .video-cut-preview {
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 16/9;
+    margin: 0 auto 20px auto;
+    position: relative;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.video-cut-container .cut-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+    border-radius: 8px;
+    display: block;
+}
+
+/* Ensure consistent video presentation */
+.video-cut-container .cut-video::-webkit-media-controls {
+    display: none;
+}
+
+.video-cut-container .cut-video::-webkit-media-controls-enclosure {
+    display: none;
+}
+
 /* Video Preview Enhancements */
 .video-cut-preview {
     position: relative;
@@ -1949,14 +2148,18 @@ body {
     background: #000;
     border-radius: 8px;
     overflow: hidden;
-    min-height: 225px;
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 16/9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .cut-video {
     width: 100%;
-    max-width: 400px;
-    height: 225px;
-    object-fit: cover;
+    height: 100%;
+    object-fit: contain;
     border-radius: 8px;
     background: #000;
     display: block;
@@ -1976,10 +2179,117 @@ body {
     justify-content: center;
     color: #888;
     font-size: 14px;
+    z-index: 5;
+    border-radius: 8px;
 }
 
 .video-icon {
     font-size: 48px;
     margin-bottom: 12px;
     opacity: 0.5;
+}
+
+/* Play Button Styling */
+.play-button {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+    font-size: 24px;
+    margin-bottom: 12px;
+}
+
+.play-button:hover {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: #3182ce;
+    transform: scale(1.1);
+}
+
+.play-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
+
+.play-content p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.play-icon {
+    font-size: 24px;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #ffffff33;
+    border-top: 4px solid #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+.play-button {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.play-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.play-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.error-content {
+    text-align: center;
+    color: #e53e3e;
+    padding: 20px;
+}
+
+.error-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.error-content p {
+    margin-bottom: 16px;
+    color: #888;
+}
+
+.error-content button {
+    font-size: 12px;
+    padding: 8px 16px;
+    min-width: auto;
+    min-height: auto;
+    background: #3182ce;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.error-content button:hover {
+    background: #2c5aa0;
 }

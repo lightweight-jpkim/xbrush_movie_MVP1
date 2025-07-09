@@ -25,6 +25,11 @@ class VideoCreationApp {
             this.loadModelImages();
             this.setupFormValidation();
             
+            // Initialize current image comparison
+            setTimeout(() => {
+                initializeCurrentImageComparison();
+            }, 100);
+            
             showToast('애플리케이션이 시작되었습니다.', 'success');
         } catch (error) {
             handleError(error, 'Application initialization');
@@ -448,6 +453,12 @@ class StepManager {
         try {
             switch(step) {
                 case STEPS.VIDEO_CREATION:
+                    // Initialize current image comparison when entering step 6
+                    setTimeout(() => {
+                        initializeCurrentImageComparison();
+                        initializeEnhancedImageSelection();
+                    }, 100);
+                    
                     // Check if this is video regeneration from cut selection
                     if (window.videoRegenerationInProgress) {
                         // Don't auto-start, let startVideoRegenerationProgress handle it
@@ -476,23 +487,18 @@ class StepManager {
                         cameFromImageSelection: window.cameFromImageSelection
                     });
                     
-                    // More robust flag checking
-                    const shouldHideAdvancedEdit = window.videoRegenerationCompleted && 
-                                                  !window.advancedEditAlreadyHidden && 
-                                                  !window.cameFromImageSelection;
+                    // Always ensure Advanced Edit Mode is visible in Step 7
+                    // This fixes the issue where Advanced Mode box disappears after video workflows
+                    const advancedEditSection = document.getElementById('advancedEditSection');
+                    if (advancedEditSection) {
+                        advancedEditSection.style.display = 'block';
+                        console.log('Advanced Edit Mode ensured visible in Step 7');
+                    }
                     
-                    console.log('Should hide Advanced Edit Mode:', shouldHideAdvancedEdit);
-                    
-                    if (shouldHideAdvancedEdit) {
-                        this.hideAdvancedEditAfterCompletion();
+                    // Only show completion message if video regeneration was completed
+                    if (window.videoRegenerationCompleted && !window.advancedEditAlreadyHidden) {
+                        showToast('영상 제작이 완료되었습니다! 다운로드하거나 새 광고를 만들어보세요.', 'success');
                         window.advancedEditAlreadyHidden = true;
-                    } else {
-                        // Always ensure Advanced Edit Mode is visible for image selection workflow
-                        const advancedEditSection = document.getElementById('advancedEditSection');
-                        if (advancedEditSection) {
-                            advancedEditSection.style.display = 'block';
-                            console.log('Advanced Edit Mode kept visible');
-                        }
                     }
                     break;
                 case STEPS.VIDEO_CUT_SELECTION:
@@ -874,7 +880,7 @@ class StepManager {
                         
                         // Initialize video cuts after navigation
                         setTimeout(() => {
-                            initializeVideoCuts();
+                            initializeEnhancedVideoCuts();
                         }, 300);
                     }, VIDEO_CONFIG.COMPLETION_DELAY);
                 }
@@ -1004,19 +1010,23 @@ class StepManager {
     }
 
     /**
-     * Hide advanced edit mode after video regeneration completion
+     * Handle video regeneration completion (deprecated - Advanced Edit Mode should always be visible)
      */
     hideAdvancedEditAfterCompletion() {
         try {
+            // Advanced Edit Mode should always remain visible in Step 7
+            // This method is now deprecated but kept for backwards compatibility
             const advancedEditSection = document.getElementById('advancedEditSection');
             if (advancedEditSection) {
-                advancedEditSection.style.display = 'none';
+                // Instead of hiding, ensure it's visible
+                advancedEditSection.style.display = 'block';
+                console.log('Advanced Edit Mode kept visible (hideAdvancedEditAfterCompletion called)');
             }
             
             // Show completion message
             showToast('영상 제작이 완료되었습니다! 다운로드하거나 새 광고를 만들어보세요.', 'success');
             
-            // Reset the completion flag but DON'T automatically show advanced edit section
+            // Reset the completion flag
             setTimeout(() => {
                 window.videoRegenerationCompleted = false;
                 window.advancedEditAlreadyHidden = false;
@@ -1027,8 +1037,6 @@ class StepManager {
                 } else {
                     window.cameFromImageSelection = false;
                 }
-                // Don't automatically show advanced edit section to prevent navigation loop
-                // User can manually scroll down to see it if needed
             }, 1500);
         } catch (error) {
             handleError(error, 'Advanced edit completion handling');
@@ -1215,10 +1223,90 @@ function selectImage(element, cut, imageId) {
         data.selectedImages[cut] = imageId;
         app.dataService.updateField('selectedImages', data.selectedImages);
         
+        // Update current image comparison area
+        updateCurrentImageComparison(cut, element);
+        
         app.stepManager.checkNextButton();
-        checkImageSelectionButton();
+        updateImageSelectionButton();
     } catch (error) {
         handleError(error, 'Image selection');
+    }
+}
+
+/**
+ * Update current image comparison area
+ */
+function updateCurrentImageComparison(cut, selectedElement) {
+    try {
+        const currentImageElement = document.getElementById(`${cut}CurrentImage`);
+        const placeholderElement = document.getElementById(`${cut}CurrentPlaceholder`);
+        const containerElement = currentImageElement?.parentElement;
+        
+        if (!currentImageElement || !placeholderElement || !containerElement) {
+            console.warn(`Current image comparison elements not found for ${cut}`);
+            return;
+        }
+        
+        if (selectedElement) {
+            // Get the selected image source
+            const selectedImg = selectedElement.querySelector('img');
+            if (selectedImg && selectedImg.src) {
+                // Update current image
+                currentImageElement.src = selectedImg.src;
+                currentImageElement.alt = `현재 ${cut} 이미지`;
+                currentImageElement.style.display = 'block';
+                
+                // Hide placeholder
+                placeholderElement.style.display = 'none';
+                
+                // Add visual indicator
+                containerElement.classList.add('has-image');
+                
+                console.log(`Updated current image for ${cut}`);
+            }
+        } else {
+            // Clear current image
+            currentImageElement.src = '';
+            currentImageElement.style.display = 'none';
+            
+            // Show placeholder
+            placeholderElement.style.display = 'flex';
+            
+            // Remove visual indicator
+            containerElement.classList.remove('has-image');
+            
+            console.log(`Cleared current image for ${cut}`);
+        }
+    } catch (error) {
+        console.error('Error updating current image comparison:', error);
+    }
+}
+
+/**
+ * Initialize current image comparison on page load
+ */
+function initializeCurrentImageComparison() {
+    try {
+        const data = app?.dataService?.getData();
+        if (!data || !data.selectedImages) return;
+        
+        const cuts = ['cut1', 'cut2', 'cut3'];
+        
+        cuts.forEach(cutId => {
+            const selectedImageId = data.selectedImages[cutId];
+            if (selectedImageId) {
+                // Find the selected image element
+                const selectedElement = document.querySelector(
+                    `.image-grid[data-cut-section="${cutId}"] .image-option.selected`
+                );
+                
+                if (selectedElement) {
+                    updateCurrentImageComparison(cutId, selectedElement);
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error initializing current image comparison:', error);
     }
 }
 
@@ -1534,7 +1622,7 @@ function executeEditOption(option, cost) {
                         app.stepManager.goToStep(8);
                         // Initialize video cuts after navigation
                         setTimeout(() => {
-                            initializeVideoCuts();
+                            initializeEnhancedVideoCuts();
                         }, 300);
                     }
                 }, 500);
@@ -1608,6 +1696,11 @@ function showImagePreviewOption() {
         }
         if (imagePreviewSection) {
             imagePreviewSection.style.display = 'block';
+            
+            // Initialize current image comparison when image preview section becomes visible
+            setTimeout(() => {
+                initializeCurrentImageComparison();
+            }, 100);
         } else {
             // If imagePreviewSection doesn't exist, show a placeholder
             showToast('이미지 선택 인터페이스를 로드하고 있습니다...', 'info');
@@ -1701,7 +1794,7 @@ function regenerateImages(cut) {
             imageGrid.style.pointerEvents = 'auto';
             
             // Update selection status
-            checkImageSelectionButton();
+            updateImageSelectionButton();
             
             showToast(`${cut} 이미지가 새로 생성되었습니다!`, 'success');
         }, 2000);
@@ -2259,51 +2352,75 @@ function initializeEnhancedVideoCuts() {
  */
 function initializeVideoElements() {
     try {
-        const videos = document.querySelectorAll('.cut-video');
+        console.log('Starting video initialization...');
+        const containers = document.querySelectorAll('.video-cut-container');
         
-        videos.forEach((video, index) => {
-            const cutId = `cut${index + 1}`;
-            const container = video.closest('.video-cut-container');
+        containers.forEach((container) => {
+            const cutData = container.getAttribute('data-cut');
+            const video = container.querySelector('.cut-video');
+            const placeholder = container.querySelector('.video-placeholder');
             
-            console.log(`Initializing video for ${cutId}`, video);
+            if (!video || !placeholder || !cutData) {
+                console.warn(`Missing elements for container:`, container);
+                return;
+            }
             
-            // Add loading indicator
-            showVideoLoadingState(container);
+            console.log(`Initializing video for ${cutData}`, { video, placeholder });
+            
+            // Show loading state initially
+            showVideoLoadingState(container, cutData);
             
             // Handle successful video load
             video.addEventListener('loadedmetadata', () => {
-                console.log(`Video ${cutId} metadata loaded successfully`);
-                hideVideoLoadingState(container);
+                console.log(`Video ${cutData} metadata loaded successfully`);
+                hideVideoLoadingState(container, cutData);
                 container.classList.add('video-loaded');
                 
                 // Try to play the video
                 video.play().catch(error => {
-                    console.warn(`Video ${cutId} autoplay failed:`, error);
-                    // Autoplay failed, but video is loaded
+                    console.warn(`Video ${cutData} autoplay failed:`, error);
+                    // Show play button if autoplay fails
+                    showVideoPlayButton(container, cutData);
                 });
             });
             
             // Handle video load errors
             video.addEventListener('error', (e) => {
-                console.error(`Video ${cutId} loading error:`, e);
-                showVideoErrorState(container, cutId);
+                console.error(`Video ${cutData} loading error:`, e);
+                showVideoErrorState(container, cutData);
             });
             
             // Handle video loading start
             video.addEventListener('loadstart', () => {
-                console.log(`Video ${cutId} loading started`);
-                showVideoLoadingState(container);
+                console.log(`Video ${cutData} loading started`);
+                showVideoLoadingState(container, cutData);
             });
             
             // Handle video ready to play
             video.addEventListener('canplay', () => {
-                console.log(`Video ${cutId} ready to play`);
-                hideVideoLoadingState(container);
+                console.log(`Video ${cutData} ready to play`);
+                hideVideoLoadingState(container, cutData);
+                container.classList.add('video-loaded');
+            });
+            
+            // Handle video loading
+            video.addEventListener('canplaythrough', () => {
+                console.log(`Video ${cutData} can play through`);
+                hideVideoLoadingState(container, cutData);
                 container.classList.add('video-loaded');
             });
             
             // Force video to load
             video.load();
+            
+            // Set timeout to handle stuck loading
+            setTimeout(() => {
+                if (!container.classList.contains('video-loaded') && 
+                    !container.classList.contains('video-error')) {
+                    console.warn(`Video ${cutData} loading timeout`);
+                    showVideoErrorState(container, cutData);
+                }
+            }, 8000); // 8 second timeout
         });
         
         console.log('Video elements initialized');
@@ -2316,21 +2433,25 @@ function initializeVideoElements() {
 /**
  * Show video loading state
  */
-function showVideoLoadingState(container) {
+function showVideoLoadingState(container, cutId) {
     try {
-        const preview = container.querySelector('.video-cut-preview');
-        if (preview && !preview.querySelector('.video-loading-overlay')) {
-            const loadingOverlay = document.createElement('div');
-            loadingOverlay.className = 'video-loading-overlay';
-            loadingOverlay.innerHTML = `
-                <div class="loading-content">
-                    <div class="loading-spinner"></div>
-                    <p>비디오 로딩 중...</p>
-                </div>
+        const placeholder = container.querySelector('.video-placeholder');
+        const video = container.querySelector('.cut-video');
+        
+        if (placeholder) {
+            placeholder.style.display = 'flex';
+            placeholder.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p>비디오 로딩 중...</p>
             `;
-            preview.appendChild(loadingOverlay);
-            container.classList.add('video-loading');
         }
+        
+        if (video) {
+            video.style.display = 'none';
+        }
+        
+        container.classList.add('video-loading');
+        console.log(`Showing loading state for ${cutId}`);
     } catch (error) {
         console.error('Error in showVideoLoadingState:', error);
     }
@@ -2339,13 +2460,21 @@ function showVideoLoadingState(container) {
 /**
  * Hide video loading state
  */
-function hideVideoLoadingState(container) {
+function hideVideoLoadingState(container, cutId) {
     try {
-        const loadingOverlay = container.querySelector('.video-loading-overlay');
-        if (loadingOverlay) {
-            loadingOverlay.remove();
+        const placeholder = container.querySelector('.video-placeholder');
+        const video = container.querySelector('.cut-video');
+        
+        if (placeholder) {
+            placeholder.style.display = 'none';
         }
+        
+        if (video) {
+            video.style.display = 'block';
+        }
+        
         container.classList.remove('video-loading');
+        console.log(`Hiding loading state for ${cutId}`);
     } catch (error) {
         console.error('Error in hideVideoLoadingState:', error);
     }
@@ -2356,30 +2485,29 @@ function hideVideoLoadingState(container) {
  */
 function showVideoErrorState(container, cutId) {
     try {
-        const preview = container.querySelector('.video-cut-preview');
-        const video = preview.querySelector('.cut-video');
+        const placeholder = container.querySelector('.video-placeholder');
+        const video = container.querySelector('.cut-video');
         
         // Hide the video element
-        video.style.display = 'none';
+        if (video) {
+            video.style.display = 'none';
+        }
         
-        // Remove loading overlay
-        hideVideoLoadingState(container);
-        
-        // Show error message
-        if (!preview.querySelector('.video-error-overlay')) {
-            const errorOverlay = document.createElement('div');
-            errorOverlay.className = 'video-error-overlay';
-            errorOverlay.innerHTML = `
+        // Show error message in placeholder
+        if (placeholder) {
+            placeholder.style.display = 'flex';
+            placeholder.innerHTML = `
                 <div class="error-content">
-                    <i class="error-icon">⚠️</i>
+                    <div class="error-icon">⚠️</div>
                     <p>비디오를 로드할 수 없습니다</p>
                     <button class="btn btn-outline" onclick="retryVideoLoad('${cutId}')">다시 시도</button>
                 </div>
             `;
-            preview.appendChild(errorOverlay);
         }
         
         container.classList.add('video-error');
+        container.classList.remove('video-loading');
+        console.log(`Showing error state for ${cutId}`);
         
     } catch (error) {
         console.error('Error in showVideoErrorState:', error);
@@ -2393,18 +2521,82 @@ function retryVideoLoad(cutId) {
     try {
         const container = document.querySelector(`[data-cut="${cutId}"]`);
         const video = container.querySelector('.cut-video');
-        const errorOverlay = container.querySelector('.video-error-overlay');
+        const placeholder = container.querySelector('.video-placeholder');
         
-        if (errorOverlay) {
-            errorOverlay.remove();
+        if (placeholder) {
+            placeholder.style.display = 'flex';
+            placeholder.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p>비디오 재로딩 중...</p>
+            `;
         }
         
-        video.style.display = 'block';
         container.classList.remove('video-error');
-        video.load();
+        container.classList.add('video-loading');
+        
+        if (video) {
+            video.style.display = 'none';
+            video.load();
+        }
+        
+        console.log(`Retrying video load for ${cutId}`);
         
     } catch (error) {
         console.error('Error in retryVideoLoad:', error);
+    }
+}
+
+/**
+ * Show video play button when autoplay fails
+ */
+function showVideoPlayButton(container, cutId) {
+    try {
+        const video = container.querySelector('.cut-video');
+        const placeholder = container.querySelector('.video-placeholder');
+        
+        if (placeholder) {
+            placeholder.style.display = 'flex';
+            placeholder.innerHTML = `
+                <div class="play-button" onclick="playVideo('${cutId}')">
+                    <div class="play-icon">▶️</div>
+                    <p>클릭하여 재생</p>
+                </div>
+            `;
+        }
+        
+        // Add click event to video as well
+        if (video) {
+            video.addEventListener('click', () => playVideo(cutId));
+        }
+        
+    } catch (error) {
+        console.error('Error in showVideoPlayButton:', error);
+    }
+}
+
+/**
+ * Play video manually
+ */
+function playVideo(cutId) {
+    try {
+        const container = document.querySelector(`[data-cut="${cutId}"]`);
+        const video = container.querySelector('.cut-video');
+        const placeholder = container.querySelector('.video-placeholder');
+        
+        if (video) {
+            video.play().then(() => {
+                if (placeholder) {
+                    placeholder.style.display = 'none';
+                }
+                video.style.display = 'block';
+            }).catch(error => {
+                console.error(`Failed to play video ${cutId}:`, error);
+                showVideoErrorState(container, cutId);
+            });
+        }
+        
+    } catch (error) {
+        console.error('Error in playVideo:', error);
     }
 }
 
@@ -2501,6 +2693,24 @@ function toggleCutMode(cutId, mode) {
                 originalInfo.style.display = 'block';
             }
             
+            // Update current image comparison to show original placeholder
+            updateCurrentImageComparison(cutId, null);
+            
+            // Update placeholder text to indicate keeping original
+            const placeholderElement = document.getElementById(`${cutId}CurrentPlaceholder`);
+            const comparisonElement = document.getElementById(`${cutId}CurrentComparison`);
+            if (placeholderElement) {
+                const textElement = placeholderElement.querySelector('.placeholder-text');
+                if (textElement) {
+                    textElement.textContent = '원본 컷을 유지합니다';
+                }
+            }
+            
+            // Add visual styling for keeping original
+            if (comparisonElement) {
+                comparisonElement.classList.add('keeping-original');
+            }
+            
             // Mark this cut as using original
             if (app && app.dataService) {
                 app.dataService.updateImageSelection(cutId, 'original');
@@ -2513,6 +2723,32 @@ function toggleCutMode(cutId, mode) {
             }
             if (originalInfo) {
                 originalInfo.style.display = 'none';
+            }
+            
+            // Check if there's already a selected image and update current comparison
+            const selectedElement = document.querySelector(
+                `.image-grid[data-cut-section="${cutId}"] .image-option.selected`
+            );
+            if (selectedElement) {
+                updateCurrentImageComparison(cutId, selectedElement);
+            } else {
+                updateCurrentImageComparison(cutId, null);
+                
+                // Reset placeholder text to default
+                const placeholderElement = document.getElementById(`${cutId}CurrentPlaceholder`);
+                const comparisonElement = document.getElementById(`${cutId}CurrentComparison`);
+                if (placeholderElement) {
+                    const textElement = placeholderElement.querySelector('.placeholder-text');
+                    if (textElement) {
+                        const cutNumber = cutId.replace('cut', '');
+                        textElement.textContent = `컷 ${cutNumber} 이미지가 선택되지 않았습니다`;
+                    }
+                }
+                
+                // Remove keeping-original styling
+                if (comparisonElement) {
+                    comparisonElement.classList.remove('keeping-original');
+                }
             }
             
             // Clear original selection
@@ -2559,6 +2795,15 @@ function updateImageSelectionButton() {
         }
         
         proceedButton.disabled = !allCutsReady;
+        
+        // Update button styling based on enabled/disabled state
+        if (allCutsReady) {
+            proceedButton.classList.remove('btn-disabled');
+            proceedButton.classList.add('btn-primary');
+        } else {
+            proceedButton.classList.add('btn-disabled');
+            proceedButton.classList.remove('btn-primary');
+        }
         
         // Update button text based on selections
         const keepCount = cuts.filter(cutId => {
