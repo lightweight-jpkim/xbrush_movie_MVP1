@@ -229,7 +229,7 @@ class ModelRegistrationApp {
      * Start registration process
      */
     startRegistration() {
-        this.goToStep(1);
+        this.goToStep(2);
         this.showToast('모델 등록을 시작합니다!', 'success');
     }
 
