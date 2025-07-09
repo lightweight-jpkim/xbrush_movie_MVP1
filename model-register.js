@@ -6,7 +6,7 @@
 class ModelRegistrationApp {
     constructor() {
         this.currentStep = 1;
-        this.totalSteps = 5;
+        this.totalSteps = 7;
         this.registrationData = {};
         this.mediaStream = null;
         this.mediaRecorder = null;
@@ -201,6 +201,12 @@ class ModelRegistrationApp {
             case 4:
                 this.updateImageCount();
                 break;
+            case 5:
+                this.setupProductRegistration();
+                break;
+            case 6:
+                this.startReviewProcess();
+                break;
         }
     }
 
@@ -244,8 +250,8 @@ class ModelRegistrationApp {
      */
     nextModelStep() {
         if (this.validateCurrentStep()) {
-            // Special handling for completing step 4 (portfolio)
-            if (this.currentStep === 4) {
+            // Special handling for completing step 6 (review)
+            if (this.currentStep === 6) {
                 this.completeRegistration();
             }
             this.goToStep(this.currentStep + 1);
@@ -270,6 +276,10 @@ class ModelRegistrationApp {
                 return this.validateContract();
             case 4:
                 return this.validatePortfolio();
+            case 5:
+                return this.validateProductRegistration();
+            case 6:
+                return this.validateReview();
             default:
                 return true;
         }
@@ -1013,6 +1023,217 @@ class ModelRegistrationApp {
     }
 
     // ==========================================
+    // PRODUCT REGISTRATION FUNCTIONALITY
+    // ==========================================
+
+    /**
+     * Setup product registration step
+     */
+    setupProductRegistration() {
+        // Enable thumbnail selection
+        this.setupThumbnailSelection();
+        
+        // Check if step is complete
+        this.checkProductRegistrationCompletion();
+    }
+
+    /**
+     * Setup thumbnail selection
+     */
+    setupThumbnailSelection() {
+        const thumbnailInput = document.getElementById('thumbnailInput');
+        const thumbnailPreview = document.getElementById('thumbnailPreview');
+        const thumbnailPlaceholder = document.getElementById('thumbnailPlaceholder');
+        const resetBtn = document.getElementById('resetThumbnailBtn');
+
+        if (thumbnailInput) {
+            thumbnailInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        thumbnailPreview.src = e.target.result;
+                        thumbnailPreview.style.display = 'block';
+                        thumbnailPlaceholder.style.display = 'none';
+                        resetBtn.style.display = 'inline-block';
+                        
+                        this.registrationData.thumbnail = file;
+                        this.checkProductRegistrationCompletion();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    }
+
+    /**
+     * Select thumbnail image
+     */
+    selectThumbnail() {
+        document.getElementById('thumbnailInput').click();
+    }
+
+    /**
+     * Reset thumbnail selection
+     */
+    resetThumbnail() {
+        const thumbnailInput = document.getElementById('thumbnailInput');
+        const thumbnailPreview = document.getElementById('thumbnailPreview');
+        const thumbnailPlaceholder = document.getElementById('thumbnailPlaceholder');
+        const resetBtn = document.getElementById('resetThumbnailBtn');
+
+        thumbnailInput.value = '';
+        thumbnailPreview.style.display = 'none';
+        thumbnailPlaceholder.style.display = 'block';
+        resetBtn.style.display = 'none';
+        
+        delete this.registrationData.thumbnail;
+        this.checkProductRegistrationCompletion();
+    }
+
+    /**
+     * Check product registration completion
+     */
+    checkProductRegistrationCompletion() {
+        const modelName = document.getElementById('modelName')?.value.trim();
+        const modelIntro = document.getElementById('modelIntro')?.value.trim();
+        const categories = document.querySelectorAll('input[name="modelCategory"]:checked');
+        
+        const isComplete = modelName && modelIntro && categories.length > 0;
+        
+        const nextButton = document.getElementById('step5Next');
+        if (nextButton) {
+            nextButton.disabled = !isComplete;
+        }
+    }
+
+    /**
+     * Validate product registration
+     */
+    validateProductRegistration() {
+        const modelName = document.getElementById('modelName')?.value.trim();
+        const modelIntro = document.getElementById('modelIntro')?.value.trim();
+        const categories = document.querySelectorAll('input[name="modelCategory"]:checked');
+        
+        if (!modelName) {
+            this.showToast('모델명을 입력해주세요.', 'warning');
+            return false;
+        }
+        
+        if (!modelIntro) {
+            this.showToast('한 줄 소개를 입력해주세요.', 'warning');
+            return false;
+        }
+        
+        if (categories.length === 0) {
+            this.showToast('최소 하나의 카테고리를 선택해주세요.', 'warning');
+            return false;
+        }
+        
+        // Save product registration data
+        this.registrationData.productInfo = {
+            name: modelName,
+            intro: modelIntro,
+            description: document.getElementById('modelDescription')?.value.trim() || '',
+            categories: Array.from(categories).map(cb => cb.value),
+            thumbnail: this.registrationData.thumbnail || null
+        };
+        
+        return true;
+    }
+
+    // ==========================================
+    // REVIEW FUNCTIONALITY
+    // ==========================================
+
+    /**
+     * Start review process
+     */
+    startReviewProcess() {
+        // Simulate review process
+        this.simulateReviewProcess();
+        
+        // Enable completion after review
+        setTimeout(() => {
+            const nextButton = document.getElementById('step6Next');
+            if (nextButton) {
+                nextButton.disabled = false;
+                nextButton.textContent = '승인 완료';
+            }
+        }, 3000);
+    }
+
+    /**
+     * Simulate review process
+     */
+    simulateReviewProcess() {
+        const steps = ['reviewStep2', 'reviewStep3', 'reviewStep4'];
+        const checklist = ['checkProduct', 'checkFinal'];
+        
+        let currentStep = 0;
+        let currentCheck = 0;
+        
+        const processStep = () => {
+            if (currentStep < steps.length) {
+                const stepEl = document.getElementById(steps[currentStep]);
+                if (stepEl) {
+                    stepEl.classList.remove('active');
+                    stepEl.classList.add('completed');
+                    stepEl.querySelector('.step-icon').textContent = '✅';
+                }
+                
+                if (currentStep + 1 < steps.length) {
+                    const nextStepEl = document.getElementById(steps[currentStep + 1]);
+                    if (nextStepEl) {
+                        nextStepEl.classList.add('active');
+                    }
+                }
+                
+                currentStep++;
+                setTimeout(processStep, 1000);
+            } else {
+                // Complete checklist items
+                const processChecklist = () => {
+                    if (currentCheck < checklist.length) {
+                        const checkEl = document.getElementById(checklist[currentCheck]);
+                        if (checkEl) {
+                            checkEl.classList.remove('active');
+                            checkEl.classList.add('completed');
+                            checkEl.querySelector('.check-icon').textContent = '✅';
+                        }
+                        
+                        if (currentCheck + 1 < checklist.length) {
+                            const nextCheckEl = document.getElementById(checklist[currentCheck + 1]);
+                            if (nextCheckEl) {
+                                nextCheckEl.classList.add('active');
+                            }
+                        }
+                        
+                        currentCheck++;
+                        setTimeout(processChecklist, 800);
+                    } else {
+                        // Complete review
+                        document.getElementById('reviewStatusIcon').textContent = '✅';
+                        document.getElementById('reviewStatusTitle').textContent = '검수 완료';
+                        document.getElementById('reviewStatusDescription').textContent = '모든 검수가 완료되었습니다. 승인이 완료되었습니다!';
+                    }
+                };
+                
+                setTimeout(processChecklist, 500);
+            }
+        };
+        
+        setTimeout(processStep, 1000);
+    }
+
+    /**
+     * Validate review completion
+     */
+    validateReview() {
+        return true; // Review is automatically completed
+    }
+
+    // ==========================================
     // REGISTRATION COMPLETION
     // ==========================================
 
@@ -1176,6 +1397,18 @@ function nextModelStep() {
 
 function prevModelStep() {
     modelApp.prevModelStep();
+}
+
+function selectThumbnail() {
+    modelApp.selectThumbnail();
+}
+
+function resetThumbnail() {
+    modelApp.resetThumbnail();
+}
+
+function startReviewProcess() {
+    modelApp.startReviewProcess();
 }
 
 // Initialize app when DOM is ready

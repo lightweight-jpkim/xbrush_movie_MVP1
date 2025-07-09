@@ -1335,3 +1335,490 @@
     color: #667eea;
     font-weight: 500;
 }
+
+/* Step 5: Product Registration */
+.product-registration-form {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.form-section {
+    margin-bottom: 35px;
+}
+
+.form-section h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.thumbnail-upload-section {
+    text-align: center;
+    padding: 30px;
+    border: 2px dashed #cbd5e0;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.thumbnail-upload-section:hover {
+    border-color: #667eea;
+    background: #f7fafc;
+}
+
+.thumbnail-upload-section.has-image {
+    border-color: #38a169;
+    background: #f0fff4;
+}
+
+.thumbnail-preview {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    margin: 0 auto 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.thumbnail-upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.thumbnail-upload-placeholder .icon {
+    font-size: 3rem;
+    color: #a0aec0;
+}
+
+.thumbnail-upload-placeholder p {
+    color: #718096;
+    margin: 0;
+}
+
+.thumbnail-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.model-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.category-option {
+    padding: 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.category-option:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+}
+
+.category-option.selected {
+    border-color: #667eea;
+    background: #f7fafc;
+    color: #667eea;
+}
+
+.category-option .icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.category-option .title {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Step 6: Review & Approval */
+.review-section {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.review-status {
+    text-align: center;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+.review-status.pending {
+    background: #fef5e7;
+    border: 2px solid #f6e05e;
+}
+
+.review-status.approved {
+    background: #f0fff4;
+    border: 2px solid #38a169;
+}
+
+.review-status.rejected {
+    background: #fed7d7;
+    border: 2px solid #e53e3e;
+}
+
+.review-status-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.review-status.pending .review-status-icon {
+    color: #d69e2e;
+}
+
+.review-status.approved .review-status-icon {
+    color: #38a169;
+}
+
+.review-status.rejected .review-status-icon {
+    color: #e53e3e;
+}
+
+.review-status h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    color: #2d3748;
+}
+
+.review-status p {
+    color: #718096;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.review-progress {
+    margin-bottom: 30px;
+}
+
+.review-progress h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 15px 0;
+}
+
+.review-steps {
+    display: grid;
+    gap: 15px;
+}
+
+.review-step {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #f7fafc;
+    border-radius: 8px;
+    border-left: 4px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.review-step.completed {
+    border-left-color: #38a169;
+}
+
+.review-step.current {
+    border-left-color: #667eea;
+    background: #edf2f7;
+}
+
+.review-step-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    text-align: center;
+}
+
+.review-step.completed .review-step-icon {
+    color: #38a169;
+}
+
+.review-step.current .review-step-icon {
+    color: #667eea;
+}
+
+.review-step-content {
+    flex: 1;
+}
+
+.review-step-content h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 5px 0;
+}
+
+.review-step-content p {
+    color: #718096;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.review-step-status {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.review-step-status.completed {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.review-step-status.current {
+    background: #bee3f8;
+    color: #2a69ac;
+}
+
+.review-step-status.pending {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.review-timeline {
+    margin-top: 30px;
+}
+
+.review-timeline h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 15px 0;
+}
+
+.timeline-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.timeline-item {
+    text-align: center;
+    padding: 20px;
+    background: #f7fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.timeline-item .icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: #667eea;
+}
+
+.timeline-item h5 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 5px 0;
+}
+
+.timeline-item p {
+    color: #718096;
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+/* Step 7: Final Congratulations */
+.congratulations-section {
+    text-align: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 50px 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+}
+
+.congratulations-section h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+}
+
+.congratulations-section p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin: 0 0 30px 0;
+}
+
+.congratulations-icon {
+    font-size: 5rem;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.success-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.success-feature {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.success-feature .icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.success-feature h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+}
+
+.success-feature p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin: 0;
+}
+
+.next-steps-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    margin-top: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+    color: #2d3748;
+}
+
+.next-steps-card h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    color: #2d3748;
+}
+
+.next-steps-list {
+    display: grid;
+    gap: 15px;
+}
+
+.next-step-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #f7fafc;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.next-step-item .icon {
+    font-size: 1.5rem;
+    color: #667eea;
+    width: 30px;
+    text-align: center;
+}
+
+.next-step-item .content {
+    flex: 1;
+}
+
+.next-step-item h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 5px 0;
+}
+
+.next-step-item p {
+    color: #718096;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Responsive adjustments for new steps */
+@media (max-width: 768px) {
+    .model-categories {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .timeline-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .success-features {
+        grid-template-columns: 1fr;
+    }
+    
+    .congratulations-section {
+        padding: 40px 20px;
+    }
+    
+    .congratulations-section h2 {
+        font-size: 2rem;
+    }
+    
+    .congratulations-section p {
+        font-size: 1rem;
+    }
+}
