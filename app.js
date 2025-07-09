@@ -435,10 +435,39 @@ class StepManager {
 
             // Handle step-specific actions
             this.handleStepEntry(step);
+            
+            // Dispatch analytics event
+            if (typeof window !== 'undefined') {
+                const stepChangeEvent = new CustomEvent('stepChanged', {
+                    detail: {
+                        from: this.currentStep === step ? 1 : this.currentStep,
+                        to: step,
+                        stepName: this.getStepName(step)
+                    }
+                });
+                document.dispatchEvent(stepChangeEvent);
+            }
 
         } catch (error) {
             handleError(error, 'Step navigation');
         }
+    }
+
+    /**
+     * Get step name for analytics
+     */
+    getStepName(step) {
+        const stepNames = {
+            1: '출연자 선택',
+            2: '기본 정보',
+            3: '형식 선택',
+            4: '스타일 선택',
+            5: '시나리오 확인',
+            6: '영상 제작',
+            7: '결과 확인',
+            8: '영상 컷 선택'
+        };
+        return stepNames[step] || `Step ${step}`;
     }
 
     /**
