@@ -25,6 +25,11 @@ class VideoCreationApp {
             this.loadModelImages();
             this.setupFormValidation();
             
+            // Initialize current image comparison
+            setTimeout(() => {
+                initializeCurrentImageComparison();
+            }, 100);
+            
             showToast('애플리케이션이 시작되었습니다.', 'success');
         } catch (error) {
             handleError(error, 'Application initialization');
@@ -448,6 +453,11 @@ class StepManager {
         try {
             switch(step) {
                 case STEPS.VIDEO_CREATION:
+                    // Initialize current image comparison when entering step 6
+                    setTimeout(() => {
+                        initializeCurrentImageComparison();
+                    }, 100);
+                    
                     // Check if this is video regeneration from cut selection
                     if (window.videoRegenerationInProgress) {
                         // Don't auto-start, let startVideoRegenerationProgress handle it
@@ -1212,10 +1222,90 @@ function selectImage(element, cut, imageId) {
         data.selectedImages[cut] = imageId;
         app.dataService.updateField('selectedImages', data.selectedImages);
         
+        // Update current image comparison area
+        updateCurrentImageComparison(cut, element);
+        
         app.stepManager.checkNextButton();
         checkImageSelectionButton();
     } catch (error) {
         handleError(error, 'Image selection');
+    }
+}
+
+/**
+ * Update current image comparison area
+ */
+function updateCurrentImageComparison(cut, selectedElement) {
+    try {
+        const currentImageElement = document.getElementById(`${cut}CurrentImage`);
+        const placeholderElement = document.getElementById(`${cut}CurrentPlaceholder`);
+        const containerElement = currentImageElement?.parentElement;
+        
+        if (!currentImageElement || !placeholderElement || !containerElement) {
+            console.warn(`Current image comparison elements not found for ${cut}`);
+            return;
+        }
+        
+        if (selectedElement) {
+            // Get the selected image source
+            const selectedImg = selectedElement.querySelector('img');
+            if (selectedImg && selectedImg.src) {
+                // Update current image
+                currentImageElement.src = selectedImg.src;
+                currentImageElement.alt = `현재 ${cut} 이미지`;
+                currentImageElement.style.display = 'block';
+                
+                // Hide placeholder
+                placeholderElement.style.display = 'none';
+                
+                // Add visual indicator
+                containerElement.classList.add('has-image');
+                
+                console.log(`Updated current image for ${cut}`);
+            }
+        } else {
+            // Clear current image
+            currentImageElement.src = '';
+            currentImageElement.style.display = 'none';
+            
+            // Show placeholder
+            placeholderElement.style.display = 'flex';
+            
+            // Remove visual indicator
+            containerElement.classList.remove('has-image');
+            
+            console.log(`Cleared current image for ${cut}`);
+        }
+    } catch (error) {
+        console.error('Error updating current image comparison:', error);
+    }
+}
+
+/**
+ * Initialize current image comparison on page load
+ */
+function initializeCurrentImageComparison() {
+    try {
+        const data = app?.dataService?.getData();
+        if (!data || !data.selectedImages) return;
+        
+        const cuts = ['cut1', 'cut2', 'cut3'];
+        
+        cuts.forEach(cutId => {
+            const selectedImageId = data.selectedImages[cutId];
+            if (selectedImageId) {
+                // Find the selected image element
+                const selectedElement = document.querySelector(
+                    `.image-grid[data-cut-section="${cutId}"] .image-option.selected`
+                );
+                
+                if (selectedElement) {
+                    updateCurrentImageComparison(cutId, selectedElement);
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error initializing current image comparison:', error);
     }
 }
 
@@ -1602,6 +1692,11 @@ function showImagePreviewOption() {
         }
         if (imagePreviewSection) {
             imagePreviewSection.style.display = 'block';
+            
+            // Initialize current image comparison when image preview section becomes visible
+            setTimeout(() => {
+                initializeCurrentImageComparison();
+            }, 100);
         } else {
             // If imagePreviewSection doesn't exist, show a placeholder
             showToast('이미지 선택 인터페이스를 로드하고 있습니다...', 'info');
@@ -2594,6 +2689,24 @@ function toggleCutMode(cutId, mode) {
                 originalInfo.style.display = 'block';
             }
             
+            // Update current image comparison to show original placeholder
+            updateCurrentImageComparison(cutId, null);
+            
+            // Update placeholder text to indicate keeping original
+            const placeholderElement = document.getElementById(`${cutId}CurrentPlaceholder`);
+            const comparisonElement = document.getElementById(`${cutId}CurrentComparison`);
+            if (placeholderElement) {
+                const textElement = placeholderElement.querySelector('.placeholder-text');
+                if (textElement) {
+                    textElement.textContent = '원본 컷을 유지합니다';
+                }
+            }
+            
+            // Add visual styling for keeping original
+            if (comparisonElement) {
+                comparisonElement.classList.add('keeping-original');
+            }
+            
             // Mark this cut as using original
             if (app && app.dataService) {
                 app.dataService.updateImageSelection(cutId, 'original');
@@ -2606,6 +2719,32 @@ function toggleCutMode(cutId, mode) {
             }
             if (originalInfo) {
                 originalInfo.style.display = 'none';
+            }
+            
+            // Check if there's already a selected image and update current comparison
+            const selectedElement = document.querySelector(
+                `.image-grid[data-cut-section="${cutId}"] .image-option.selected`
+            );
+            if (selectedElement) {
+                updateCurrentImageComparison(cutId, selectedElement);
+            } else {
+                updateCurrentImageComparison(cutId, null);
+                
+                // Reset placeholder text to default
+                const placeholderElement = document.getElementById(`${cutId}CurrentPlaceholder`);
+                const comparisonElement = document.getElementById(`${cutId}CurrentComparison`);
+                if (placeholderElement) {
+                    const textElement = placeholderElement.querySelector('.placeholder-text');
+                    if (textElement) {
+                        const cutNumber = cutId.replace('cut', '');
+                        textElement.textContent = `컷 ${cutNumber} 이미지가 선택되지 않았습니다`;
+                    }
+                }
+                
+                // Remove keeping-original styling
+                if (comparisonElement) {
+                    comparisonElement.classList.remove('keeping-original');
+                }
             }
             
             // Clear original selection
