@@ -177,6 +177,16 @@ class ModelRegistrationApp {
         categoryCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', () => this.checkProductRegistrationCompletion());
         });
+        
+        // Thumbnail selection button - add alternative click handler
+        const thumbnailSelectBtn = document.querySelector('button[onclick="openThumbnailSelector()"]');
+        if (thumbnailSelectBtn) {
+            thumbnailSelectBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Thumbnail select button clicked via event listener');
+                this.openThumbnailSelector();
+            });
+        }
     }
 
     /**
@@ -1096,8 +1106,16 @@ class ModelRegistrationApp {
      * Open thumbnail selector modal
      */
     openThumbnailSelector() {
+        console.log('Opening thumbnail selector...');
+        console.log('Uploaded images:', this.uploadedImages);
         this.loadPortfolioThumbnails();
-        document.getElementById('thumbnailModal').style.display = 'flex';
+        const modal = document.getElementById('thumbnailModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            console.log('Modal should be visible now');
+        } else {
+            console.error('Thumbnail modal element not found');
+        }
     }
 
     /**
@@ -1113,7 +1131,15 @@ class ModelRegistrationApp {
      * Load portfolio images for thumbnail selection
      */
     loadPortfolioThumbnails() {
+        console.log('Loading portfolio thumbnails...');
         const grid = document.getElementById('portfolioThumbnailGrid');
+        
+        if (!grid) {
+            console.error('Portfolio thumbnail grid element not found');
+            return;
+        }
+        
+        console.log('Found grid element, uploaded images count:', this.uploadedImages.length);
         
         if (this.uploadedImages.length === 0) {
             grid.innerHTML = `
@@ -1122,15 +1148,19 @@ class ModelRegistrationApp {
                     <p>먼저 포트폴리오 단계에서 이미지를 업로드해주세요.</p>
                 </div>
             `;
+            console.log('No images found, showing empty message');
             return;
         }
 
-        grid.innerHTML = this.uploadedImages.map(image => `
+        const thumbnailsHTML = this.uploadedImages.map(image => `
             <div class="portfolio-thumbnail-item" data-image-id="${image.id}" onclick="modelApp.selectPortfolioThumbnail('${image.id}')">
                 <img src="${image.url}" alt="Portfolio image">
                 <div class="selection-indicator">✓</div>
             </div>
         `).join('');
+        
+        grid.innerHTML = thumbnailsHTML;
+        console.log('Portfolio thumbnails loaded successfully');
     }
 
     /**
@@ -1528,7 +1558,13 @@ function prevModelStep() {
 }
 
 function openThumbnailSelector() {
-    modelApp.openThumbnailSelector();
+    console.log('Global openThumbnailSelector called');
+    console.log('modelApp exists:', !!modelApp);
+    if (modelApp) {
+        modelApp.openThumbnailSelector();
+    } else {
+        console.error('modelApp is not initialized');
+    }
 }
 
 function closeThumbnailSelector() {
