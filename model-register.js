@@ -59,6 +59,9 @@ class ModelRegistrationApp {
 
         // Step 3 - Portfolio
         this.setupPortfolioEventListeners();
+
+        // Step 5 - Product Registration
+        this.setupProductRegistrationEventListeners();
     }
 
     /**
@@ -151,6 +154,29 @@ class ModelRegistrationApp {
         // Gallery controls
         document.getElementById('selectAllImages')?.addEventListener('click', () => this.selectAllImages());
         document.getElementById('deleteSelectedImages')?.addEventListener('click', () => this.deleteSelectedImages());
+    }
+
+    /**
+     * Set up product registration event listeners
+     */
+    setupProductRegistrationEventListeners() {
+        // Model name input
+        const modelNameInput = document.getElementById('modelName');
+        modelNameInput?.addEventListener('input', () => this.checkProductRegistrationCompletion());
+        
+        // Model intro input
+        const modelIntroInput = document.getElementById('modelIntro');
+        modelIntroInput?.addEventListener('input', () => this.checkProductRegistrationCompletion());
+        
+        // Model description input
+        const modelDescInput = document.getElementById('modelDescription');
+        modelDescInput?.addEventListener('input', () => this.checkProductRegistrationCompletion());
+        
+        // Category checkboxes
+        const categoryCheckboxes = document.querySelectorAll('input[name="modelCategory"]');
+        categoryCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => this.checkProductRegistrationCompletion());
+        });
     }
 
     /**
@@ -1067,26 +1093,122 @@ class ModelRegistrationApp {
     }
 
     /**
-     * Select thumbnail image
+     * Open thumbnail selector modal
      */
-    selectThumbnail() {
-        document.getElementById('thumbnailInput').click();
+    openThumbnailSelector() {
+        this.loadPortfolioThumbnails();
+        document.getElementById('thumbnailModal').style.display = 'flex';
+    }
+
+    /**
+     * Close thumbnail selector modal
+     */
+    closeThumbnailSelector() {
+        document.getElementById('thumbnailModal').style.display = 'none';
+        this.selectedThumbnailId = null;
+        this.updateThumbnailConfirmButton();
+    }
+
+    /**
+     * Load portfolio images for thumbnail selection
+     */
+    loadPortfolioThumbnails() {
+        const grid = document.getElementById('portfolioThumbnailGrid');
+        
+        if (this.uploadedImages.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #718096;">
+                    <p>포트폴리오에 업로드된 이미지가 없습니다.</p>
+                    <p>먼저 포트폴리오 단계에서 이미지를 업로드해주세요.</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = this.uploadedImages.map(image => `
+            <div class="portfolio-thumbnail-item" data-image-id="${image.id}" onclick="modelApp.selectPortfolioThumbnail('${image.id}')">
+                <img src="${image.url}" alt="Portfolio image">
+                <div class="selection-indicator">✓</div>
+            </div>
+        `).join('');
+    }
+
+    /**
+     * Select portfolio image as thumbnail
+     */
+    selectPortfolioThumbnail(imageId) {
+        // Remove previous selection
+        document.querySelectorAll('.portfolio-thumbnail-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        
+        // Add selection to clicked item
+        const selectedItem = document.querySelector(`[data-image-id="${imageId}"]`);
+        if (selectedItem) {
+            selectedItem.classList.add('selected');
+            this.selectedThumbnailId = imageId;
+            this.updateThumbnailConfirmButton();
+        }
+    }
+
+    /**
+     * Update confirm button state
+     */
+    updateThumbnailConfirmButton() {
+        const confirmBtn = document.getElementById('confirmThumbnailBtn');
+        if (confirmBtn) {
+            confirmBtn.disabled = !this.selectedThumbnailId;
+        }
+    }
+
+    /**
+     * Confirm thumbnail selection
+     */
+    confirmThumbnailSelection() {
+        if (!this.selectedThumbnailId) return;
+        
+        const selectedImage = this.uploadedImages.find(img => img.id === this.selectedThumbnailId);
+        if (selectedImage) {
+            // Update thumbnail preview
+            const thumbnailPreview = document.getElementById('thumbnailPreview');
+            const thumbnailPlaceholder = document.getElementById('thumbnailPlaceholder');
+            const resetBtn = document.getElementById('resetThumbnailBtn');
+            const previewContainer = document.querySelector('.thumbnail-preview-container');
+            
+            thumbnailPreview.src = selectedImage.url;
+            thumbnailPreview.style.display = 'block';
+            thumbnailPlaceholder.style.display = 'none';
+            resetBtn.style.display = 'inline-block';
+            previewContainer.classList.add('has-image');
+            
+            // Store thumbnail data
+            this.registrationData.thumbnail = {
+                id: selectedImage.id,
+                url: selectedImage.url,
+                file: selectedImage.file
+            };
+            
+            this.checkProductRegistrationCompletion();
+        }
+        
+        this.closeThumbnailSelector();
     }
 
     /**
      * Reset thumbnail selection
      */
     resetThumbnail() {
-        const thumbnailInput = document.getElementById('thumbnailInput');
         const thumbnailPreview = document.getElementById('thumbnailPreview');
         const thumbnailPlaceholder = document.getElementById('thumbnailPlaceholder');
         const resetBtn = document.getElementById('resetThumbnailBtn');
+        const previewContainer = document.querySelector('.thumbnail-preview-container');
 
-        thumbnailInput.value = '';
         thumbnailPreview.style.display = 'none';
-        thumbnailPlaceholder.style.display = 'block';
+        thumbnailPlaceholder.style.display = 'flex';
         resetBtn.style.display = 'none';
+        previewContainer.classList.remove('has-image');
         
+        this.selectedThumbnailId = null;
         delete this.registrationData.thumbnail;
         this.checkProductRegistrationCompletion();
     }
@@ -1098,8 +1220,9 @@ class ModelRegistrationApp {
         const modelName = document.getElementById('modelName')?.value.trim();
         const modelIntro = document.getElementById('modelIntro')?.value.trim();
         const categories = document.querySelectorAll('input[name="modelCategory"]:checked');
+        const hasThumbnail = !!this.registrationData.thumbnail;
         
-        const isComplete = modelName && modelIntro && categories.length > 0;
+        const isComplete = modelName && modelIntro && categories.length > 0 && hasThumbnail;
         
         const nextButton = document.getElementById('step5Next');
         if (nextButton) {
@@ -1114,6 +1237,11 @@ class ModelRegistrationApp {
         const modelName = document.getElementById('modelName')?.value.trim();
         const modelIntro = document.getElementById('modelIntro')?.value.trim();
         const categories = document.querySelectorAll('input[name="modelCategory"]:checked');
+        
+        if (!this.registrationData.thumbnail) {
+            this.showToast('썸네일 이미지를 선택해주세요.', 'warning');
+            return false;
+        }
         
         if (!modelName) {
             this.showToast('모델명을 입력해주세요.', 'warning');
@@ -1399,8 +1527,16 @@ function prevModelStep() {
     modelApp.prevModelStep();
 }
 
-function selectThumbnail() {
-    modelApp.selectThumbnail();
+function openThumbnailSelector() {
+    modelApp.openThumbnailSelector();
+}
+
+function closeThumbnailSelector() {
+    modelApp.closeThumbnailSelector();
+}
+
+function confirmThumbnailSelection() {
+    modelApp.confirmThumbnailSelection();
 }
 
 function resetThumbnail() {
