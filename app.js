@@ -453,8 +453,9 @@ class StepManager {
                 case STEPS.RESULTS:
                     this.updateFinalInfo();
                     // Hide advanced edit mode if video regeneration was just completed
-                    if (window.videoRegenerationCompleted) {
+                    if (window.videoRegenerationCompleted && !window.advancedEditAlreadyHidden) {
                         this.hideAdvancedEditAfterCompletion();
+                        window.advancedEditAlreadyHidden = true;
                     }
                     break;
                 case STEPS.VIDEO_CUT_SELECTION:
@@ -657,6 +658,7 @@ class StepManager {
                     // Reset the regeneration flag and mark as completed
                     window.videoRegenerationInProgress = false;
                     window.videoRegenerationCompleted = true;
+                    window.videoCompletionTime = Date.now(); // Track completion time
                     
                     setTimeout(() => {
                         showToast('영상 재생성이 완료되었습니다! 🎉', 'success');
@@ -771,14 +773,13 @@ class StepManager {
             // Show completion message
             showToast('영상 제작이 완료되었습니다! 다운로드하거나 새 광고를 만들어보세요.', 'success');
             
-            // Reset the completion flag and show advanced edit section immediately
+            // Reset the completion flag but DON'T automatically show advanced edit section
             setTimeout(() => {
                 window.videoRegenerationCompleted = false;
-                // Show advanced edit section again
-                if (advancedEditSection) {
-                    advancedEditSection.style.display = 'block';
-                }
-            }, 1500); // Reduced from 5000ms to 1500ms
+                window.advancedEditAlreadyHidden = false;
+                // Don't automatically show advanced edit section to prevent navigation loop
+                // User can manually scroll down to see it if needed
+            }, 1500);
         } catch (error) {
             handleError(error, 'Advanced edit completion handling');
         }
@@ -1148,6 +1149,9 @@ function showAdvancedEdit() {
     try {
         const advancedEditSection = document.getElementById('advancedEditSection');
         if (advancedEditSection) {
+            // Make sure it's visible (in case it was hidden after completion)
+            advancedEditSection.style.display = 'block';
+            
             advancedEditSection.scrollIntoView({ 
                 behavior: 'smooth', 
                 block: 'start' 
@@ -1260,6 +1264,12 @@ function executeEditOption(option, cost) {
     try {
         switch(option) {
             case 'regenerate-video':
+                // Add navigation guard to prevent immediate re-navigation after completion
+                if (window.videoRegenerationCompleted && Date.now() - window.videoCompletionTime < 5000) {
+                    showToast('영상 제작이 방금 완료되었습니다. 잠시 후 다시 시도해주세요.', 'warning');
+                    return;
+                }
+                
                 showToast(`영상 컷 선택 화면으로 이동합니다.`, 'info');
                 
                 // Navigate to Step 8 (Video Cut Selection)
