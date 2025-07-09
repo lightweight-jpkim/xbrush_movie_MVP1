@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xBrush 모델 등록</title>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="model-register.css">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="xBrush AI 모델 등록 - 당신의 얼굴로 AI 모델이 되어 수익을 창출하세요">
+    <meta name="keywords" content="AI 모델, 얼굴 등록, 수익 창출, xBrush">
+    <meta name="author" content="xBrush">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="xBrush 모델 등록">
+    <meta property="og:description" content="AI 모델 등록으로 새로운 수익 기회를 만나보세요">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="model-register-header">
+            <div class="header-content">
+                <div class="brand-section">
+                    <h1 class="brand-title">xBrush 모델 등록</h1>
+                    <p class="brand-subtitle">AI 모델이 되어 새로운 수익을 창출하세요</p>
+                </div>
+                <div class="progress-indicator">
+                    <div class="step-indicator" id="stepIndicator">
+                        <span class="current-step">0</span> / <span class="total-steps">6</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Progress Navigation -->
+        <nav class="model-progress-nav" role="navigation" aria-label="모델 등록 진행률">
+            <div class="progress-steps" id="modelProgressSteps">
+                <div class="progress-line">
+                    <div class="progress-line-active" id="modelProgressLine" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                
+                <button class="step active" data-step="0" type="button" aria-label="0단계: 진입 및 자격 안내">
+                    <div class="step-number">0</div>
+                    <div class="step-label">진입 안내</div>
+                </button>
+                
+                <button class="step" data-step="1" type="button" aria-label="1단계: KYC 2단계 인증">
+                    <div class="step-number">1</div>
+                    <div class="step-label">본인 인증</div>
+                </button>
+                
+                <button class="step" data-step="2" type="button" aria-label="2단계: 계약 조건 설정">
+                    <div class="step-number">2</div>
+                    <div class="step-label">계약 조건</div>
+                </button>
+                
+                <button class="step" data-step="3" type="button" aria-label="3단계: 포트폴리오 업로드">
+                    <div class="step-number">3</div>
+                    <div class="step-label">포트폴리오</div>
+                </button>
+                
+                <button class="step" data-step="4" type="button" aria-label="4단계: 모델 페이지 생성">
+                    <div class="step-number">4</div>
+                    <div class="step-label">페이지 생성</div>
+                </button>
+                
+                <button class="step" data-step="5" type="button" aria-label="5단계: 검수 및 승인">
+                    <div class="step-number">5</div>
+                    <div class="step-label">검수 승인</div>
+                </button>
+                
+                <button class="step" data-step="6" type="button" aria-label="6단계: 사후 관리">
+                    <div class="step-number">6</div>
+                    <div class="step-label">사후 관리</div>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="model-content-area">
+            <!-- Step 0: Entry & Qualification Guide -->
+            <section class="step-content active" id="modelStep0">
+                <div class="step-header">
+                    <div class="step-badge">단계 0/6</div>
+                    <h1 class="step-title">모델 되기 시작하기</h1>
+                    <p class="step-description">AI 모델 등록을 위한 준비사항을 확인해주세요</p>
+                </div>
+                
+                <div class="qualification-card">
+                    <div class="card-header">
+                        <h2 class="card-title">✨ AI 모델이 되면?</h2>
+                    </div>
+                    <div class="benefits-grid">
+                        <div class="benefit-item">
+                            <div class="benefit-icon">💰</div>
+                            <h3>수익 창출</h3>
+                            <p>당신의 얼굴로 제작된 광고 영상마다 수익 발생</p>
+                        </div>
+                        <div class="benefit-item">
+                            <div class="benefit-icon">🎬</div>
+                            <h3>자동 생성</h3>
+                            <p>AI가 자동으로 다양한 광고 영상 제작</p>
+                        </div>
+                        <div class="benefit-item">
+                            <div class="benefit-icon">🔒</div>
+                            <h3>안전한 사용</h3>
+                            <p>계약 조건에 따른 안전하고 투명한 사용</p>
+                        </div>
+                        <div class="benefit-item">
+                            <div class="benefit-icon">📈</div>
+                            <h3>지속적 수익</h3>
+                            <p>한 번 등록으로 지속적인 수익 기회</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="requirements-card">
+                    <div class="card-header">
+                        <h2 class="card-title">📋 필수 준비사항</h2>
+                        <p class="card-subtitle">등록을 위해 다음 항목들을 미리 준비해주세요</p>
+                    </div>
+                    
+                    <div class="requirements-list">
+                        <div class="requirement-item">
+                            <div class="requirement-icon">📄</div>
+                            <div class="requirement-content">
+                                <h3>실명 기반 신분증</h3>
+                                <p>여권, 주민등록증, 운전면허증 중 하나</p>
+                                <span class="requirement-status">필수</span>
+                            </div>
+                        </div>
+                        
+                        <div class="requirement-item">
+                            <div class="requirement-icon">📸</div>
+                            <div class="requirement-content">
+                                <h3>얼굴 정면 사진</h3>
+                                <p>깨끗한 배경, 좋은 조명에서 촬영된 고화질 사진</p>
+                                <span class="requirement-status">필수</span>
+                            </div>
+                        </div>
+                        
+                        <div class="requirement-item">
+                            <div class="requirement-icon">🎥</div>
+                            <div class="requirement-content">
+                                <h3>동영상 촬영 환경</h3>
+                                <p>웹캠 또는 스마트폰으로 5초 이상 촬영 가능한 환경</p>
+                                <span class="requirement-status">필수</span>
+                            </div>
+                        </div>
+                        
+                        <div class="requirement-item">
+                            <div class="requirement-icon">🖼️</div>
+                            <div class="requirement-content">
+                                <h3>포트폴리오 이미지</h3>
+                                <p>최소 10장 이상의 고해상도 이미지 (2,048px 이상 권장)</p>
+                                <span class="requirement-status">필수</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="terms-preview-card">
+                    <div class="card-header">
+                        <h2 class="card-title">📄 주요 약관 미리보기</h2>
+                    </div>
+                    <div class="terms-content">
+                        <ul class="terms-list">
+                            <li>만 18세 이상만 등록 가능합니다</li>
+                            <li>등록된 이미지는 AI 모델 훈련에만 사용됩니다</li>
+                            <li>계약 조건에 따라 사용 범위와 수익 배분이 결정됩니다</li>
+                            <li>언제든지 계약을 해지하고 데이터 삭제를 요청할 수 있습니다</li>
+                            <li>부적절한 용도로 사용될 경우 즉시 차단됩니다</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="action-section">
+                    <div class="action-buttons">
+                        <button class="btn btn-outline" onclick="goBack()">뒤로 가기</button>
+                        <button class="btn btn-primary btn-large" onclick="startModelRegistration()">
+                            🚀 모델 등록 시작하기
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 1: KYC 2-Step Verification -->
+            <section class="step-content" id="modelStep1">
+                <div class="step-header">
+                    <div class="step-badge">단계 1/6</div>
+                    <h1 class="step-title">본인 인증 (KYC)</h1>
+                    <p class="step-description">안전한 모델 등록을 위해 2단계 본인 인증을 진행합니다</p>
+                </div>
+
+                <!-- Sub-step 1-A: Face Recognition -->
+                <div class="kyc-section" id="kycStepA">
+                    <div class="kyc-header">
+                        <h2 class="kyc-title">1-A. 얼굴 인식 및 신분증 확인</h2>
+                        <div class="kyc-status" id="kycAStatus">대기 중</div>
+                    </div>
+                    
+                    <div class="kyc-content">
+                        <div class="verification-grid">
+                            <div class="verification-section">
+                                <h3>📄 신분증 업로드</h3>
+                                <div class="id-upload-area" id="idUploadArea">
+                                    <div class="upload-placeholder">
+                                        <div class="upload-icon">📄</div>
+                                        <p>신분증을 업로드해주세요</p>
+                                        <button class="btn btn-outline">파일 선택</button>
+                                    </div>
+                                    <input type="file" id="idUpload" accept="image/*" hidden>
+                                </div>
+                                <div class="upload-guidelines">
+                                    <ul>
+                                        <li>여권, 주민등록증, 운전면허증 가능</li>
+                                        <li>텍스트가 선명하게 보여야 합니다</li>
+                                        <li>전체가 프레임 안에 들어와야 합니다</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="verification-section">
+                                <h3>📸 실시간 얼굴 촬영</h3>
+                                <div class="face-capture-area">
+                                    <div class="camera-container" id="cameraContainer">
+                                        <video id="faceVideo" autoplay muted></video>
+                                        <canvas id="faceCanvas" hidden></canvas>
+                                        <div class="face-guide-overlay">
+                                            <div class="face-guide-circle"></div>
+                                            <p class="guide-text">얼굴을 원 안에 맞춰주세요</p>
+                                        </div>
+                                    </div>
+                                    <div class="capture-controls">
+                                        <button class="btn btn-primary" id="startCamera">카메라 시작</button>
+                                        <button class="btn btn-primary hidden" id="capturePhoto">사진 촬영</button>
+                                        <button class="btn btn-outline hidden" id="retakePhoto">다시 촬영</button>
+                                    </div>
+                                </div>
+                                <div class="capture-guidelines">
+                                    <ul>
+                                        <li>정면을 바라보고 촬영해주세요</li>
+                                        <li>충분한 조명이 있는 곳에서 촬영</li>
+                                        <li>안경, 모자 등을 착용하지 마세요</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="verification-result" id="verificationAResult" style="display: none;">
+                            <div class="result-content">
+                                <div class="result-icon" id="resultAIcon">⏳</div>
+                                <div class="result-text" id="resultAText">검증 중...</div>
+                                <div class="result-details" id="resultADetails"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub-step 1-B: Video + Random Code -->
+                <div class="kyc-section disabled" id="kycStepB">
+                    <div class="kyc-header">
+                        <h2 class="kyc-title">1-B. 동영상 + 난수 코드 인증</h2>
+                        <div class="kyc-status" id="kycBStatus">대기 중</div>
+                    </div>
+                    
+                    <div class="kyc-content">
+                        <div class="random-code-section">
+                            <div class="code-display">
+                                <h3>화면에 표시된 숫자를 소리내어 읽어주세요</h3>
+                                <div class="random-code" id="randomCode">------</div>
+                                <button class="btn btn-outline" id="generateCode">새 코드 생성</button>
+                            </div>
+                        </div>
+                        
+                        <div class="video-recording-area">
+                            <div class="recording-container">
+                                <video id="recordingVideo" autoplay muted></video>
+                                <canvas id="recordingCanvas" hidden></canvas>
+                                <div class="recording-overlay">
+                                    <div class="recording-status" id="recordingStatus">준비</div>
+                                    <div class="recording-timer" id="recordingTimer">00:00</div>
+                                </div>
+                            </div>
+                            
+                            <div class="recording-controls">
+                                <button class="btn btn-primary" id="startRecording">녹화 시작</button>
+                                <button class="btn btn-danger hidden" id="stopRecording">녹화 중지</button>
+                                <button class="btn btn-outline hidden" id="retakeVideo">다시 녹화</button>
+                            </div>
+                            
+                            <div class="recording-guidelines">
+                                <ul>
+                                    <li>최소 5초 이상 녹화해주세요</li>
+                                    <li>화면의 6자리 숫자를 명확하게 발음</li>
+                                    <li>얼굴이 화면에서 벗어나지 않도록 주의</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="verification-result" id="verificationBResult" style="display: none;">
+                            <div class="result-content">
+                                <div class="result-icon" id="resultBIcon">⏳</div>
+                                <div class="result-text" id="resultBText">검증 중...</div>
+                                <div class="result-details" id="resultBDetails"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="kyc-attempts">
+                    <div class="attempts-info">
+                        <span class="attempts-text">시도 횟수: <span id="kycAttempts">0</span>/3</span>
+                        <span class="attempts-warning">3회 실패 시 24시간 후 재시도 가능</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-outline" onclick="prevModelStep()">이전 단계</button>
+                    <button class="btn btn-primary" id="step1Next" onclick="nextModelStep()" disabled>다음 단계</button>
+                </div>
+            </section>
+
+            <!-- Step 2: Contract Conditions -->
+            <section class="step-content" id="modelStep2">
+                <div class="step-header">
+                    <div class="step-badge">단계 2/6</div>
+                    <h1 class="step-title">계약 조건 설정</h1>
+                    <p class="step-description">수익 배분, 계약 기간, 사용 범위를 설정해주세요</p>
+                </div>
+
+                <!-- Pricing Policy -->
+                <div class="contract-section">
+                    <h2 class="section-title">💰 가격 정책</h2>
+                    <div class="pricing-options">
+                        <label class="pricing-option">
+                            <input type="radio" name="pricingType" value="flat" checked>
+                            <div class="option-content">
+                                <h3>정액제</h3>
+                                <p>영상 컷당 고정 금액</p>
+                                <div class="price-input-group">
+                                    <input type="number" id="flatRate" placeholder="100000" min="10000" step="10000">
+                                    <span>원 / 컷</span>
+                                </div>
+                            </div>
+                        </label>
+                        
+                        <label class="pricing-option">
+                            <input type="radio" name="pricingType" value="share">
+                            <div class="option-content">
+                                <h3>수익 쉐어</h3>
+                                <p>매출의 일정 비율</p>
+                                <div class="price-input-group">
+                                    <input type="number" id="shareRate" placeholder="30" min="10" max="80" step="5">
+                                    <span>% / 매출</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Contract Period -->
+                <div class="contract-section">
+                    <h2 class="section-title">📅 계약 기간</h2>
+                    <div class="period-options">
+                        <label class="period-option">
+                            <input type="radio" name="contractPeriod" value="3" checked>
+                            <div class="period-content">
+                                <span class="period-number">3</span>
+                                <span class="period-unit">개월</span>
+                            </div>
+                        </label>
+                        
+                        <label class="period-option">
+                            <input type="radio" name="contractPeriod" value="6">
+                            <div class="period-content">
+                                <span class="period-number">6</span>
+                                <span class="period-unit">개월</span>
+                            </div>
+                        </label>
+                        
+                        <label class="period-option">
+                            <input type="radio" name="contractPeriod" value="12">
+                            <div class="period-content">
+                                <span class="period-number">12</span>
+                                <span class="period-unit">개월</span>
+                            </div>
+                        </label>
+                        
+                        <label class="period-option">
+                            <input type="radio" name="contractPeriod" value="24">
+                            <div class="period-content">
+                                <span class="period-number">24</span>
+                                <span class="period-unit">개월</span>
+                            </div>
+                        </label>
+                        
+                        <label class="period-option custom-period">
+                            <input type="radio" name="contractPeriod" value="custom">
+                            <div class="period-content">
+                                <input type="number" id="customPeriod" placeholder="12" min="1" max="60">
+                                <span class="period-unit">개월</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Usage Scope -->
+                <div class="contract-section">
+                    <h2 class="section-title">🎯 사용 범위</h2>
+                    
+                    <div class="scope-category">
+                        <h3 class="category-title">기본 범위 (자동 승인)</h3>
+                        <div class="scope-options basic-scope">
+                            <label class="scope-option">
+                                <input type="checkbox" name="basicScope" value="commercial" checked disabled>
+                                <span class="checkmark"></span>
+                                <div class="scope-content">
+                                    <h4>일반 상업 광고</h4>
+                                    <p>제품, 서비스 홍보 영상</p>
+                                </div>
+                            </label>
+                            
+                            <label class="scope-option">
+                                <input type="checkbox" name="basicScope" value="sns" checked disabled>
+                                <span class="checkmark"></span>
+                                <div class="scope-content">
+                                    <h4>SNS 마케팅</h4>
+                                    <p>소셜미디어 광고 콘텐츠</p>
+                                </div>
+                            </label>
+                            
+                            <label class="scope-option">
+                                <input type="checkbox" name="basicScope" value="search" checked disabled>
+                                <span class="checkmark"></span>
+                                <div class="scope-content">
+                                    <h4>검색 광고</h4>
+                                    <p>구글, 네이버 등 검색 엔진 광고</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="scope-category">
+                        <h3 class="category-title">고위험 범위 (추가 승인 필요)</h3>
+                        <div class="scope-options high-risk-scope">
+                            <label class="scope-option">
+                                <input type="checkbox" name="highRiskScope" value="medical">
+                                <span class="checkmark"></span>
+                                <div class="scope-content">
+                                    <h4>의료 광고</h4>
+                                    <p>성형외과, 한의원 등</p>
+                                    <span class="risk-badge">추가 승인</span>
+                                </div>
+                            </label>
+                            
+                            <label class="scope-option">
+                                <input type="checkbox" name="highRiskScope" value="alcohol">
+                                <span class="checkmark"></span>
+                                <div class="scope-content">
+                                    <h4>주류 및 유흥</h4>
+                                    <p>주류, 유흥업소 광고</p>
+                                    <span class="risk-badge">추가 승인</span>
+                                </div>
+                            </label>
+                            
+                            <label class="scope-option">
+                                <input type="checkbox" name="highRiskScope" value="political">
+                                <span class="checkmark"></span>
+                                <div class="scope-content">
+                                    <h4>정치 및 선거</h4>
+                                    <p>정치 캠페인, 선거 광고</p>
+                                    <span class="risk-badge">추가 승인</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2nd Confirmation Option -->
+                <div class="contract-section">
+                    <h2 class="section-title">✅ 2차 컨펌 옵션</h2>
+                    <div class="confirmation-option">
+                        <label class="toggle-option">
+                            <input type="checkbox" id="secondConfirm">
+                            <span class="toggle-slider"></span>
+                            <div class="toggle-content">
+                                <h3>사전 검토 권리</h3>
+                                <p>생성된 LoRA 결과물을 사전에 검토하고 거절할 권리를 부여받습니다</p>
+                                <span class="toggle-note">활성화하면 모든 생성 결과물에 대해 승인/거절 권한을 가집니다</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Contract Preview -->
+                <div class="contract-preview">
+                    <h2 class="section-title">📄 계약서 미리보기</h2>
+                    <div class="contract-summary" id="contractSummary">
+                        <div class="summary-item">
+                            <span class="summary-label">가격 정책:</span>
+                            <span class="summary-value" id="summaryPricing">정액 100,000원/컷</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">계약 기간:</span>
+                            <span class="summary-value" id="summaryPeriod">3개월</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">기본 범위:</span>
+                            <span class="summary-value">일반 상업, SNS, 검색 광고</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">고위험 범위:</span>
+                            <span class="summary-value" id="summaryHighRisk">선택 안함</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">2차 컨펌:</span>
+                            <span class="summary-value" id="summaryConfirm">비활성화</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Electronic Signature -->
+                <div class="signature-section">
+                    <h2 class="section-title">✍️ 전자 서명</h2>
+                    <div class="signature-area">
+                        <canvas id="signatureCanvas" width="400" height="200"></canvas>
+                        <div class="signature-controls">
+                            <button class="btn btn-outline" id="clearSignature">지우기</button>
+                            <span class="signature-note">위 영역에 서명해주세요</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-outline" onclick="prevModelStep()">이전 단계</button>
+                    <button class="btn btn-primary" id="step2Next" onclick="nextModelStep()" disabled>계약 완료 및 다음 단계</button>
+                </div>
+            </section>
+
+            <!-- Remaining steps will be added in subsequent parts -->
+            <!-- Step 3: Portfolio Upload -->
+            <section class="step-content" id="modelStep3">
+                <div class="step-header">
+                    <div class="step-badge">단계 3/6</div>
+                    <h1 class="step-title">포트폴리오 업로드</h1>
+                    <p class="step-description">최소 10장 이상의 고품질 이미지를 업로드해주세요</p>
+                </div>
+                
+                <div class="portfolio-upload-area">
+                    <div class="upload-guidelines">
+                        <h2>📸 업로드 가이드라인</h2>
+                        <div class="guidelines-grid">
+                            <div class="guideline-item">
+                                <div class="guideline-icon">📏</div>
+                                <h3>해상도</h3>
+                                <p>2,048px 이상 권장<br>최소 1,024px</p>
+                            </div>
+                            <div class="guideline-item">
+                                <div class="guideline-icon">💡</div>
+                                <h3>조명</h3>
+                                <p>자연광 권장<br>그림자 최소화</p>
+                            </div>
+                            <div class="guideline-item">
+                                <div class="guideline-icon">🎭</div>
+                                <h3>표정</h3>
+                                <p>다양한 표정<br>자연스러운 포즈</p>
+                            </div>
+                            <div class="guideline-item">
+                                <div class="guideline-icon">🖼️</div>
+                                <h3>배경</h3>
+                                <p>깔끔한 배경<br>얼굴에 집중</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="upload-section">
+                        <div class="upload-dropzone" id="portfolioDropzone">
+                            <div class="dropzone-content">
+                                <div class="dropzone-icon">📁</div>
+                                <h3>이미지를 드래그하거나 클릭하여 업로드</h3>
+                                <p>최소 10장, 최대 50장까지 업로드 가능</p>
+                                <button class="btn btn-primary">파일 선택</button>
+                            </div>
+                            <input type="file" id="portfolioFiles" multiple accept="image/*" hidden>
+                        </div>
+                        
+                        <div class="upload-progress" id="uploadProgress" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="uploadProgressFill"></div>
+                            </div>
+                            <span class="progress-text" id="uploadProgressText">0% 완료</span>
+                        </div>
+                    </div>
+
+                    <div class="portfolio-gallery" id="portfolioGallery">
+                        <div class="gallery-header">
+                            <h3>업로드된 이미지 (<span id="imageCount">0</span>/50)</h3>
+                            <div class="gallery-controls">
+                                <button class="btn btn-outline" id="selectAllImages">전체 선택</button>
+                                <button class="btn btn-outline" id="deleteSelectedImages">선택 삭제</button>
+                            </div>
+                        </div>
+                        <div class="gallery-grid" id="galleryGrid">
+                            <!-- Images will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-outline" onclick="prevModelStep()">이전 단계</button>
+                    <button class="btn btn-primary" id="step3Next" onclick="nextModelStep()" disabled>다음 단계</button>
+                </div>
+            </section>
+
+            <!-- Steps 4-6 will be added as we continue -->
+            
+        </main>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="constants.js"></script>
+    <script src="utils.js"></script>
+    <script src="model-register.js"></script>
+</body>
+</html>
