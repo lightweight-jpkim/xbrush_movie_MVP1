@@ -251,6 +251,22 @@ class DataService {
             handleError(error, 'Data reset');
         }
     }
+
+    /**
+     * Update image selection for a specific cut
+     */
+    updateImageSelection(cutId, value) {
+        try {
+            if (this.selectedData.selectedImages.hasOwnProperty(cutId)) {
+                this.selectedData.selectedImages[cutId] = value;
+                console.log(`Updated image selection for ${cutId}:`, value);
+            } else {
+                console.warn(`Unknown cut ID: ${cutId}`);
+            }
+        } catch (error) {
+            handleError(error, 'Image selection update');
+        }
+    }
 }
 
 /**
@@ -480,9 +496,9 @@ class StepManager {
                     }
                     break;
                 case STEPS.VIDEO_CUT_SELECTION:
-                    // Initialize video cuts when entering step 8
+                    // Initialize enhanced video cuts when entering step 8
                     setTimeout(() => {
-                        initializeVideoCuts();
+                        initializeEnhancedVideoCuts();
                     }, 300);
                     break;
             }
@@ -848,6 +864,101 @@ class StepManager {
             
         } catch (error) {
             handleError(error, 'Image-to-video generation process');
+        }
+    }
+
+    /**
+     * Start partial video regeneration progress for mixed scenarios
+     */
+    startPartialVideoRegenerationProgress() {
+        try {
+            // Show video creation progress section
+            const videoCreationProgress = document.getElementById('videoCreationProgress');
+            const imagePreviewSection = document.getElementById('imagePreviewSection');
+            
+            if (videoCreationProgress) {
+                videoCreationProgress.style.display = 'block';
+            }
+            if (imagePreviewSection) {
+                imagePreviewSection.style.display = 'none';
+            }
+            
+            // Get current cut configuration
+            const cutConfiguration = window.currentCutConfiguration || {};
+            const regeneratingCuts = Object.keys(cutConfiguration).filter(cut => cutConfiguration[cut] === 'regenerate');
+            
+            // Update step description for partial regeneration
+            const progressText = document.querySelector('#step6 .progress-text');
+            if (progressText) {
+                progressText.textContent = '6/8 단계 - 부분 영상 재생성';
+            }
+            
+            // Update main heading for partial regeneration
+            const mainHeading = document.querySelector('#step6 .heading');
+            if (mainHeading) {
+                mainHeading.innerHTML = '🔄 선택 컷 재생성 중...';
+            }
+            
+            // Update description for partial regeneration
+            const description = document.querySelector('#step6 p');
+            if (description) {
+                description.textContent = `${regeneratingCuts.length}개의 컷을 새로 생성하고 기존 컷과 결합하여 최종 영상을 제작하고 있습니다.`;
+            }
+            
+            // Change progress bar color to orange for partial regeneration
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.background = 'linear-gradient(90deg, #ed8936, #f56500)';
+            }
+            
+            // Hide step 6 action buttons
+            this.uiController.toggleElement('step6Actions', false);
+            
+            // Start progress simulation for partial regeneration
+            let progress = VIDEO_CONFIG.INITIAL_PROGRESS;
+            let statusIndex = 0;
+            
+            // Custom status messages for partial regeneration
+            const partialRegenerationStatuses = [
+                '선택된 컷 분석 중...',
+                '기존 컷 보존 처리 중...',
+                '새로 생성할 컷 준비 중...',
+                '부분 재생성 시작 중...',
+                '재생성된 컷 품질 확인 중...',
+                '기존 컷과 결합 중...',
+                '최종 영상 편집 중...',
+                '부분 재생성 완료!'
+            ];
+            
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * VIDEO_CONFIG.MAX_PROGRESS_STEP + VIDEO_CONFIG.MIN_PROGRESS_STEP;
+                if (progress > 100) progress = 100;
+                
+                this.uiController.updateProgress(progress, partialRegenerationStatuses[statusIndex]);
+                
+                if (statusIndex < partialRegenerationStatuses.length - 1) {
+                    statusIndex++;
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    
+                    // Reset the regeneration flags and mark as completed
+                    window.videoRegenerationInProgress = false;
+                    window.partialRegenerationInProgress = false;
+                    window.videoRegenerationCompleted = true;
+                    window.videoCompletionTime = Date.now();
+                    
+                    setTimeout(() => {
+                        showToast('부분 영상 재생성이 완료되었습니다! 🎬', 'success');
+                        // Navigate to Step 7 (Results)
+                        this.goToStep(7);
+                    }, VIDEO_CONFIG.COMPLETION_DELAY);
+                }
+            }, VIDEO_CONFIG.PROGRESS_INTERVAL);
+            
+        } catch (error) {
+            handleError(error, 'Partial video regeneration process');
         }
     }
 
@@ -1625,21 +1736,50 @@ function proceedToVideoCutSelection() {
             return;
         }
         
-        // Check if all cuts have selected images
-        const allSelected = data.selectedImages.cut1 && 
-                           data.selectedImages.cut2 && 
-                           data.selectedImages.cut3;
+        // Get current image selection configuration
+        const imageConfig = getImageSelectionConfiguration();
+        console.log('Image selection configuration:', imageConfig);
         
-        if (!allSelected) {
-            showToast('모든 컷의 이미지를 선택해주세요.', 'warning');
+        // Check if all cuts are ready (either selected images or keep original)
+        const cuts = ['cut1', 'cut2', 'cut3'];
+        let allReady = true;
+        
+        for (const cutId of cuts) {
+            if (imageConfig[cutId] === 'keep') {
+                // Cut is keeping original, so it's ready
+                continue;
+            } else if (imageConfig[cutId] === 'new') {
+                // Cut needs new image selection
+                if (!data.selectedImages[cutId]) {
+                    allReady = false;
+                    break;
+                }
+            }
+        }
+        
+        if (!allReady) {
+            showToast('모든 컷의 이미지를 선택하거나 원본 유지를 선택해주세요.', 'warning');
             return;
         }
+        
+        // Store image configuration for use during processing
+        window.currentImageConfiguration = imageConfig;
         
         // Set flag BEFORE navigation starts to prevent race condition
         window.cameFromImageSelection = true;
         console.log('Setting cameFromImageSelection flag to true');
         
-        showToast('선택된 이미지로 영상 컷을 생성하고 있습니다...', 'info');
+        // Show appropriate message based on configuration
+        const keepCount = cuts.filter(cutId => imageConfig[cutId] === 'keep').length;
+        const newCount = 3 - keepCount;
+        
+        if (keepCount === 0) {
+            showToast('선택된 이미지로 영상 컷을 생성하고 있습니다...', 'info');
+        } else if (newCount === 0) {
+            showToast('원본 영상을 그대로 사용합니다.', 'info');
+        } else {
+            showToast(`${newCount}개 컷을 새로 생성하고 ${keepCount}개 원본을 유지합니다...`, 'info');
+        }
         
         // Navigate to Step 6 to show progress for video generation from selected images
         setTimeout(() => {
@@ -1849,31 +1989,66 @@ function updateProceedButton() {
 
 function proceedWithSelectedCuts() {
     try {
-        const selectedCuts = document.querySelectorAll('[data-cut].selected, [data-cut].btn-selected');
+        // Get current cut configuration
+        const cutConfiguration = getCurrentCutConfiguration();
+        const { regenerationCount, totalCost } = updateCostCalculation();
         
-        console.log('Proceeding with selected cuts:', selectedCuts.length); // Debug log
+        console.log('Cut configuration:', cutConfiguration);
+        console.log('Regeneration count:', regenerationCount, 'Total cost:', totalCost);
         
-        if (selectedCuts.length === 0) {
-            showToast('최소 하나의 컷을 선택해주세요.', 'warning');
-            return;
+        // Store configuration for use during processing
+        window.currentCutConfiguration = cutConfiguration;
+        
+        // Show appropriate message based on configuration
+        if (regenerationCount === 0) {
+            showToast('기존 영상을 그대로 사용합니다.', 'info');
+            
+            // Skip regeneration and go directly to results
+            setTimeout(() => {
+                if (app && app.stepManager) {
+                    app.stepManager.goToStep(7);
+                    showToast('영상 제작이 완료되었습니다! 🎬', 'success');
+                }
+            }, 1000);
+            
+        } else if (regenerationCount === 3) {
+            showToast(`전체 컷을 새로 생성합니다... (${totalCost} 토큰 소모)`, 'info');
+            
+            // Navigate to Step 6 for full regeneration
+            setTimeout(() => {
+                if (app && app.stepManager) {
+                    app.stepManager.goToStep(6);
+                    
+                    // Set flag to trigger video regeneration progress
+                    window.videoRegenerationInProgress = true;
+                    
+                    // Start the video regeneration progress
+                    setTimeout(() => {
+                        startVideoRegenerationProgress();
+                    }, 500);
+                }
+            }, 1000);
+            
+        } else {
+            showToast(`${regenerationCount}개 컷을 새로 생성합니다... (${totalCost} 토큰 소모)`, 'info');
+            
+            // Navigate to Step 6 for partial regeneration
+            setTimeout(() => {
+                if (app && app.stepManager) {
+                    app.stepManager.goToStep(6);
+                    
+                    // Set flag to trigger partial video regeneration progress
+                    window.videoRegenerationInProgress = true;
+                    window.partialRegenerationInProgress = true;
+                    
+                    // Start the video regeneration progress
+                    setTimeout(() => {
+                        startPartialVideoRegenerationProgress();
+                    }, 500);
+                }
+            }, 1000);
         }
         
-        showToast(`선택된 ${selectedCuts.length}개 컷으로 최종 영상을 제작합니다!`, 'success');
-        
-        // Navigate to Step 6 to show progress bar for video regeneration
-        setTimeout(() => {
-            if (app && app.stepManager) {
-                app.stepManager.goToStep(6);
-                
-                // Set flag to trigger video regeneration progress
-                window.videoRegenerationInProgress = true;
-                
-                // Start the video regeneration progress
-                setTimeout(() => {
-                    startVideoRegenerationProgress();
-                }, 500);
-            }
-        }, 1000);
     } catch (error) {
         console.error('Error in proceedWithSelectedCuts:', error);
         showToast('영상 제작에 실패했습니다.', 'error');
@@ -1905,6 +2080,365 @@ function regenerateEntireVideo() {
     } catch (error) {
         console.error('Error in regenerateEntireVideo:', error);
         showToast('전체 영상 재생성에 실패했습니다.', 'error');
+    }
+}
+
+// ========================================
+// Enhanced Video Cut Selection Functions
+// ========================================
+
+/**
+ * Handle cut option change (keep vs regenerate)
+ */
+function handleCutOptionChange(cutId, option) {
+    try {
+        console.log(`Cut ${cutId} option changed to: ${option}`);
+        
+        // Update cut status display
+        const statusElement = document.getElementById(`${cutId}Status`);
+        const container = document.querySelector(`[data-cut="${cutId}"]`);
+        
+        if (statusElement && container) {
+            if (option === 'keep') {
+                statusElement.textContent = '기존 컷 유지';
+                statusElement.className = 'cut-status';
+                container.className = 'video-cut-container keeping';
+            } else {
+                statusElement.textContent = '새로 생성';
+                statusElement.className = 'cut-status regenerating';
+                container.className = 'video-cut-container regenerating';
+            }
+        }
+        
+        // Update cost calculation
+        updateCostCalculation();
+        
+        // Update proceed button text
+        updateProceedButton();
+        
+    } catch (error) {
+        console.error('Error in handleCutOptionChange:', error);
+    }
+}
+
+/**
+ * Update cost calculation based on selected options
+ */
+function updateCostCalculation() {
+    try {
+        const cuts = ['cut1', 'cut2', 'cut3'];
+        let regenerationCount = 0;
+        
+        cuts.forEach(cutId => {
+            const regenerateRadio = document.querySelector(`input[name="${cutId}Option"][value="regenerate"]`);
+            if (regenerateRadio && regenerateRadio.checked) {
+                regenerationCount++;
+            }
+        });
+        
+        const costPerCut = 5;
+        const totalCost = regenerationCount * costPerCut;
+        
+        // Update UI
+        const regenerationCountElement = document.getElementById('regenerationCount');
+        const totalCostElement = document.getElementById('totalCost');
+        
+        if (regenerationCountElement) {
+            regenerationCountElement.textContent = regenerationCount;
+        }
+        
+        if (totalCostElement) {
+            totalCostElement.textContent = totalCost;
+        }
+        
+        return { regenerationCount, totalCost };
+        
+    } catch (error) {
+        console.error('Error in updateCostCalculation:', error);
+        return { regenerationCount: 0, totalCost: 0 };
+    }
+}
+
+/**
+ * Update proceed button text based on selections
+ */
+function updateProceedButton() {
+    try {
+        const { regenerationCount, totalCost } = updateCostCalculation();
+        
+        const proceedButtonText = document.getElementById('proceedButtonText');
+        const proceedButtonCost = document.getElementById('proceedButtonCost');
+        
+        if (proceedButtonText && proceedButtonCost) {
+            if (regenerationCount === 0) {
+                proceedButtonText.textContent = '기존 영상 그대로 사용';
+                proceedButtonCost.textContent = '(무료)';
+            } else if (regenerationCount === 3) {
+                proceedButtonText.textContent = '전체 컷 새로 생성';
+                proceedButtonCost.textContent = `(${totalCost} 토큰)`;
+            } else {
+                proceedButtonText.textContent = `${regenerationCount}개 컷 새로 생성`;
+                proceedButtonCost.textContent = `(${totalCost} 토큰)`;
+            }
+        }
+        
+    } catch (error) {
+        console.error('Error in updateProceedButton:', error);
+    }
+}
+
+/**
+ * Initialize enhanced video cut selection
+ */
+function initializeEnhancedVideoCuts() {
+    try {
+        // Initialize all cuts to "keep" state
+        const cuts = ['cut1', 'cut2', 'cut3'];
+        
+        cuts.forEach(cutId => {
+            const keepRadio = document.querySelector(`input[name="${cutId}Option"][value="keep"]`);
+            if (keepRadio) {
+                keepRadio.checked = true;
+                handleCutOptionChange(cutId, 'keep');
+            }
+        });
+        
+        // Initialize cost calculation
+        updateCostCalculation();
+        updateProceedButton();
+        
+        console.log('Enhanced video cut selection initialized');
+        
+    } catch (error) {
+        console.error('Error in initializeEnhancedVideoCuts:', error);
+    }
+}
+
+/**
+ * Set all cuts to regenerate
+ */
+function regenerateAllCuts() {
+    try {
+        const confirmed = confirm('모든 컷을 다시 제작하시겠습니까?\n\n비용: 15 토큰\n시간: 약 5-8분');
+        
+        if (confirmed) {
+            const cuts = ['cut1', 'cut2', 'cut3'];
+            
+            cuts.forEach(cutId => {
+                const regenerateRadio = document.querySelector(`input[name="${cutId}Option"][value="regenerate"]`);
+                if (regenerateRadio) {
+                    regenerateRadio.checked = true;
+                    handleCutOptionChange(cutId, 'regenerate');
+                }
+            });
+            
+            showToast('모든 컷이 재생성으로 설정되었습니다.', 'success');
+        }
+        
+    } catch (error) {
+        console.error('Error in regenerateAllCuts:', error);
+        showToast('설정 변경에 실패했습니다.', 'error');
+    }
+}
+
+/**
+ * Get current cut selection configuration
+ */
+function getCurrentCutConfiguration() {
+    try {
+        const cuts = ['cut1', 'cut2', 'cut3'];
+        const configuration = {};
+        
+        cuts.forEach(cutId => {
+            const keepRadio = document.querySelector(`input[name="${cutId}Option"][value="keep"]`);
+            const regenerateRadio = document.querySelector(`input[name="${cutId}Option"][value="regenerate"]`);
+            
+            if (keepRadio && keepRadio.checked) {
+                configuration[cutId] = 'keep';
+            } else if (regenerateRadio && regenerateRadio.checked) {
+                configuration[cutId] = 'regenerate';
+            } else {
+                configuration[cutId] = 'keep'; // Default to keep
+            }
+        });
+        
+        return configuration;
+        
+    } catch (error) {
+        console.error('Error in getCurrentCutConfiguration:', error);
+        return { cut1: 'keep', cut2: 'keep', cut3: 'keep' };
+    }
+}
+
+/**
+ * Start partial video regeneration progress for mixed scenarios
+ */
+function startPartialVideoRegenerationProgress() {
+    try {
+        if (app && app.stepManager) {
+            app.stepManager.startPartialVideoRegenerationProgress();
+        }
+    } catch (error) {
+        console.error('Error in startPartialVideoRegenerationProgress:', error);
+        showToast('부분 영상 재생성 시작에 실패했습니다.', 'error');
+    }
+}
+
+// ========================================
+// Enhanced Image Selection Functions
+// ========================================
+
+/**
+ * Toggle between new image selection and keep original cut
+ */
+function toggleCutMode(cutId, mode) {
+    try {
+        console.log(`Cut ${cutId} mode changed to: ${mode}`);
+        
+        const selectionArea = document.getElementById(`${cutId}Selection`);
+        const originalInfo = document.getElementById(`${cutId}OriginalInfo`);
+        
+        if (mode === 'keep') {
+            // Hide image selection area and show original cut info
+            if (selectionArea) {
+                selectionArea.style.display = 'none';
+            }
+            if (originalInfo) {
+                originalInfo.style.display = 'block';
+            }
+            
+            // Mark this cut as using original
+            if (app && app.dataService) {
+                app.dataService.updateImageSelection(cutId, 'original');
+            }
+            
+        } else {
+            // Show image selection area and hide original cut info
+            if (selectionArea) {
+                selectionArea.style.display = 'block';
+            }
+            if (originalInfo) {
+                originalInfo.style.display = 'none';
+            }
+            
+            // Clear original selection
+            if (app && app.dataService) {
+                app.dataService.updateImageSelection(cutId, null);
+            }
+        }
+        
+        // Update proceed button state
+        updateImageSelectionButton();
+        
+    } catch (error) {
+        console.error('Error in toggleCutMode:', error);
+        showToast('컷 모드 변경에 실패했습니다.', 'error');
+    }
+}
+
+/**
+ * Update the proceed button state based on image selections
+ */
+function updateImageSelectionButton() {
+    try {
+        const proceedButton = document.getElementById('step6ImageNext');
+        if (!proceedButton) return;
+        
+        const cuts = ['cut1', 'cut2', 'cut3'];
+        let allCutsReady = true;
+        
+        for (const cutId of cuts) {
+            const keepRadio = document.querySelector(`input[name="${cutId}Mode"][value="keep"]`);
+            const newRadio = document.querySelector(`input[name="${cutId}Mode"][value="new"]`);
+            
+            if (keepRadio && keepRadio.checked) {
+                // This cut is keeping original, so it's ready
+                continue;
+            } else if (newRadio && newRadio.checked) {
+                // This cut needs new image selection
+                const data = app ? app.dataService.getData() : null;
+                if (!data || !data.selectedImages || !data.selectedImages[cutId]) {
+                    allCutsReady = false;
+                    break;
+                }
+            }
+        }
+        
+        proceedButton.disabled = !allCutsReady;
+        
+        // Update button text based on selections
+        const keepCount = cuts.filter(cutId => {
+            const keepRadio = document.querySelector(`input[name="${cutId}Mode"][value="keep"]`);
+            return keepRadio && keepRadio.checked;
+        }).length;
+        
+        const newCount = 3 - keepCount;
+        
+        if (keepCount === 0) {
+            proceedButton.textContent = '선택된 이미지로 영상 컷 생성';
+        } else if (newCount === 0) {
+            proceedButton.textContent = '원본 영상 그대로 사용';
+        } else {
+            proceedButton.textContent = `${newCount}개 컷 새로 생성 (${keepCount}개 원본 유지)`;
+        }
+        
+    } catch (error) {
+        console.error('Error in updateImageSelectionButton:', error);
+    }
+}
+
+/**
+ * Get current image selection configuration
+ */
+function getImageSelectionConfiguration() {
+    try {
+        const cuts = ['cut1', 'cut2', 'cut3'];
+        const configuration = {};
+        
+        cuts.forEach(cutId => {
+            const keepRadio = document.querySelector(`input[name="${cutId}Mode"][value="keep"]`);
+            const newRadio = document.querySelector(`input[name="${cutId}Mode"][value="new"]`);
+            
+            if (keepRadio && keepRadio.checked) {
+                configuration[cutId] = 'keep';
+            } else if (newRadio && newRadio.checked) {
+                configuration[cutId] = 'new';
+            } else {
+                configuration[cutId] = 'new'; // Default to new
+            }
+        });
+        
+        return configuration;
+        
+    } catch (error) {
+        console.error('Error in getImageSelectionConfiguration:', error);
+        return { cut1: 'new', cut2: 'new', cut3: 'new' };
+    }
+}
+
+/**
+ * Initialize enhanced image selection
+ */
+function initializeEnhancedImageSelection() {
+    try {
+        // Initialize all cuts to "new" mode
+        const cuts = ['cut1', 'cut2', 'cut3'];
+        
+        cuts.forEach(cutId => {
+            const newRadio = document.querySelector(`input[name="${cutId}Mode"][value="new"]`);
+            if (newRadio) {
+                newRadio.checked = true;
+                toggleCutMode(cutId, 'new');
+            }
+        });
+        
+        // Initialize button state
+        updateImageSelectionButton();
+        
+        console.log('Enhanced image selection initialized');
+        
+    } catch (error) {
+        console.error('Error in initializeEnhancedImageSelection:', error);
     }
 }
 
