@@ -187,6 +187,11 @@ class ModelRegistrationApp {
                 this.openThumbnailSelector();
             });
         }
+        
+        // Initial check for form completion
+        setTimeout(() => {
+            this.checkProductRegistrationCompletion();
+        }, 100);
     }
 
     /**
@@ -1153,20 +1158,34 @@ class ModelRegistrationApp {
         }
 
         const thumbnailsHTML = this.uploadedImages.map(image => `
-            <div class="portfolio-thumbnail-item" data-image-id="${image.id}" onclick="modelApp.selectPortfolioThumbnail('${image.id}')">
+            <div class="portfolio-thumbnail-item" data-image-id="${image.id}">
                 <img src="${image.url}" alt="Portfolio image">
                 <div class="selection-indicator">✓</div>
             </div>
         `).join('');
         
         grid.innerHTML = thumbnailsHTML;
-        console.log('Portfolio thumbnails loaded successfully');
+        
+        // Add click event listeners to each thumbnail
+        this.uploadedImages.forEach(image => {
+            const thumbnailItem = document.querySelector(`[data-image-id="${image.id}"]`);
+            if (thumbnailItem) {
+                thumbnailItem.addEventListener('click', () => {
+                    console.log('Thumbnail clicked:', image.id);
+                    this.selectPortfolioThumbnail(image.id);
+                });
+            }
+        });
+        
+        console.log('Portfolio thumbnails loaded successfully with click handlers');
     }
 
     /**
      * Select portfolio image as thumbnail
      */
     selectPortfolioThumbnail(imageId) {
+        console.log('selectPortfolioThumbnail called with:', imageId);
+        
         // Remove previous selection
         document.querySelectorAll('.portfolio-thumbnail-item').forEach(item => {
             item.classList.remove('selected');
@@ -1174,10 +1193,15 @@ class ModelRegistrationApp {
         
         // Add selection to clicked item
         const selectedItem = document.querySelector(`[data-image-id="${imageId}"]`);
+        console.log('Selected item found:', !!selectedItem);
+        
         if (selectedItem) {
             selectedItem.classList.add('selected');
             this.selectedThumbnailId = imageId;
+            console.log('Selected thumbnail ID set to:', this.selectedThumbnailId);
             this.updateThumbnailConfirmButton();
+        } else {
+            console.error('Could not find thumbnail item with ID:', imageId);
         }
     }
 
@@ -1186,8 +1210,12 @@ class ModelRegistrationApp {
      */
     updateThumbnailConfirmButton() {
         const confirmBtn = document.getElementById('confirmThumbnailBtn');
+        console.log('Updating confirm button, selectedThumbnailId:', this.selectedThumbnailId);
+        console.log('Confirm button found:', !!confirmBtn);
+        
         if (confirmBtn) {
             confirmBtn.disabled = !this.selectedThumbnailId;
+            console.log('Confirm button disabled:', confirmBtn.disabled);
         }
     }
 
@@ -1218,6 +1246,7 @@ class ModelRegistrationApp {
                 file: selectedImage.file
             };
             
+            console.log('Thumbnail data stored:', this.registrationData.thumbnail);
             this.checkProductRegistrationCompletion();
         }
         
@@ -1252,11 +1281,22 @@ class ModelRegistrationApp {
         const categories = document.querySelectorAll('input[name="modelCategory"]:checked');
         const hasThumbnail = !!this.registrationData.thumbnail;
         
+        console.log('Checking product registration completion:');
+        console.log('- Model name:', modelName);
+        console.log('- Model intro:', modelIntro);
+        console.log('- Categories selected:', categories.length);
+        console.log('- Has thumbnail:', hasThumbnail);
+        console.log('- Thumbnail data:', this.registrationData.thumbnail);
+        
         const isComplete = modelName && modelIntro && categories.length > 0 && hasThumbnail;
+        console.log('- Form is complete:', isComplete);
         
         const nextButton = document.getElementById('step5Next');
         if (nextButton) {
             nextButton.disabled = !isComplete;
+            console.log('- Next button disabled:', nextButton.disabled);
+        } else {
+            console.error('Step 5 next button not found');
         }
     }
 
