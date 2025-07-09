@@ -177,6 +177,12 @@ class ModelRegistrationApp {
         // Update progress indicators
         this.updateProgressIndicator();
         
+        // Scroll to top of page for better user experience
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+        
         // Handle step-specific actions
         this.handleStepEntry(stepNumber);
     }
@@ -229,8 +235,8 @@ class ModelRegistrationApp {
      * Start registration process
      */
     startRegistration() {
-        this.goToStep(2);
         this.showToast('모델 등록을 시작합니다!', 'success');
+        this.goToStep(2);
     }
 
     /**
