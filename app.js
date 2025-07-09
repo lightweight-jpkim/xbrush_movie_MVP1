@@ -1579,24 +1579,20 @@ function backToVideoOptions() {
 
 function initializeVideoCuts() {
     try {
-        // Mark all cuts as selected initially
+        // Mark all cuts as NOT selected initially
         const cuts = ['cut1', 'cut2', 'cut3'];
         cuts.forEach(cut => {
             const button = document.querySelector(`[data-cut="${cut}"]`);
             if (button) {
-                button.classList.add('selected');
-                button.classList.remove('btn-success');
-                button.classList.add('btn-selected');
-                button.innerHTML = '✓ 선택됨';
+                button.classList.remove('selected');
+                button.classList.remove('btn-selected');
+                button.classList.add('btn-success');
+                button.innerHTML = '이 컷 사용';
             }
         });
         
-        // Enable proceed button
-        const proceedButton = document.getElementById('proceedWithCuts');
-        if (proceedButton) {
-            proceedButton.disabled = false;
-            proceedButton.classList.remove('btn-disabled');
-        }
+        // Update proceed button state (should be disabled initially)
+        updateProceedButton();
         
         // Auto-play videos
         const videos = document.querySelectorAll('.cut-video');
