@@ -1916,12 +1916,23 @@
     justify-content: center;
     color: white;
     font-size: 12px;
+    font-weight: bold;
     opacity: 0;
     transition: opacity 0.3s ease;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .portfolio-thumbnail-item.selected .selection-indicator {
-    opacity: 1;
+    opacity: 1 !important;
+    display: flex !important;
+}
+
+.portfolio-thumbnail-item.selected {
+    border-color: #667eea !important;
+    border-width: 3px !important;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.3) !important;
+    transform: scale(1.02);
 }
 
 .thumbnail-modal-footer {

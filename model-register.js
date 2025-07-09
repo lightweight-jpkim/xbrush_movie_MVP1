@@ -1113,6 +1113,17 @@ class ModelRegistrationApp {
     openThumbnailSelector() {
         console.log('Opening thumbnail selector...');
         console.log('Uploaded images:', this.uploadedImages);
+        
+        // Check if there are any uploaded images
+        if (!this.uploadedImages || this.uploadedImages.length === 0) {
+            console.warn('No uploaded images found. User needs to upload portfolio images first.');
+            this.showToast('먼저 포트폴리오 이미지를 업로드해주세요.', 'warning');
+            return;
+        }
+        
+        // Reset selection state
+        this.selectedThumbnailId = null;
+        
         this.loadPortfolioThumbnails();
         const modal = document.getElementById('thumbnailModal');
         if (modal) {
@@ -1120,6 +1131,7 @@ class ModelRegistrationApp {
             console.log('Modal should be visible now');
         } else {
             console.error('Thumbnail modal element not found');
+            this.showToast('썸네일 선택 모달을 열 수 없습니다.', 'error');
         }
     }
 
@@ -1157,25 +1169,56 @@ class ModelRegistrationApp {
             return;
         }
 
-        const thumbnailsHTML = this.uploadedImages.map(image => `
-            <div class="portfolio-thumbnail-item" data-image-id="${image.id}">
-                <img src="${image.url}" alt="Portfolio image">
-                <div class="selection-indicator">✓</div>
-            </div>
-        `).join('');
+        // Clear existing content
+        grid.innerHTML = '';
         
-        grid.innerHTML = thumbnailsHTML;
-        
-        // Add click event listeners to each thumbnail
+        // Create thumbnails with proper error handling
         this.uploadedImages.forEach(image => {
-            const thumbnailItem = document.querySelector(`[data-image-id="${image.id}"]`);
-            if (thumbnailItem) {
-                thumbnailItem.addEventListener('click', () => {
-                    console.log('Thumbnail clicked:', image.id);
-                    this.selectPortfolioThumbnail(image.id);
-                });
+            if (!image.id || !image.url) {
+                console.warn('Invalid image data:', image);
+                return;
             }
+            
+            const thumbnailItem = document.createElement('div');
+            thumbnailItem.className = 'portfolio-thumbnail-item';
+            thumbnailItem.setAttribute('data-image-id', image.id);
+            
+            const img = document.createElement('img');
+            img.src = image.url;
+            img.alt = 'Portfolio image';
+            img.onerror = () => {
+                console.error('Failed to load image:', image.url);
+                thumbnailItem.style.opacity = '0.5';
+            };
+            
+            const indicator = document.createElement('div');
+            indicator.className = 'selection-indicator';
+            indicator.textContent = '✓';
+            
+            thumbnailItem.appendChild(img);
+            thumbnailItem.appendChild(indicator);
+            grid.appendChild(thumbnailItem);
         });
+        
+        // Add click event listeners to each thumbnail using event delegation
+        setTimeout(() => {
+            const allThumbnails = grid.querySelectorAll('.portfolio-thumbnail-item');
+            console.log('Found thumbnails:', allThumbnails.length);
+            
+            allThumbnails.forEach(thumbnail => {
+                const imageId = thumbnail.getAttribute('data-image-id');
+                if (imageId) {
+                    thumbnail.style.cursor = 'pointer';
+                    thumbnail.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Thumbnail clicked with ID:', imageId);
+                        this.selectPortfolioThumbnail(imageId);
+                    });
+                    console.log('Click handler added for image:', imageId);
+                }
+            });
+        }, 100); // Small delay to ensure DOM is ready
         
         console.log('Portfolio thumbnails loaded successfully with click handlers');
     }
@@ -1185,23 +1228,35 @@ class ModelRegistrationApp {
      */
     selectPortfolioThumbnail(imageId) {
         console.log('selectPortfolioThumbnail called with:', imageId);
+        console.log('Available uploaded images:', this.uploadedImages.map(img => img.id));
+        
+        // Validate that the image exists
+        const imageExists = this.uploadedImages.find(img => img.id === imageId);
+        if (!imageExists) {
+            console.error('Image with ID not found in uploadedImages:', imageId);
+            return;
+        }
         
         // Remove previous selection
         document.querySelectorAll('.portfolio-thumbnail-item').forEach(item => {
             item.classList.remove('selected');
+            console.log('Removed selection from item:', item.getAttribute('data-image-id'));
         });
         
         // Add selection to clicked item
         const selectedItem = document.querySelector(`[data-image-id="${imageId}"]`);
         console.log('Selected item found:', !!selectedItem);
+        console.log('Selected item element:', selectedItem);
         
         if (selectedItem) {
             selectedItem.classList.add('selected');
             this.selectedThumbnailId = imageId;
             console.log('Selected thumbnail ID set to:', this.selectedThumbnailId);
+            console.log('Classes after selection:', selectedItem.classList.toString());
             this.updateThumbnailConfirmButton();
         } else {
             console.error('Could not find thumbnail item with ID:', imageId);
+            console.log('All thumbnail items:', document.querySelectorAll('.portfolio-thumbnail-item'));
         }
     }
 
@@ -1212,10 +1267,25 @@ class ModelRegistrationApp {
         const confirmBtn = document.getElementById('confirmThumbnailBtn');
         console.log('Updating confirm button, selectedThumbnailId:', this.selectedThumbnailId);
         console.log('Confirm button found:', !!confirmBtn);
+        console.log('Confirm button element:', confirmBtn);
         
         if (confirmBtn) {
-            confirmBtn.disabled = !this.selectedThumbnailId;
+            const shouldDisable = !this.selectedThumbnailId;
+            confirmBtn.disabled = shouldDisable;
+            
+            // Visual feedback
+            if (shouldDisable) {
+                confirmBtn.style.opacity = '0.5';
+                confirmBtn.style.cursor = 'not-allowed';
+            } else {
+                confirmBtn.style.opacity = '1';
+                confirmBtn.style.cursor = 'pointer';
+            }
+            
             console.log('Confirm button disabled:', confirmBtn.disabled);
+            console.log('Confirm button styles updated');
+        } else {
+            console.error('Confirm button element not found in DOM');
         }
     }
 
@@ -1604,6 +1674,16 @@ function openThumbnailSelector() {
         modelApp.openThumbnailSelector();
     } else {
         console.error('modelApp is not initialized');
+        // Fallback: try to initialize if not already done
+        if (typeof ModelRegistrationApp !== 'undefined') {
+            console.log('Attempting to initialize modelApp...');
+            modelApp = new ModelRegistrationApp();
+            setTimeout(() => {
+                if (modelApp) {
+                    modelApp.openThumbnailSelector();
+                }
+            }, 100);
+        }
     }
 }
 
@@ -1627,6 +1707,8 @@ function startReviewProcess() {
 let modelApp;
 document.addEventListener('DOMContentLoaded', () => {
     modelApp = new ModelRegistrationApp();
+    window.modelApp = modelApp; // Make it globally accessible
+    console.log('Model Registration App initialized and stored globally');
 });
 
 // Add CSS animations
