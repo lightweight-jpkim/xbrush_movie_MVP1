@@ -874,7 +874,7 @@ class StepManager {
                         
                         // Initialize video cuts after navigation
                         setTimeout(() => {
-                            initializeVideoCuts();
+                            initializeEnhancedVideoCuts();
                         }, 300);
                     }, VIDEO_CONFIG.COMPLETION_DELAY);
                 }
@@ -1531,7 +1531,7 @@ function executeEditOption(option, cost) {
                         app.stepManager.goToStep(8);
                         // Initialize video cuts after navigation
                         setTimeout(() => {
-                            initializeVideoCuts();
+                            initializeEnhancedVideoCuts();
                         }, 300);
                     }
                 }, 500);
