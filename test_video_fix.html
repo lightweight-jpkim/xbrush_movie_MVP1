@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f7fafc;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .video-cut-container {
+            margin-bottom: 32px;
+            padding: 24px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+        .video-cut-preview {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 225px;
+            background: #000;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .cut-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #000;
+        }
+        .video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 14px;
+            z-index: 5;
+            border-radius: 8px;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #ffffff33;
+            border-top: 4px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error-content {
+            text-align: center;
+            color: #e53e3e;
+            padding: 20px;
+        }
+        .error-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .error-content p {
+            margin-bottom: 16px;
+            color: #888;
+        }
+        .error-content button {
+            font-size: 12px;
+            padding: 8px 16px;
+            background: #3182ce;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .error-content button:hover {
+            background: #2c5aa0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Video Fix Test - Step 8 Video Cut Selection</h1>
+        
+        <!-- Working Video (Cut 1) -->
+        <div class="video-cut-container" data-cut="cut1">
+            <h4>컷 1: 오프닝 장면 (Working Video)</h4>
+            <div class="video-cut-preview">
+                <video class="cut-video" muted loop preload="metadata">
+                    <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/1.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="video-placeholder" id="cut1Placeholder">
+                    <div class="loading-spinner"></div>
+                    <p>비디오 로딩 중...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Broken Video (Cut 2) -->
+        <div class="video-cut-container" data-cut="cut2">
+            <h4>컷 2: 제품 소개 장면 (Broken Video - 404 Error)</h4>
+            <div class="video-cut-preview">
+                <video class="cut-video" muted loop preload="metadata">
+                    <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/apple_demo.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="video-placeholder" id="cut2Placeholder">
+                    <div class="loading-spinner"></div>
+                    <p>비디오 로딩 중...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Working Video (Cut 3) -->
+        <div class="video-cut-container" data-cut="cut3">
+            <h4>컷 3: 마무리 장면 (Working Video)</h4>
+            <div class="video-cut-preview">
+                <video class="cut-video" muted loop preload="metadata">
+                    <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/1.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="video-placeholder" id="cut3Placeholder">
+                    <div class="loading-spinner"></div>
+                    <p>비디오 로딩 중...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Test the video initialization
+        function initializeTestVideos() {
+            const videos = document.querySelectorAll('.cut-video');
+            
+            videos.forEach((video, index) => {
+                const cutId = `cut${index + 1}`;
+                const container = video.closest('.video-cut-container');
+                const placeholder = document.getElementById(`${cutId}Placeholder`);
+                
+                console.log(`Testing video for ${cutId}`, video);
+                
+                // Show loading state initially
+                placeholder.style.display = 'flex';
+                video.style.display = 'none';
+                
+                // Handle successful video load
+                video.addEventListener('loadedmetadata', () => {
+                    console.log(`Video ${cutId} loaded successfully`);
+                    placeholder.style.display = 'none';
+                    video.style.display = 'block';
+                    
+                    // Try to play the video
+                    video.play().catch(error => {
+                        console.warn(`Video ${cutId} autoplay failed:`, error);
+                        placeholder.style.display = 'flex';
+                        placeholder.innerHTML = `
+                            <div onclick="playVideo('${cutId}')" style="cursor: pointer; text-align: center;">
+                                <div style="font-size: 32px; margin-bottom: 8px;">▶️</div>
+                                <p>클릭하여 재생</p>
+                            </div>
+                        `;
+                    });
+                });
+                
+                // Handle video load errors
+                video.addEventListener('error', (e) => {
+                    console.error(`Video ${cutId} loading error:`, e);
+                    placeholder.style.display = 'flex';
+                    placeholder.innerHTML = `
+                        <div class="error-content">
+                            <div class="error-icon">⚠️</div>
+                            <p>비디오를 로드할 수 없습니다</p>
+                            <button onclick="retryVideo('${cutId}')">다시 시도</button>
+                        </div>
+                    `;
+                });
+                
+                // Force video to load
+                video.load();
+                
+                // Set timeout to handle stuck loading
+                setTimeout(() => {
+                    if (placeholder.style.display === 'flex' && 
+                        !placeholder.innerHTML.includes('error-content')) {
+                        console.warn(`Video ${cutId} loading timeout`);
+                        placeholder.innerHTML = `
+                            <div class="error-content">
+                                <div class="error-icon">⚠️</div>
+                                <p>비디오 로딩 시간이 초과되었습니다</p>
+                                <button onclick="retryVideo('${cutId}')">다시 시도</button>
+                            </div>
+                        `;
+                    }
+                }, 5000);
+            });
+        }
+        
+        function playVideo(cutId) {
+            const container = document.querySelector(`[data-cut="${cutId}"]`);
+            const video = container.querySelector('.cut-video');
+            const placeholder = document.getElementById(`${cutId}Placeholder`);
+            
+            video.play().then(() => {
+                placeholder.style.display = 'none';
+                video.style.display = 'block';
+            }).catch(error => {
+                console.error(`Failed to play video ${cutId}:`, error);
+            });
+        }
+        
+        function retryVideo(cutId) {
+            const container = document.querySelector(`[data-cut="${cutId}"]`);
+            const video = container.querySelector('.cut-video');
+            const placeholder = document.getElementById(`${cutId}Placeholder`);
+            
+            placeholder.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p>비디오 재로딩 중...</p>
+            `;
+            
+            video.load();
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeTestVideos);
+    </script>
+</body>
+</html>

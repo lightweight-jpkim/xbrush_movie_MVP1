@@ -2256,51 +2256,75 @@ function initializeEnhancedVideoCuts() {
  */
 function initializeVideoElements() {
     try {
-        const videos = document.querySelectorAll('.cut-video');
+        console.log('Starting video initialization...');
+        const containers = document.querySelectorAll('.video-cut-container');
         
-        videos.forEach((video, index) => {
-            const cutId = `cut${index + 1}`;
-            const container = video.closest('.video-cut-container');
+        containers.forEach((container) => {
+            const cutData = container.getAttribute('data-cut');
+            const video = container.querySelector('.cut-video');
+            const placeholder = container.querySelector('.video-placeholder');
             
-            console.log(`Initializing video for ${cutId}`, video);
+            if (!video || !placeholder || !cutData) {
+                console.warn(`Missing elements for container:`, container);
+                return;
+            }
             
-            // Add loading indicator
-            showVideoLoadingState(container);
+            console.log(`Initializing video for ${cutData}`, { video, placeholder });
+            
+            // Show loading state initially
+            showVideoLoadingState(container, cutData);
             
             // Handle successful video load
             video.addEventListener('loadedmetadata', () => {
-                console.log(`Video ${cutId} metadata loaded successfully`);
-                hideVideoLoadingState(container);
+                console.log(`Video ${cutData} metadata loaded successfully`);
+                hideVideoLoadingState(container, cutData);
                 container.classList.add('video-loaded');
                 
                 // Try to play the video
                 video.play().catch(error => {
-                    console.warn(`Video ${cutId} autoplay failed:`, error);
-                    // Autoplay failed, but video is loaded
+                    console.warn(`Video ${cutData} autoplay failed:`, error);
+                    // Show play button if autoplay fails
+                    showVideoPlayButton(container, cutData);
                 });
             });
             
             // Handle video load errors
             video.addEventListener('error', (e) => {
-                console.error(`Video ${cutId} loading error:`, e);
-                showVideoErrorState(container, cutId);
+                console.error(`Video ${cutData} loading error:`, e);
+                showVideoErrorState(container, cutData);
             });
             
             // Handle video loading start
             video.addEventListener('loadstart', () => {
-                console.log(`Video ${cutId} loading started`);
-                showVideoLoadingState(container);
+                console.log(`Video ${cutData} loading started`);
+                showVideoLoadingState(container, cutData);
             });
             
             // Handle video ready to play
             video.addEventListener('canplay', () => {
-                console.log(`Video ${cutId} ready to play`);
-                hideVideoLoadingState(container);
+                console.log(`Video ${cutData} ready to play`);
+                hideVideoLoadingState(container, cutData);
+                container.classList.add('video-loaded');
+            });
+            
+            // Handle video loading
+            video.addEventListener('canplaythrough', () => {
+                console.log(`Video ${cutData} can play through`);
+                hideVideoLoadingState(container, cutData);
                 container.classList.add('video-loaded');
             });
             
             // Force video to load
             video.load();
+            
+            // Set timeout to handle stuck loading
+            setTimeout(() => {
+                if (!container.classList.contains('video-loaded') && 
+                    !container.classList.contains('video-error')) {
+                    console.warn(`Video ${cutData} loading timeout`);
+                    showVideoErrorState(container, cutData);
+                }
+            }, 8000); // 8 second timeout
         });
         
         console.log('Video elements initialized');
@@ -2313,21 +2337,25 @@ function initializeVideoElements() {
 /**
  * Show video loading state
  */
-function showVideoLoadingState(container) {
+function showVideoLoadingState(container, cutId) {
     try {
-        const preview = container.querySelector('.video-cut-preview');
-        if (preview && !preview.querySelector('.video-loading-overlay')) {
-            const loadingOverlay = document.createElement('div');
-            loadingOverlay.className = 'video-loading-overlay';
-            loadingOverlay.innerHTML = `
-                <div class="loading-content">
-                    <div class="loading-spinner"></div>
-                    <p>비디오 로딩 중...</p>
-                </div>
+        const placeholder = container.querySelector('.video-placeholder');
+        const video = container.querySelector('.cut-video');
+        
+        if (placeholder) {
+            placeholder.style.display = 'flex';
+            placeholder.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p>비디오 로딩 중...</p>
             `;
-            preview.appendChild(loadingOverlay);
-            container.classList.add('video-loading');
         }
+        
+        if (video) {
+            video.style.display = 'none';
+        }
+        
+        container.classList.add('video-loading');
+        console.log(`Showing loading state for ${cutId}`);
     } catch (error) {
         console.error('Error in showVideoLoadingState:', error);
     }
@@ -2336,13 +2364,21 @@ function showVideoLoadingState(container) {
 /**
  * Hide video loading state
  */
-function hideVideoLoadingState(container) {
+function hideVideoLoadingState(container, cutId) {
     try {
-        const loadingOverlay = container.querySelector('.video-loading-overlay');
-        if (loadingOverlay) {
-            loadingOverlay.remove();
+        const placeholder = container.querySelector('.video-placeholder');
+        const video = container.querySelector('.cut-video');
+        
+        if (placeholder) {
+            placeholder.style.display = 'none';
         }
+        
+        if (video) {
+            video.style.display = 'block';
+        }
+        
         container.classList.remove('video-loading');
+        console.log(`Hiding loading state for ${cutId}`);
     } catch (error) {
         console.error('Error in hideVideoLoadingState:', error);
     }
@@ -2353,30 +2389,29 @@ function hideVideoLoadingState(container) {
  */
 function showVideoErrorState(container, cutId) {
     try {
-        const preview = container.querySelector('.video-cut-preview');
-        const video = preview.querySelector('.cut-video');
+        const placeholder = container.querySelector('.video-placeholder');
+        const video = container.querySelector('.cut-video');
         
         // Hide the video element
-        video.style.display = 'none';
+        if (video) {
+            video.style.display = 'none';
+        }
         
-        // Remove loading overlay
-        hideVideoLoadingState(container);
-        
-        // Show error message
-        if (!preview.querySelector('.video-error-overlay')) {
-            const errorOverlay = document.createElement('div');
-            errorOverlay.className = 'video-error-overlay';
-            errorOverlay.innerHTML = `
+        // Show error message in placeholder
+        if (placeholder) {
+            placeholder.style.display = 'flex';
+            placeholder.innerHTML = `
                 <div class="error-content">
-                    <i class="error-icon">⚠️</i>
+                    <div class="error-icon">⚠️</div>
                     <p>비디오를 로드할 수 없습니다</p>
                     <button class="btn btn-outline" onclick="retryVideoLoad('${cutId}')">다시 시도</button>
                 </div>
             `;
-            preview.appendChild(errorOverlay);
         }
         
         container.classList.add('video-error');
+        container.classList.remove('video-loading');
+        console.log(`Showing error state for ${cutId}`);
         
     } catch (error) {
         console.error('Error in showVideoErrorState:', error);
@@ -2390,18 +2425,82 @@ function retryVideoLoad(cutId) {
     try {
         const container = document.querySelector(`[data-cut="${cutId}"]`);
         const video = container.querySelector('.cut-video');
-        const errorOverlay = container.querySelector('.video-error-overlay');
+        const placeholder = container.querySelector('.video-placeholder');
         
-        if (errorOverlay) {
-            errorOverlay.remove();
+        if (placeholder) {
+            placeholder.style.display = 'flex';
+            placeholder.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p>비디오 재로딩 중...</p>
+            `;
         }
         
-        video.style.display = 'block';
         container.classList.remove('video-error');
-        video.load();
+        container.classList.add('video-loading');
+        
+        if (video) {
+            video.style.display = 'none';
+            video.load();
+        }
+        
+        console.log(`Retrying video load for ${cutId}`);
         
     } catch (error) {
         console.error('Error in retryVideoLoad:', error);
+    }
+}
+
+/**
+ * Show video play button when autoplay fails
+ */
+function showVideoPlayButton(container, cutId) {
+    try {
+        const video = container.querySelector('.cut-video');
+        const placeholder = container.querySelector('.video-placeholder');
+        
+        if (placeholder) {
+            placeholder.style.display = 'flex';
+            placeholder.innerHTML = `
+                <div class="play-button" onclick="playVideo('${cutId}')">
+                    <div class="play-icon">▶️</div>
+                    <p>클릭하여 재생</p>
+                </div>
+            `;
+        }
+        
+        // Add click event to video as well
+        if (video) {
+            video.addEventListener('click', () => playVideo(cutId));
+        }
+        
+    } catch (error) {
+        console.error('Error in showVideoPlayButton:', error);
+    }
+}
+
+/**
+ * Play video manually
+ */
+function playVideo(cutId) {
+    try {
+        const container = document.querySelector(`[data-cut="${cutId}"]`);
+        const video = container.querySelector('.cut-video');
+        const placeholder = container.querySelector('.video-placeholder');
+        
+        if (video) {
+            video.play().then(() => {
+                if (placeholder) {
+                    placeholder.style.display = 'none';
+                }
+                video.style.display = 'block';
+            }).catch(error => {
+                console.error(`Failed to play video ${cutId}:`, error);
+                showVideoErrorState(container, cutId);
+            });
+        }
+        
+    } catch (error) {
+        console.error('Error in playVideo:', error);
     }
 }
 
