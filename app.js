@@ -452,10 +452,17 @@ class StepManager {
                     break;
                 case STEPS.RESULTS:
                     this.updateFinalInfo();
-                    // Hide advanced edit mode if video regeneration was just completed
-                    if (window.videoRegenerationCompleted && !window.advancedEditAlreadyHidden) {
+                    // Hide advanced edit mode only if video regeneration was just completed from cut selection
+                    // Do NOT hide it if coming from image selection workflow
+                    if (window.videoRegenerationCompleted && !window.advancedEditAlreadyHidden && !window.imageToVideoInProgress) {
                         this.hideAdvancedEditAfterCompletion();
                         window.advancedEditAlreadyHidden = true;
+                    } else {
+                        // Ensure Advanced Edit Mode is visible when not hiding it
+                        const advancedEditSection = document.getElementById('advancedEditSection');
+                        if (advancedEditSection) {
+                            advancedEditSection.style.display = 'block';
+                        }
                     }
                     break;
                 case STEPS.VIDEO_CUT_SELECTION:
@@ -720,6 +727,8 @@ class StepManager {
                     window.videoRegenerationInProgress = false;
                     window.videoRegenerationCompleted = true;
                     window.videoCompletionTime = Date.now(); // Track completion time
+                    // Reset image to video flag since regeneration is complete
+                    window.imageToVideoInProgress = false;
                     
                     setTimeout(() => {
                         showToast('최종 영상 제작이 완료되었습니다! 🎬', 'success');
