@@ -496,6 +496,18 @@ class StepManager {
                     }
                     break;
                 case STEPS.VIDEO_CUT_SELECTION:
+                    // Add navigation guard to prevent recursive loop after video regeneration
+                    if (window.preventStep8Navigation || 
+                        (window.videoRegenerationCompleted && Date.now() - window.videoCompletionTime < 3000)) {
+                        console.log('Navigation guard: Preventing recursive entry to Step 8 after video regeneration');
+                        showToast('영상 제작이 완료되었습니다. 결과를 확인해주세요.', 'info');
+                        // Return to Step 7 instead
+                        setTimeout(() => {
+                            this.goToStep(7);
+                        }, 500);
+                        return;
+                    }
+                    
                     // Initialize enhanced video cuts when entering step 8
                     setTimeout(() => {
                         initializeEnhancedVideoCuts();
@@ -762,8 +774,14 @@ class StepManager {
                     
                     setTimeout(() => {
                         showToast('최종 영상 제작이 완료되었습니다! 🎬', 'success');
-                        // Navigate to Step 7 (Results)
+                        // Navigate to Step 7 (Results) and set navigation guard
+                        window.preventStep8Navigation = true;
                         this.goToStep(7);
+                        
+                        // Clear the navigation guard after a delay
+                        setTimeout(() => {
+                            window.preventStep8Navigation = false;
+                        }, 5000);
                     }, VIDEO_CONFIG.COMPLETION_DELAY);
                 }
             }, VIDEO_CONFIG.PROGRESS_INTERVAL);
@@ -951,8 +969,14 @@ class StepManager {
                     
                     setTimeout(() => {
                         showToast('부분 영상 재생성이 완료되었습니다! 🎬', 'success');
-                        // Navigate to Step 7 (Results)
+                        // Navigate to Step 7 (Results) and set navigation guard
+                        window.preventStep8Navigation = true;
                         this.goToStep(7);
+                        
+                        // Clear the navigation guard after a delay
+                        setTimeout(() => {
+                            window.preventStep8Navigation = false;
+                        }, 5000);
                     }, VIDEO_CONFIG.COMPLETION_DELAY);
                 }
             }, VIDEO_CONFIG.PROGRESS_INTERVAL);
@@ -2004,10 +2028,20 @@ function proceedWithSelectedCuts() {
             showToast('기존 영상을 그대로 사용합니다.', 'info');
             
             // Skip regeneration and go directly to results
+            // Set completion flags to prevent navigation loop
+            window.videoRegenerationCompleted = true;
+            window.videoCompletionTime = Date.now();
+            window.preventStep8Navigation = true;
+            
             setTimeout(() => {
                 if (app && app.stepManager) {
                     app.stepManager.goToStep(7);
                     showToast('영상 제작이 완료되었습니다! 🎬', 'success');
+                    
+                    // Clear the navigation guard after a delay
+                    setTimeout(() => {
+                        window.preventStep8Navigation = false;
+                    }, 5000);
                 }
             }, 1000);
             
