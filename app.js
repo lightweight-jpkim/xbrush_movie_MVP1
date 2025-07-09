@@ -456,6 +456,7 @@ class StepManager {
                     // Initialize current image comparison when entering step 6
                     setTimeout(() => {
                         initializeCurrentImageComparison();
+                        initializeEnhancedImageSelection();
                     }, 100);
                     
                     // Check if this is video regeneration from cut selection
@@ -1226,7 +1227,7 @@ function selectImage(element, cut, imageId) {
         updateCurrentImageComparison(cut, element);
         
         app.stepManager.checkNextButton();
-        checkImageSelectionButton();
+        updateImageSelectionButton();
     } catch (error) {
         handleError(error, 'Image selection');
     }
@@ -1790,7 +1791,7 @@ function regenerateImages(cut) {
             imageGrid.style.pointerEvents = 'auto';
             
             // Update selection status
-            checkImageSelectionButton();
+            updateImageSelectionButton();
             
             showToast(`${cut} 이미지가 새로 생성되었습니다!`, 'success');
         }, 2000);
@@ -2791,6 +2792,15 @@ function updateImageSelectionButton() {
         }
         
         proceedButton.disabled = !allCutsReady;
+        
+        // Update button styling based on enabled/disabled state
+        if (allCutsReady) {
+            proceedButton.classList.remove('btn-disabled');
+            proceedButton.classList.add('btn-primary');
+        } else {
+            proceedButton.classList.add('btn-disabled');
+            proceedButton.classList.remove('btn-primary');
+        }
         
         // Update button text based on selections
         const keepCount = cuts.filter(cutId => {
