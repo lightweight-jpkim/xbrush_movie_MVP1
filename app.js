@@ -2237,6 +2237,9 @@ function initializeEnhancedVideoCuts() {
             }
         });
         
+        // Initialize video loading and error handling
+        initializeVideoElements();
+        
         // Initialize cost calculation
         updateCostCalculation();
         updateProceedButton();
@@ -2245,6 +2248,160 @@ function initializeEnhancedVideoCuts() {
         
     } catch (error) {
         console.error('Error in initializeEnhancedVideoCuts:', error);
+    }
+}
+
+/**
+ * Initialize video elements with loading and error handling
+ */
+function initializeVideoElements() {
+    try {
+        const videos = document.querySelectorAll('.cut-video');
+        
+        videos.forEach((video, index) => {
+            const cutId = `cut${index + 1}`;
+            const container = video.closest('.video-cut-container');
+            
+            console.log(`Initializing video for ${cutId}`, video);
+            
+            // Add loading indicator
+            showVideoLoadingState(container);
+            
+            // Handle successful video load
+            video.addEventListener('loadedmetadata', () => {
+                console.log(`Video ${cutId} metadata loaded successfully`);
+                hideVideoLoadingState(container);
+                container.classList.add('video-loaded');
+                
+                // Try to play the video
+                video.play().catch(error => {
+                    console.warn(`Video ${cutId} autoplay failed:`, error);
+                    // Autoplay failed, but video is loaded
+                });
+            });
+            
+            // Handle video load errors
+            video.addEventListener('error', (e) => {
+                console.error(`Video ${cutId} loading error:`, e);
+                showVideoErrorState(container, cutId);
+            });
+            
+            // Handle video loading start
+            video.addEventListener('loadstart', () => {
+                console.log(`Video ${cutId} loading started`);
+                showVideoLoadingState(container);
+            });
+            
+            // Handle video ready to play
+            video.addEventListener('canplay', () => {
+                console.log(`Video ${cutId} ready to play`);
+                hideVideoLoadingState(container);
+                container.classList.add('video-loaded');
+            });
+            
+            // Force video to load
+            video.load();
+        });
+        
+        console.log('Video elements initialized');
+        
+    } catch (error) {
+        console.error('Error in initializeVideoElements:', error);
+    }
+}
+
+/**
+ * Show video loading state
+ */
+function showVideoLoadingState(container) {
+    try {
+        const preview = container.querySelector('.video-cut-preview');
+        if (preview && !preview.querySelector('.video-loading-overlay')) {
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.className = 'video-loading-overlay';
+            loadingOverlay.innerHTML = `
+                <div class="loading-content">
+                    <div class="loading-spinner"></div>
+                    <p>비디오 로딩 중...</p>
+                </div>
+            `;
+            preview.appendChild(loadingOverlay);
+            container.classList.add('video-loading');
+        }
+    } catch (error) {
+        console.error('Error in showVideoLoadingState:', error);
+    }
+}
+
+/**
+ * Hide video loading state
+ */
+function hideVideoLoadingState(container) {
+    try {
+        const loadingOverlay = container.querySelector('.video-loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.remove();
+        }
+        container.classList.remove('video-loading');
+    } catch (error) {
+        console.error('Error in hideVideoLoadingState:', error);
+    }
+}
+
+/**
+ * Show video error state
+ */
+function showVideoErrorState(container, cutId) {
+    try {
+        const preview = container.querySelector('.video-cut-preview');
+        const video = preview.querySelector('.cut-video');
+        
+        // Hide the video element
+        video.style.display = 'none';
+        
+        // Remove loading overlay
+        hideVideoLoadingState(container);
+        
+        // Show error message
+        if (!preview.querySelector('.video-error-overlay')) {
+            const errorOverlay = document.createElement('div');
+            errorOverlay.className = 'video-error-overlay';
+            errorOverlay.innerHTML = `
+                <div class="error-content">
+                    <i class="error-icon">⚠️</i>
+                    <p>비디오를 로드할 수 없습니다</p>
+                    <button class="btn btn-outline" onclick="retryVideoLoad('${cutId}')">다시 시도</button>
+                </div>
+            `;
+            preview.appendChild(errorOverlay);
+        }
+        
+        container.classList.add('video-error');
+        
+    } catch (error) {
+        console.error('Error in showVideoErrorState:', error);
+    }
+}
+
+/**
+ * Retry video loading
+ */
+function retryVideoLoad(cutId) {
+    try {
+        const container = document.querySelector(`[data-cut="${cutId}"]`);
+        const video = container.querySelector('.cut-video');
+        const errorOverlay = container.querySelector('.video-error-overlay');
+        
+        if (errorOverlay) {
+            errorOverlay.remove();
+        }
+        
+        video.style.display = 'block';
+        container.classList.remove('video-error');
+        video.load();
+        
+    } catch (error) {
+        console.error('Error in retryVideoLoad:', error);
     }
 }
 
