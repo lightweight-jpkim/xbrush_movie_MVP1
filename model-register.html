@@ -33,7 +33,7 @@
                 </div>
                 <div class="progress-indicator">
                     <div class="step-indicator" id="stepIndicator">
-                        <span class="current-step">0</span> / <span class="total-steps">4</span>
+                        <span class="current-step">1</span> / <span class="total-steps">5</span>
                     </div>
                 </div>
             </div>
@@ -46,28 +46,28 @@
                     <div class="progress-line-active" id="modelProgressLine" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 
-                <button class="step active" data-step="0" type="button" aria-label="0단계: 진입 및 자격 안내">
-                    <div class="step-number">0</div>
+                <button class="step active" data-step="1" type="button" aria-label="1단계: 진입 및 자격 안내">
+                    <div class="step-number">1</div>
                     <div class="step-label">진입 안내</div>
                 </button>
                 
-                <button class="step" data-step="1" type="button" aria-label="1단계: KYC 2단계 인증">
-                    <div class="step-number">1</div>
+                <button class="step" data-step="2" type="button" aria-label="2단계: KYC 2단계 인증">
+                    <div class="step-number">2</div>
                     <div class="step-label">본인 인증</div>
                 </button>
                 
-                <button class="step" data-step="2" type="button" aria-label="2단계: 계약 조건 설정">
-                    <div class="step-number">2</div>
+                <button class="step" data-step="3" type="button" aria-label="3단계: 계약 조건 설정">
+                    <div class="step-number">3</div>
                     <div class="step-label">계약 조건</div>
                 </button>
                 
-                <button class="step" data-step="3" type="button" aria-label="3단계: 포트폴리오 업로드">
-                    <div class="step-number">3</div>
+                <button class="step" data-step="4" type="button" aria-label="4단계: 포트폴리오 업로드">
+                    <div class="step-number">4</div>
                     <div class="step-label">포트폴리오</div>
                 </button>
                 
-                <button class="step" data-step="4" type="button" aria-label="4단계: 등록 완료">
-                    <div class="step-number">4</div>
+                <button class="step" data-step="5" type="button" aria-label="5단계: 등록 완료">
+                    <div class="step-number">5</div>
                     <div class="step-label">등록 완료</div>
                 </button>
             </div>
@@ -75,10 +75,10 @@
 
         <!-- Main Content Area -->
         <main class="model-content-area">
-            <!-- Step 0: Entry & Qualification Guide -->
-            <section class="step-content active" id="modelStep0">
+            <!-- Step 1: Entry & Qualification Guide -->
+            <section class="step-content active" id="modelStep1">
                 <div class="step-header">
-                    <div class="step-badge">단계 0/6</div>
+                    <div class="step-badge">단계 1/5</div>
                     <h1 class="step-title">모델 되기 시작하기</h1>
                     <p class="step-description">AI 모델 등록을 위한 준비사항을 확인해주세요</p>
                 </div>
@@ -181,10 +181,10 @@
                 </div>
             </section>
 
-            <!-- Step 1: KYC 2-Step Verification -->
-            <section class="step-content" id="modelStep1">
+            <!-- Step 2: KYC 2-Step Verification -->
+            <section class="step-content" id="modelStep2">
                 <div class="step-header">
-                    <div class="step-badge">단계 1/6</div>
+                    <div class="step-badge">단계 2/5</div>
                     <h1 class="step-title">본인 인증 (KYC)</h1>
                     <p class="step-description">안전한 모델 등록을 위해 2단계 본인 인증을 진행합니다</p>
                 </div>
@@ -318,10 +318,10 @@
                 </div>
             </section>
 
-            <!-- Step 2: Contract Conditions -->
-            <section class="step-content" id="modelStep2">
+            <!-- Step 3: Contract Conditions -->
+            <section class="step-content" id="modelStep3">
                 <div class="step-header">
-                    <div class="step-badge">단계 2/6</div>
+                    <div class="step-badge">단계 3/5</div>
                     <h1 class="step-title">계약 조건 설정</h1>
                     <p class="step-description">수익 배분, 계약 기간, 사용 범위를 설정해주세요</p>
                 </div>
@@ -536,12 +536,12 @@
             </section>
 
             <!-- Remaining steps will be added in subsequent parts -->
-            <!-- Step 3: Portfolio Upload -->
-            <section class="step-content" id="modelStep3">
+            <!-- Step 4: Portfolio Upload -->
+            <section class="step-content" id="modelStep4">
                 <div class="step-header">
-                    <div class="step-badge">단계 3/6</div>
+                    <div class="step-badge">단계 4/5</div>
                     <h1 class="step-title">포트폴리오 업로드</h1>
-                    <p class="step-description">최소 10장 이상의 고품질 이미지를 업로드해주세요</p>
+                    <p class="step-description">고품질 이미지를 업로드해주세요</p>
                 </div>
                 
                 <div class="portfolio-upload-area">
@@ -606,14 +606,14 @@
 
                 <div class="action-buttons">
                     <button class="btn btn-outline" onclick="prevModelStep()">이전 단계</button>
-                    <button class="btn btn-primary" id="step3Next" onclick="nextModelStep()" disabled>다음 단계</button>
+                    <button class="btn btn-primary" id="step4Next" onclick="nextModelStep()" disabled>다음 단계</button>
                 </div>
             </section>
 
-            <!-- Step 4: Registration Complete -->
-            <section class="step-content" id="modelStep4">
+            <!-- Step 5: Registration Complete -->
+            <section class="step-content" id="modelStep5">
                 <div class="step-header">
-                    <div class="step-badge">단계 4/4</div>
+                    <div class="step-badge">단계 5/5</div>
                     <h1 class="step-title">🎉 모델 등록이 완료되었습니다!</h1>
                     <p class="step-description">축하합니다! 모델 등록 신청이 성공적으로 제출되었습니다.</p>
                 </div>
