@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Sizing Test</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Step 8 Video Sizing Test</h1>
+        
+        <!-- Video Cut 1: Testing -->
+        <div class="video-cut-container" data-cut="cut1">
+            <h4 class="cut-title">컷 1: 오프닝 장면 (Test)</h4>
+            <div class="video-cut-preview">
+                <video class="cut-video" controls muted loop preload="metadata">
+                    <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/1.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="cut-duration">0-5초</div>
+                <div class="cut-status">기존 컷 유지</div>
+            </div>
+        </div>
+        
+        <!-- Video Cut 2: Testing -->
+        <div class="video-cut-container" data-cut="cut2">
+            <h4 class="cut-title">컷 2: 제품 소개 장면 (Test)</h4>
+            <div class="video-cut-preview">
+                <video class="cut-video" controls muted loop preload="metadata">
+                    <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/안동 사과 TVCM 18s 버전 모델 이상아.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="cut-duration">5-10초</div>
+                <div class="cut-status">기존 컷 유지</div>
+            </div>
+        </div>
+        
+        <!-- Advanced Edit Section Test -->
+        <div id="advancedEditSection" class="advanced-edit-section">
+            <h3>🎨 고급 편집 모드 (Test)</h3>
+            <p class="mb-3">Advanced Mode box should always be visible in Step 7</p>
+            
+            <div class="edit-options-grid">
+                <div class="card edit-option-card">
+                    <div class="icon">🎬</div>
+                    <h4>영상만 다시 제작</h4>
+                    <p>같은 이미지로 영상 스타일이나 편집을 변경</p>
+                    <div class="cost-badge low">비용: 5 토큰</div>
+                </div>
+                
+                <div class="card edit-option-card">
+                    <div class="icon">🖼️</div>
+                    <h4>새 이미지로 제작</h4>
+                    <p>이미지 선택부터 다시 시작</p>
+                    <div class="cost-badge medium">비용: 10 토큰</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

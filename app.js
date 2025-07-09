@@ -476,23 +476,18 @@ class StepManager {
                         cameFromImageSelection: window.cameFromImageSelection
                     });
                     
-                    // More robust flag checking
-                    const shouldHideAdvancedEdit = window.videoRegenerationCompleted && 
-                                                  !window.advancedEditAlreadyHidden && 
-                                                  !window.cameFromImageSelection;
+                    // Always ensure Advanced Edit Mode is visible in Step 7
+                    // This fixes the issue where Advanced Mode box disappears after video workflows
+                    const advancedEditSection = document.getElementById('advancedEditSection');
+                    if (advancedEditSection) {
+                        advancedEditSection.style.display = 'block';
+                        console.log('Advanced Edit Mode ensured visible in Step 7');
+                    }
                     
-                    console.log('Should hide Advanced Edit Mode:', shouldHideAdvancedEdit);
-                    
-                    if (shouldHideAdvancedEdit) {
-                        this.hideAdvancedEditAfterCompletion();
+                    // Only show completion message if video regeneration was completed
+                    if (window.videoRegenerationCompleted && !window.advancedEditAlreadyHidden) {
+                        showToast('영상 제작이 완료되었습니다! 다운로드하거나 새 광고를 만들어보세요.', 'success');
                         window.advancedEditAlreadyHidden = true;
-                    } else {
-                        // Always ensure Advanced Edit Mode is visible for image selection workflow
-                        const advancedEditSection = document.getElementById('advancedEditSection');
-                        if (advancedEditSection) {
-                            advancedEditSection.style.display = 'block';
-                            console.log('Advanced Edit Mode kept visible');
-                        }
                     }
                     break;
                 case STEPS.VIDEO_CUT_SELECTION:
@@ -1004,19 +999,23 @@ class StepManager {
     }
 
     /**
-     * Hide advanced edit mode after video regeneration completion
+     * Handle video regeneration completion (deprecated - Advanced Edit Mode should always be visible)
      */
     hideAdvancedEditAfterCompletion() {
         try {
+            // Advanced Edit Mode should always remain visible in Step 7
+            // This method is now deprecated but kept for backwards compatibility
             const advancedEditSection = document.getElementById('advancedEditSection');
             if (advancedEditSection) {
-                advancedEditSection.style.display = 'none';
+                // Instead of hiding, ensure it's visible
+                advancedEditSection.style.display = 'block';
+                console.log('Advanced Edit Mode kept visible (hideAdvancedEditAfterCompletion called)');
             }
             
             // Show completion message
             showToast('영상 제작이 완료되었습니다! 다운로드하거나 새 광고를 만들어보세요.', 'success');
             
-            // Reset the completion flag but DON'T automatically show advanced edit section
+            // Reset the completion flag
             setTimeout(() => {
                 window.videoRegenerationCompleted = false;
                 window.advancedEditAlreadyHidden = false;
@@ -1027,8 +1026,6 @@ class StepManager {
                 } else {
                     window.cameFromImageSelection = false;
                 }
-                // Don't automatically show advanced edit section to prevent navigation loop
-                // User can manually scroll down to see it if needed
             }, 1500);
         } catch (error) {
             handleError(error, 'Advanced edit completion handling');
