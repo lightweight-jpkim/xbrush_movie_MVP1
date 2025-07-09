@@ -452,16 +452,30 @@ class StepManager {
                     break;
                 case STEPS.RESULTS:
                     this.updateFinalInfo();
-                    // Hide advanced edit mode only if video regeneration was just completed from cut selection
-                    // Do NOT hide it if coming from image selection workflow
-                    if (window.videoRegenerationCompleted && !window.advancedEditAlreadyHidden && !window.cameFromImageSelection) {
+                    
+                    // Debug logging
+                    console.log('Step 7 Entry - Flag states:', {
+                        videoRegenerationCompleted: window.videoRegenerationCompleted,
+                        advancedEditAlreadyHidden: window.advancedEditAlreadyHidden,
+                        cameFromImageSelection: window.cameFromImageSelection
+                    });
+                    
+                    // More robust flag checking
+                    const shouldHideAdvancedEdit = window.videoRegenerationCompleted && 
+                                                  !window.advancedEditAlreadyHidden && 
+                                                  !window.cameFromImageSelection;
+                    
+                    console.log('Should hide Advanced Edit Mode:', shouldHideAdvancedEdit);
+                    
+                    if (shouldHideAdvancedEdit) {
                         this.hideAdvancedEditAfterCompletion();
                         window.advancedEditAlreadyHidden = true;
                     } else {
-                        // Ensure Advanced Edit Mode is visible when not hiding it
+                        // Always ensure Advanced Edit Mode is visible for image selection workflow
                         const advancedEditSection = document.getElementById('advancedEditSection');
                         if (advancedEditSection) {
                             advancedEditSection.style.display = 'block';
+                            console.log('Advanced Edit Mode kept visible');
                         }
                     }
                     break;
@@ -871,7 +885,13 @@ class StepManager {
             setTimeout(() => {
                 window.videoRegenerationCompleted = false;
                 window.advancedEditAlreadyHidden = false;
-                window.cameFromImageSelection = false;
+                // Only reset cameFromImageSelection if we're not in image selection workflow
+                // This prevents issues with flag timing
+                if (window.cameFromImageSelection) {
+                    console.log('Preserving cameFromImageSelection flag');
+                } else {
+                    window.cameFromImageSelection = false;
+                }
                 // Don't automatically show advanced edit section to prevent navigation loop
                 // User can manually scroll down to see it if needed
             }, 1500);
@@ -1615,6 +1635,10 @@ function proceedToVideoCutSelection() {
             return;
         }
         
+        // Set flag BEFORE navigation starts to prevent race condition
+        window.cameFromImageSelection = true;
+        console.log('Setting cameFromImageSelection flag to true');
+        
         showToast('선택된 이미지로 영상 컷을 생성하고 있습니다...', 'info');
         
         // Navigate to Step 6 to show progress for video generation from selected images
@@ -1624,8 +1648,6 @@ function proceedToVideoCutSelection() {
                 
                 // Set flag to trigger image-to-video generation progress
                 window.imageToVideoInProgress = true;
-                // Set flag to track that we came from image selection workflow
-                window.cameFromImageSelection = true;
                 
                 // Start the image-to-video generation progress
                 setTimeout(() => {
