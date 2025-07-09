@@ -1384,8 +1384,11 @@ function goToLibrary() {
 
 function applyAsModel() {
     try {
-        showToast('모델 신청 페이지로 이동합니다! 🌟', 'info');
-        // Actual navigation logic would go here
+        showToast('모델 등록 페이지로 이동합니다! 🌟', 'info');
+        // Navigate to model registration page
+        setTimeout(() => {
+            window.location.href = 'model-register.html';
+        }, 1000);
     } catch (error) {
         handleError(error, 'Model application');
     }
