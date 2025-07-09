@@ -454,7 +454,7 @@ class StepManager {
                     this.updateFinalInfo();
                     // Hide advanced edit mode only if video regeneration was just completed from cut selection
                     // Do NOT hide it if coming from image selection workflow
-                    if (window.videoRegenerationCompleted && !window.advancedEditAlreadyHidden && !window.imageToVideoInProgress) {
+                    if (window.videoRegenerationCompleted && !window.advancedEditAlreadyHidden && !window.cameFromImageSelection) {
                         this.hideAdvancedEditAfterCompletion();
                         window.advancedEditAlreadyHidden = true;
                     } else {
@@ -871,6 +871,7 @@ class StepManager {
             setTimeout(() => {
                 window.videoRegenerationCompleted = false;
                 window.advancedEditAlreadyHidden = false;
+                window.cameFromImageSelection = false;
                 // Don't automatically show advanced edit section to prevent navigation loop
                 // User can manually scroll down to see it if needed
             }, 1500);
@@ -1366,6 +1367,9 @@ function executeEditOption(option, cost) {
                 
                 showToast(`영상 컷 선택 화면으로 이동합니다.`, 'info');
                 
+                // Reset the image selection flag since this is video-only regeneration
+                window.cameFromImageSelection = false;
+                
                 // Navigate to Step 8 (Video Cut Selection)
                 setTimeout(() => {
                     if (app && app.stepManager) {
@@ -1620,6 +1624,8 @@ function proceedToVideoCutSelection() {
                 
                 // Set flag to trigger image-to-video generation progress
                 window.imageToVideoInProgress = true;
+                // Set flag to track that we came from image selection workflow
+                window.cameFromImageSelection = true;
                 
                 // Start the image-to-video generation progress
                 setTimeout(() => {
