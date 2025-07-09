@@ -67,6 +67,11 @@ const TOAST_CONFIG = {
     POSITION: 'top-right'
 };
 
+// URL configuration
+const URLS = {
+    MODEL_REGISTRATION: 'model-register.html'
+};
+
 // Export constants for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -75,6 +80,7 @@ if (typeof module !== 'undefined' && module.exports) {
         PROGRESS_STATUSES,
         DEFAULT_SCENARIOS,
         VIDEO_CONFIG,
-        TOAST_CONFIG
+        TOAST_CONFIG,
+        URLS
     };
 }

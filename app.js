@@ -1387,7 +1387,7 @@ function applyAsModel() {
         showToast('모델 등록 페이지로 이동합니다! 🌟', 'info');
         // Navigate to model registration page
         setTimeout(() => {
-            window.location.href = 'model-register.html';
+            window.location.href = URLS.MODEL_REGISTRATION;
         }, 1000);
     } catch (error) {
         handleError(error, 'Model application');
