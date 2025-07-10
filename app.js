@@ -1131,8 +1131,7 @@ let app; // Global app instance
 function initializeApp() {
     try {
         app = new VideoCreationApp();
-        // Load featured models on main page
-        loadFeaturedModels();
+        // Featured models will be loaded when Firebase is ready
     } catch (error) {
         handleError(error, 'Application initialization');
     }
@@ -2896,15 +2895,21 @@ async function loadFeaturedModels() {
     
     if (!featuredModelsGrid) return;
     
+    console.log('[Featured Models] Starting to load...');
+    
     try {
         // Show loading state
         featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>모델을 불러오는 중...</p></div>';
         
         // Wait for Firebase to be ready
+        console.log('[Featured Models] Waiting for Firebase...');
         await waitForFirebase();
+        console.log('[Featured Models] Firebase ready!');
         
         // Get active models from Firebase
+        console.log('[Featured Models] Fetching models from Firebase...');
         const models = await window.modelStorageAdapter.getActiveModels();
+        console.log('[Featured Models] Got models:', models.length);
         
         // Update count
         modelCount.textContent = `총 ${models.length}개`;
@@ -2950,13 +2955,14 @@ async function loadFeaturedModels() {
  * Wait for Firebase to be ready
  */
 async function waitForFirebase() {
-    let retries = 10;
+    let retries = 20; // 10 seconds total
     while (retries > 0 && (!window.firebaseDB || !window.modelStorageAdapter)) {
         await new Promise(resolve => setTimeout(resolve, 500));
         retries--;
     }
     if (!window.modelStorageAdapter) {
-        throw new Error('Firebase not initialized');
+        console.error('[Featured Models] Firebase failed to initialize after 10 seconds');
+        throw new Error('Firebase initialization timeout');
     }
 }
 

@@ -1083,8 +1083,17 @@
     <script src="utils.js"></script>
     <script src="app.js"></script>
     
-    <!-- Secret admin access: Press Ctrl+Shift+A -->
+    <!-- Load featured models when Firebase is ready -->
     <script>
+        // Wait for Firebase to be ready before loading models
+        window.addEventListener('firebaseReady', function() {
+            console.log('[Main Page] Firebase ready event received, loading featured models...');
+            if (typeof loadFeaturedModels === 'function') {
+                loadFeaturedModels();
+            }
+        });
+        
+        // Secret admin access: Press Ctrl+Shift+A
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.shiftKey && e.key === 'A') {
                 window.location.href = 'admin.html';
