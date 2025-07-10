@@ -1137,11 +1137,24 @@ class ModelRegistrationApp {
             modal.style.zIndex = '1000';
             console.log('Modal should be visible now');
             
+            // Add diagnostic click handler to the modal
+            const modalClickHandler = (e) => {
+                console.log('Modal clicked, target:', e.target);
+                console.log('Target classes:', e.target.className);
+                console.log('Event phase:', e.eventPhase);
+            };
+            modal.removeEventListener('click', modal._diagnosticHandler);
+            modal._diagnosticHandler = modalClickHandler;
+            modal.addEventListener('click', modalClickHandler, true);
+            
             // Focus on the modal for accessibility
             const modalContent = modal.querySelector('.thumbnail-modal-content');
             if (modalContent) {
                 modalContent.focus();
             }
+            
+            // Update confirm button state
+            this.updateThumbnailConfirmButton();
         } else {
             console.error('Thumbnail modal element not found');
             this.showToast('썸네일 선택 모달을 열 수 없습니다.', 'error');
@@ -1182,15 +1195,10 @@ class ModelRegistrationApp {
             return;
         }
 
-        // Clear existing content and remove old event listeners
+        // Clear existing content
         grid.innerHTML = '';
         
-        // Remove any existing click handlers
-        const newGrid = grid.cloneNode(true);
-        grid.parentNode.replaceChild(newGrid, grid);
-        const gridElement = document.getElementById('portfolioThumbnailGrid');
-        
-        // Create thumbnails with proper error handling
+        // Create thumbnails
         this.uploadedImages.forEach(image => {
             if (!image.id || !image.url) {
                 console.warn('Invalid image data:', image);
@@ -1200,58 +1208,57 @@ class ModelRegistrationApp {
             const thumbnailItem = document.createElement('div');
             thumbnailItem.className = 'portfolio-thumbnail-item';
             thumbnailItem.setAttribute('data-image-id', image.id);
-            
-            // Make sure the item is clickable
-            thumbnailItem.style.cursor = 'pointer';
-            thumbnailItem.style.position = 'relative';
-            thumbnailItem.style.pointerEvents = 'auto';
+            thumbnailItem.setAttribute('role', 'button');
+            thumbnailItem.setAttribute('tabindex', '0');
             
             const img = document.createElement('img');
             img.src = image.url;
             img.alt = 'Portfolio image';
-            img.style.pointerEvents = 'none'; // Prevent image from intercepting clicks
-            img.onerror = () => {
-                console.error('Failed to load image:', image.url);
-                thumbnailItem.style.opacity = '0.5';
-            };
             
             const indicator = document.createElement('div');
             indicator.className = 'selection-indicator';
             indicator.textContent = '✓';
-            indicator.style.pointerEvents = 'none'; // Prevent indicator from intercepting clicks
             
             thumbnailItem.appendChild(img);
             thumbnailItem.appendChild(indicator);
             
-            // Add click handler using closure to capture image ID
-            const imageId = image.id;
-            thumbnailItem.onclick = () => {
-                console.log('Thumbnail onclick triggered, ID:', imageId);
-                this.selectPortfolioThumbnail(imageId);
-                return false;
-            };
-            
-            gridElement.appendChild(thumbnailItem);
+            grid.appendChild(thumbnailItem);
         });
         
-        // Also add event delegation as backup
-        gridElement.addEventListener('click', (e) => {
-            console.log('Grid clicked (delegation), target:', e.target);
-            
-            // Find the closest portfolio-thumbnail-item
-            const thumbnailItem = e.target.closest('.portfolio-thumbnail-item');
-            if (thumbnailItem) {
-                const imageId = thumbnailItem.getAttribute('data-image-id');
-                console.log('Thumbnail item found via delegation, ID:', imageId);
+        // Add a single event listener on the grid using event delegation
+        const handleClick = (e) => {
+            const item = e.target.closest('.portfolio-thumbnail-item');
+            if (item && item.parentElement === grid) {
+                const imageId = item.getAttribute('data-image-id');
+                console.log('Thumbnail clicked via delegation, ID:', imageId);
                 if (imageId) {
                     e.preventDefault();
                     e.stopPropagation();
                     this.selectPortfolioThumbnail(imageId);
                 }
             }
-        }, true); // Use capture phase to ensure we get the event
+        };
         
-        console.log('Portfolio thumbnails loaded successfully with click handlers');
+        // Remove any existing listeners first
+        grid.removeEventListener('click', grid._thumbnailClickHandler);
+        grid.removeEventListener('touchend', grid._thumbnailTouchHandler);
+        
+        // Store references to handlers so we can remove them later
+        grid._thumbnailClickHandler = handleClick;
+        grid._thumbnailTouchHandler = handleClick;
+        
+        // Add event listeners
+        grid.addEventListener('click', handleClick);
+        grid.addEventListener('touchend', handleClick);
+        
+        // Handle keyboard navigation
+        grid.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                handleClick(e);
+            }
+        });
+        
+        console.log('Portfolio thumbnails loaded successfully');
     }
 
     /**
@@ -1745,6 +1752,32 @@ class ModelRegistrationApp {
         
         console.log('Selected thumbnail ID:', this.selectedThumbnailId);
         console.log('=== End Debug ===');
+        
+        // Test clicking the first thumbnail
+        console.log('=== Testing Click on First Thumbnail ===');
+        const firstThumbnail = document.querySelector('.portfolio-thumbnail-item');
+        if (firstThumbnail) {
+            console.log('Simulating click on first thumbnail...');
+            const clickEvent = new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            firstThumbnail.dispatchEvent(clickEvent);
+            console.log('Click event dispatched');
+        }
+    }
+    
+    /**
+     * Test thumbnail selection
+     */
+    testThumbnailSelection(imageId) {
+        console.log('=== Testing Thumbnail Selection ===');
+        if (!imageId && this.uploadedImages.length > 0) {
+            imageId = this.uploadedImages[0].id;
+        }
+        console.log('Testing with image ID:', imageId);
+        this.selectPortfolioThumbnail(imageId);
     }
 
     /**
@@ -1820,6 +1853,74 @@ class ModelRegistrationApp {
         
         this.showToast('KYC-B 관리자 승인 완료', 'success');
     }
+
+    /**
+     * Admin skip all KYC steps
+     */
+    adminSkipKYC() {
+        console.log('Admin skipping all KYC verification');
+        
+        // Skip KYC-A
+        this.registrationData.idCardImage = 'admin-bypass';
+        this.registrationData.faceImage = 'admin-bypass';
+        this.registrationData.ocrData = {
+            name: '테스트 사용자',
+            idNumber: '000000-0000000',
+            issueDate: '2024-01-01'
+        };
+        
+        // Skip KYC-B
+        this.registrationData.verificationVideo = 'admin-bypass';
+        this.registrationData.randomCode = '000000';
+        this.registrationData.videoAnalysis = {
+            speechText: '000000',
+            faceMatches: true,
+            deepfakeDetected: false,
+            audioQuality: 'good'
+        };
+        
+        // Update UI for both KYC steps
+        this.updateKYCStatus('kycAStatus', 'success', '인증 완료 (관리자)');
+        this.updateKYCStatus('kycBStatus', 'success', '인증 완료 (관리자)');
+        
+        // Update verification results
+        const resultADiv = document.getElementById('verificationAResult');
+        if (resultADiv) {
+            resultADiv.style.display = 'block';
+            const iconA = document.getElementById('resultAIcon');
+            const textA = document.getElementById('resultAText');
+            const detailsA = document.getElementById('resultADetails');
+            if (iconA) iconA.textContent = '✅';
+            if (textA) textA.textContent = '관리자 승인 완료';
+            if (detailsA) detailsA.textContent = '테스트용 관리자 승인';
+        }
+        
+        const resultBDiv = document.getElementById('verificationBResult');
+        if (resultBDiv) {
+            resultBDiv.style.display = 'block';
+            const iconB = document.getElementById('resultBIcon');
+            const textB = document.getElementById('resultBText');
+            const detailsB = document.getElementById('resultBDetails');
+            if (iconB) iconB.textContent = '✅';
+            if (textB) textB.textContent = '관리자 승인 완료';
+            if (detailsB) detailsB.textContent = '테스트용 관리자 승인';
+        }
+        
+        // Enable KYC step B section
+        this.enableKYCStepB();
+        
+        // Mark KYC as complete
+        this.registrationData.kycComplete = true;
+        this.validateAndUpdateKYCCompletion();
+        
+        // Show success message
+        this.showToast('모든 KYC 인증이 관리자 권한으로 완료되었습니다', 'success');
+        
+        // Automatically move to next step after a short delay
+        setTimeout(() => {
+            this.goToStep(3);
+        }, 1500);
+    }
 }
 
 // Global functions for HTML onclick handlers
@@ -1875,18 +1976,11 @@ function startReviewProcess() {
     modelApp.startReviewProcess();
 }
 
-// Admin bypass functions for testing
-function adminBypassKYCA() {
-    console.log('Admin bypass for KYC-A triggered');
+// Admin skip function for testing
+function adminSkipKYC() {
+    console.log('Admin skip KYC triggered');
     if (modelApp) {
-        modelApp.adminBypassKYCA();
-    }
-}
-
-function adminBypassKYCB() {
-    console.log('Admin bypass for KYC-B triggered');
-    if (modelApp) {
-        modelApp.adminBypassKYCB();
+        modelApp.adminSkipKYC();
     }
 }
 
@@ -1902,6 +1996,15 @@ document.addEventListener('DOMContentLoaded', () => {
 window.debugThumbnailSelection = function() {
     if (window.modelApp) {
         window.modelApp.debugThumbnailSelection();
+    } else {
+        console.error('ModelApp not initialized');
+    }
+};
+
+// Global test function
+window.testThumbnailSelection = function(imageId) {
+    if (window.modelApp) {
+        window.modelApp.testThumbnailSelection(imageId);
     } else {
         console.error('ModelApp not initialized');
     }

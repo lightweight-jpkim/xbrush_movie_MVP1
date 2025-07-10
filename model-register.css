@@ -1967,24 +1967,37 @@
     margin-top: 5px;
 }
 
-/* Admin Bypass Button */
-.admin-bypass {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px dashed #e2e8f0;
+/* Admin Skip Section */
+.admin-skip-section {
+    text-align: center;
+    margin: 20px 0 40px 0;
+    padding: 20px;
+    background: #fef5e7;
+    border-radius: 12px;
+    border: 2px dashed #f6e05e;
 }
 
-.admin-btn {
-    background: #fef5e7 !important;
-    border-color: #f6e05e !important;
-    color: #744210 !important;
-    font-size: 0.9rem;
-    padding: 10px 20px;
-}
-
-.admin-btn:hover {
+.admin-skip-btn {
     background: #f6e05e !important;
-    transform: translateY(-1px);
+    border-color: #d69e2e !important;
+    color: #744210 !important;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 12px 30px;
+    transition: all 0.3s ease;
+}
+
+.admin-skip-btn:hover {
+    background: #ecc94b !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(214, 158, 46, 0.3);
+}
+
+.admin-skip-note {
+    margin-top: 10px;
+    color: #744210;
+    font-size: 0.85rem;
+    opacity: 0.8;
 }
 
 .pricing-preview {

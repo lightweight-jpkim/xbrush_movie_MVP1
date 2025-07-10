@@ -194,9 +194,17 @@
             <!-- Step 2: KYC 2-Step Verification -->
             <section class="step-content" id="modelStep2">
                 <div class="step-header">
-                    <div class="step-badge">단계 2/5</div>
+                    <div class="step-badge">단계 2/7</div>
                     <h1 class="step-title">본인 인증 (KYC)</h1>
                     <p class="step-description">안전한 모델 등록을 위해 2단계 본인 인증을 진행합니다</p>
+                </div>
+                
+                <!-- Admin Skip Button -->
+                <div class="admin-skip-section">
+                    <button class="btn btn-outline admin-skip-btn" onclick="adminSkipKYC()">
+                        ⚡ 관리자 권한으로 인증 건너뛰기
+                    </button>
+                    <p class="admin-skip-note">테스트 및 개발용 기능입니다</p>
                 </div>
 
                 <!-- Sub-step 1-A: Face Recognition -->
@@ -261,13 +269,6 @@
                                 <div class="result-details" id="resultADetails"></div>
                             </div>
                         </div>
-                        
-                        <!-- Admin Bypass Button -->
-                        <div class="admin-bypass" style="margin-top: 20px; text-align: center;">
-                            <button class="btn btn-outline admin-btn" onclick="adminBypassKYCA()">
-                                🔑 관리자 승인 (테스트용)
-                            </button>
-                        </div>
                     </div>
                 </div>
 
@@ -318,13 +319,6 @@
                                 <div class="result-text" id="resultBText">검증 중...</div>
                                 <div class="result-details" id="resultBDetails"></div>
                             </div>
-                        </div>
-                        
-                        <!-- Admin Bypass Button -->
-                        <div class="admin-bypass" style="margin-top: 20px; text-align: center;">
-                            <button class="btn btn-outline admin-btn" onclick="adminBypassKYCB()">
-                                🔑 관리자 승인 (테스트용)
-                            </button>
                         </div>
                     </div>
                 </div>
