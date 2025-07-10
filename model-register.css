@@ -1949,6 +1949,17 @@
     transform: scale(1.02);
 }
 
+/* Enhanced selection indicator */
+.selection-indicator {
+    width: 30px !important;
+    height: 30px !important;
+    background: #667eea !important;
+    border: 3px solid white !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+}
+
 .thumbnail-modal-footer {
     display: flex;
     justify-content: flex-end;
@@ -2219,6 +2230,19 @@
     }
 }
 
+@keyframes thumbnailSuccess {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
 .review-details {
     background: white;
     border-radius: 16px;
@@ -2323,4 +2347,38 @@
     padding: 15px;
     background: #edf2f7;
     border-radius: 8px;
+}
+
+/* Admin Approval Section */
+.admin-approval-section {
+    text-align: center;
+    margin: 30px 0;
+    padding: 20px;
+    background: #fef5e7;
+    border-radius: 12px;
+    border: 2px dashed #f6e05e;
+}
+
+.admin-approval-btn {
+    background: #f6e05e;
+    color: #744210;
+    border: 2px solid #f6e05e;
+    padding: 12px 30px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.admin-approval-btn:hover {
+    background: #f7dc6f;
+    border-color: #f7dc6f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(246, 224, 94, 0.3);
+}
+
+.admin-approval-note {
+    margin: 10px 0 0 0;
+    color: #744210;
+    font-size: 0.85rem;
+    font-style: italic;
 }

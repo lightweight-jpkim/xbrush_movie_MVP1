@@ -1385,6 +1385,12 @@ class ModelRegistrationApp {
             resetBtn.style.display = 'inline-block';
             previewContainer.classList.add('has-image');
             
+            // Add success animation
+            previewContainer.style.animation = 'thumbnailSuccess 0.5s ease';
+            setTimeout(() => {
+                previewContainer.style.animation = '';
+            }, 500);
+            
             // Store thumbnail data
             this.registrationData.thumbnail = {
                 id: selectedImage.id,
@@ -1890,6 +1896,60 @@ class ModelRegistrationApp {
     }
 
     /**
+     * Admin approve registration
+     */
+    adminApproveRegistration() {
+        console.log('Admin approving registration...');
+        
+        // Update all review steps to completed
+        const reviewSteps = ['reviewStep2', 'reviewStep3', 'reviewStep4'];
+        reviewSteps.forEach(stepId => {
+            const step = document.getElementById(stepId);
+            if (step) {
+                step.classList.remove('active');
+                step.classList.add('completed');
+                step.querySelector('.step-icon').textContent = '✅';
+            }
+        });
+        
+        // Update checklist items
+        const checklistItems = ['checkProduct', 'checkFinal'];
+        checklistItems.forEach(itemId => {
+            const item = document.getElementById(itemId);
+            if (item) {
+                item.classList.remove('active');
+                item.classList.add('completed');
+                item.querySelector('.check-icon').textContent = '✅';
+            }
+        });
+        
+        // Update status
+        const statusIcon = document.getElementById('reviewStatusIcon');
+        const statusTitle = document.getElementById('reviewStatusTitle');
+        const statusDesc = document.getElementById('reviewStatusDescription');
+        
+        if (statusIcon) statusIcon.textContent = '✅';
+        if (statusTitle) statusTitle.textContent = '관리자 승인 완료';
+        if (statusDesc) statusDesc.textContent = '관리자 권한으로 모든 검수가 승인되었습니다.';
+        
+        // Enable next button
+        const nextButton = document.getElementById('step6Next');
+        if (nextButton) {
+            nextButton.disabled = false;
+            nextButton.textContent = '다음 단계로';
+            nextButton.onclick = () => this.nextModelStep();
+        }
+        
+        // Show success message
+        this.showToast('관리자 권한으로 승인이 완료되었습니다!', 'success');
+        
+        // Automatically move to next step after a short delay
+        setTimeout(() => {
+            this.nextModelStep();
+        }, 1500);
+    }
+
+    /**
      * Admin skip all KYC steps
      */
     adminSkipKYC() {
@@ -1987,6 +2047,14 @@ function adminSkipKYC() {
     console.log('Admin skip KYC triggered');
     if (modelApp) {
         modelApp.adminSkipKYC();
+    }
+}
+
+// Admin approve registration function
+function adminApproveRegistration() {
+    console.log('Admin approve registration triggered');
+    if (modelApp) {
+        modelApp.adminApproveRegistration();
     }
 }
 
