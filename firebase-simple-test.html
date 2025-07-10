@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Firebase Test</title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f0f0f0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Firebase Test</h1>
+    
+    <button onclick="testConnection()">Test Firebase Connection</button>
+    <button onclick="writeTestData()">Write Test Data</button>
+    <button onclick="readTestData()">Read Test Data</button>
+    <button onclick="listAllModels()">List All Models</button>
+    
+    <div id="results"></div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsQzvoYysNkHcxR4NztCdqTVkD_HgtJEU",
+            authDomain: "xbrush-moviemaker-mvp.firebaseapp.com",
+            projectId: "xbrush-moviemaker-mvp",
+            storageBucket: "xbrush-moviemaker-mvp.firebasestorage.app",
+            messagingSenderId: "138732810619",
+            appId: "1:138732810619:web:a35c938d2d3b2880db4dde"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        const results = document.getElementById('results');
+        
+        function addResult(message, isSuccess = true) {
+            const div = document.createElement('div');
+            div.className = `result ${isSuccess ? 'success' : 'error'}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+        
+        function testConnection() {
+            results.innerHTML = '';
+            
+            if (firebase.apps.length > 0) {
+                addResult('✅ Firebase is connected!');
+                addResult(`Project ID: ${firebaseConfig.projectId}`);
+            } else {
+                addResult('❌ Firebase is not connected', false);
+            }
+        }
+        
+        async function writeTestData() {
+            results.innerHTML = '';
+            try {
+                const testDoc = {
+                    name: 'Test Model',
+                    timestamp: new Date().toISOString(),
+                    browser: navigator.userAgent
+                };
+                
+                await db.collection('test').doc('test-' + Date.now()).set(testDoc);
+                addResult('✅ Successfully wrote test data to Firebase!');
+            } catch (error) {
+                addResult(`❌ Write failed: ${error.message}`, false);
+                console.error(error);
+            }
+        }
+        
+        async function readTestData() {
+            results.innerHTML = '';
+            try {
+                const snapshot = await db.collection('test').limit(5).get();
+                addResult(`✅ Found ${snapshot.size} test documents`);
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    addResult(`Document ${doc.id}: ${data.name} - ${data.timestamp}`);
+                });
+            } catch (error) {
+                addResult(`❌ Read failed: ${error.message}`, false);
+                console.error(error);
+            }
+        }
+        
+        async function listAllModels() {
+            results.innerHTML = '';
+            try {
+                const snapshot = await db.collection('models').get();
+                addResult(`✅ Found ${snapshot.size} models in Firebase`);
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const name = data.personalInfo?.name || 'Unknown';
+                    addResult(`Model: ${name} (ID: ${doc.id})`);
+                });
+                
+                if (snapshot.size === 0) {
+                    addResult('No models found. Try migrating from localStorage first.');
+                }
+            } catch (error) {
+                addResult(`❌ Failed to list models: ${error.message}`, false);
+                console.error(error);
+            }
+        }
+        
+        // Test on load
+        window.addEventListener('DOMContentLoaded', testConnection);
+    </script>
+</body>
+</html>

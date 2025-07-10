@@ -6,12 +6,28 @@
 
 class ModelStorageAdapter {
     constructor() {
-        // Check if Firebase is available
-        this.useFirebase = window.firebaseModelStorage ? true : false;
+        // Initialize with localStorage first
+        this.useFirebase = false;
         this.localStorage = window.modelStorage;
-        this.firebaseStorage = window.firebaseModelStorage;
+        this.firebaseStorage = null;
         
-        console.log('Model Storage Adapter initialized. Using:', this.useFirebase ? 'Firebase' : 'localStorage');
+        // Try to initialize Firebase after a delay
+        this.initializeFirebase();
+        
+        console.log('Model Storage Adapter initialized. Starting with localStorage');
+    }
+    
+    async initializeFirebase() {
+        // Wait a bit for Firebase to initialize
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        if (window.firebaseModelStorage && window.firebaseDB) {
+            this.firebaseStorage = window.firebaseModelStorage;
+            this.useFirebase = true;
+            console.log('Model Storage Adapter: Switched to Firebase');
+        } else {
+            console.log('Model Storage Adapter: Firebase not available, continuing with localStorage');
+        }
     }
 
     /**
