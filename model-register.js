@@ -1863,8 +1863,14 @@ class ModelRegistrationApp {
      */
     adminSkipKYC() {
         console.log('Admin skipping KYC step entirely');
+        console.log('Current step:', this.currentStep);
         
-        // Set minimal required data for KYC bypass
+        // Set all required data that validateKYC() checks for
+        this.registrationData.idDocument = 'admin-bypass';
+        this.registrationData.facePhoto = 'admin-bypass';
+        this.registrationData.verificationVideo = 'admin-bypass';
+        
+        // Also set the other properties for completeness
         this.registrationData.idCardImage = 'admin-bypass';
         this.registrationData.faceImage = 'admin-bypass';
         this.registrationData.ocrData = {
@@ -1872,7 +1878,6 @@ class ModelRegistrationApp {
             idNumber: '000000-0000000',
             issueDate: '2024-01-01'
         };
-        this.registrationData.verificationVideo = 'admin-bypass';
         this.registrationData.randomCode = '000000';
         this.registrationData.videoAnalysis = {
             speechText: '000000',
@@ -1885,8 +1890,11 @@ class ModelRegistrationApp {
         // Show skip message
         this.showToast('KYC 단계를 건너뛰고 다음 단계로 이동합니다', 'info');
         
-        // Immediately move to next step
-        this.nextModelStep();
+        // Log what step we're going to
+        console.log('Moving from step', this.currentStep, 'to step', this.currentStep + 1);
+        
+        // Directly go to next step, bypassing validation
+        this.goToStep(this.currentStep + 1);
     }
 }
 
