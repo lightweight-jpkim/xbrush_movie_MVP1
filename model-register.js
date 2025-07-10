@@ -1862,9 +1862,9 @@ class ModelRegistrationApp {
      * Admin skip all KYC steps
      */
     adminSkipKYC() {
-        console.log('Admin skipping all KYC verification');
+        console.log('Admin skipping KYC step entirely');
         
-        // Skip KYC-A
+        // Set minimal required data for KYC bypass
         this.registrationData.idCardImage = 'admin-bypass';
         this.registrationData.faceImage = 'admin-bypass';
         this.registrationData.ocrData = {
@@ -1872,8 +1872,6 @@ class ModelRegistrationApp {
             idNumber: '000000-0000000',
             issueDate: '2024-01-01'
         };
-        
-        // Skip KYC-B
         this.registrationData.verificationVideo = 'admin-bypass';
         this.registrationData.randomCode = '000000';
         this.registrationData.videoAnalysis = {
@@ -1882,50 +1880,13 @@ class ModelRegistrationApp {
             deepfakeDetected: false,
             audioQuality: 'good'
         };
-        
-        // Update UI for both KYC steps
-        this.updateKYCStatus('kycAStatus', 'success', '인증 완료 (관리자)');
-        this.updateKYCStatus('kycBStatus', 'success', '인증 완료 (관리자)');
-        
-        // Update verification results
-        const resultADiv = document.getElementById('verificationAResult');
-        if (resultADiv) {
-            resultADiv.style.display = 'block';
-            const iconA = document.getElementById('resultAIcon');
-            const textA = document.getElementById('resultAText');
-            const detailsA = document.getElementById('resultADetails');
-            if (iconA) iconA.textContent = '✅';
-            if (textA) textA.textContent = '관리자 승인 완료';
-            if (detailsA) detailsA.textContent = '테스트용 관리자 승인';
-        }
-        
-        const resultBDiv = document.getElementById('verificationBResult');
-        if (resultBDiv) {
-            resultBDiv.style.display = 'block';
-            const iconB = document.getElementById('resultBIcon');
-            const textB = document.getElementById('resultBText');
-            const detailsB = document.getElementById('resultBDetails');
-            if (iconB) iconB.textContent = '✅';
-            if (textB) textB.textContent = '관리자 승인 완료';
-            if (detailsB) detailsB.textContent = '테스트용 관리자 승인';
-        }
-        
-        // Enable KYC step B section
-        this.enableKYCStepB();
-        
-        // Mark KYC as complete
         this.registrationData.kycComplete = true;
         
-        // Enable the next button for the current step
-        this.enableNextStep(this.currentStep);
+        // Show skip message
+        this.showToast('KYC 단계를 건너뛰고 다음 단계로 이동합니다', 'info');
         
-        // Show success message
-        this.showToast('모든 KYC 인증이 관리자 권한으로 완료되었습니다', 'success');
-        
-        // Automatically move to next step after a short delay
-        setTimeout(() => {
-            this.nextModelStep();
-        }, 1500);
+        // Immediately move to next step
+        this.nextModelStep();
     }
 }
 
