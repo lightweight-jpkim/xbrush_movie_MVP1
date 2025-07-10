@@ -89,10 +89,15 @@ class FirebaseModelStorage {
             // Upload thumbnail if it's base64
             if (modelData.portfolio?.thumbnailUrl?.startsWith('data:')) {
                 console.log('Uploading thumbnail to Firebase Storage...');
-                modelData.portfolio.thumbnailUrl = await this.uploadImage(
-                    modelData.portfolio.thumbnailUrl,
-                    `thumbnail_${modelData.id}.jpg`
-                );
+                try {
+                    modelData.portfolio.thumbnailUrl = await this.uploadImage(
+                        modelData.portfolio.thumbnailUrl,
+                        `thumbnail_${modelData.id}.jpg`
+                    );
+                } catch (error) {
+                    console.error('Thumbnail upload failed (CORS issue), keeping base64:', error);
+                    // Keep base64 for now - will work but less efficient
+                }
             }
             
             // Upload portfolio images if they're base64
@@ -102,14 +107,19 @@ class FirebaseModelStorage {
                 for (let i = 0; i < modelData.portfolio.images.length; i++) {
                     const img = modelData.portfolio.images[i];
                     if (img.url?.startsWith('data:')) {
-                        const uploadedUrl = await this.uploadImage(
-                            img.url,
-                            `portfolio_${modelData.id}_${i}.jpg`
-                        );
-                        uploadedImages.push({
-                            ...img,
-                            url: uploadedUrl
-                        });
+                        try {
+                            const uploadedUrl = await this.uploadImage(
+                                img.url,
+                                `portfolio_${modelData.id}_${i}.jpg`
+                            );
+                            uploadedImages.push({
+                                ...img,
+                                url: uploadedUrl
+                            });
+                        } catch (error) {
+                            console.error(`Portfolio image ${i} upload failed (CORS), keeping base64:`, error);
+                            uploadedImages.push(img); // Keep base64 version
+                        }
                     } else {
                         uploadedImages.push(img);
                     }
