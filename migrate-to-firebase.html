@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Migration Tool</title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #f5f5f5;
+        }
+        .migration-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .warning { color: orange; font-weight: bold; }
+        .info { color: blue; font-weight: bold; }
+        pre {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .model-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f9f9f9;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .model-item.success {
+            background: #f0fdf4;
+            border: 1px solid #22c55e;
+        }
+        .model-item.error {
+            background: #fef2f2;
+            border: 1px solid #ef4444;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Firebase Migration Tool</h1>
+    
+    <div class="migration-section">
+        <h2>1. System Status</h2>
+        <p><strong>localStorage Models:</strong> <span id="localCount">Checking...</span></p>
+        <p><strong>Firebase Status:</strong> <span id="firebaseStatus">Checking...</span></p>
+        <p><strong>Firebase Models:</strong> <span id="firebaseCount">Checking...</span></p>
+    </div>
+
+    <div class="migration-section">
+        <h2>2. Migration Actions</h2>
+        <button onclick="checkStatus()" id="checkBtn">Check Status</button>
+        <button onclick="viewLocalModels()" id="viewBtn">View Local Models</button>
+        <button onclick="migrateAll()" id="migrateBtn">Migrate All to Firebase</button>
+        <button onclick="clearLocal()" id="clearBtn" disabled>Clear localStorage (After Migration)</button>
+    </div>
+
+    <div class="migration-section">
+        <h2>3. Migration Progress</h2>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+        </div>
+        <p id="progressText">Ready to migrate</p>
+        <div id="migrationLog"></div>
+    </div>
+
+    <div class="migration-section">
+        <h2>4. Local Models</h2>
+        <div id="localModels">Click "View Local Models" to see models</div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <!-- JavaScript Files -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-model-storage.js"></script>
+    <script src="js/model-storage.js"></script>
+    <script src="js/model-storage-adapter.js"></script>
+    
+    <script>
+        let localModelsData = [];
+        let firebaseModelsData = [];
+
+        async function checkStatus() {
+            try {
+                // Check localStorage
+                const localModels = window.modelStorage.getAllModels();
+                localModelsData = localModels;
+                document.getElementById('localCount').innerHTML = `<span class="info">${localModels.length} models</span>`;
+                
+                // Check Firebase
+                if (window.firebaseModelStorage) {
+                    document.getElementById('firebaseStatus').innerHTML = '<span class="success">Connected</span>';
+                    
+                    const firebaseModels = await window.firebaseModelStorage.getAllModels();
+                    firebaseModelsData = firebaseModels;
+                    document.getElementById('firebaseCount').innerHTML = `<span class="info">${firebaseModels.length} models</span>`;
+                    
+                    // Enable migration if there are local models
+                    if (localModels.length > 0) {
+                        document.getElementById('migrateBtn').disabled = false;
+                    }
+                } else {
+                    document.getElementById('firebaseStatus').innerHTML = '<span class="error">Not connected</span>';
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+                document.getElementById('firebaseStatus').innerHTML = '<span class="error">Error: ' + error.message + '</span>';
+            }
+        }
+
+        function viewLocalModels() {
+            const container = document.getElementById('localModels');
+            
+            if (localModelsData.length === 0) {
+                container.innerHTML = '<p class="warning">No models found in localStorage</p>';
+                return;
+            }
+            
+            container.innerHTML = localModelsData.map(model => `
+                <div class="model-item">
+                    <div>
+                        <strong>${model.personalInfo?.name || 'Unknown'}</strong>
+                        <span style="color: #666; margin-left: 10px;">ID: ${model.id}</span>
+                        <span style="color: #666; margin-left: 10px;">Status: ${model.status}</span>
+                    </div>
+                    <div id="status-${model.id}"></div>
+                </div>
+            `).join('');
+        }
+
+        async function migrateAll() {
+            if (!window.firebaseModelStorage) {
+                alert('Firebase not initialized!');
+                return;
+            }
+            
+            if (localModelsData.length === 0) {
+                alert('No models to migrate!');
+                return;
+            }
+            
+            const confirmMigrate = confirm(`Migrate ${localModelsData.length} models to Firebase?`);
+            if (!confirmMigrate) return;
+            
+            // Disable buttons during migration
+            document.getElementById('migrateBtn').disabled = true;
+            document.getElementById('checkBtn').disabled = true;
+            
+            const log = document.getElementById('migrationLog');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            log.innerHTML = '';
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (let i = 0; i < localModelsData.length; i++) {
+                const model = localModelsData[i];
+                const progress = ((i + 1) / localModelsData.length) * 100;
+                
+                progressBar.style.width = progress + '%';
+                progressText.textContent = `Migrating ${i + 1} of ${localModelsData.length}...`;
+                
+                try {
+                    await window.firebaseModelStorage.saveModel(model);
+                    successCount++;
+                    
+                    log.innerHTML += `<p class="success">✅ Migrated: ${model.personalInfo?.name || model.id}</p>`;
+                    
+                    // Update status in view
+                    const statusEl = document.getElementById(`status-${model.id}`);
+                    if (statusEl) {
+                        statusEl.innerHTML = '<span class="success">✅ Migrated</span>';
+                    }
+                } catch (error) {
+                    errorCount++;
+                    log.innerHTML += `<p class="error">❌ Failed: ${model.personalInfo?.name || model.id} - ${error.message}</p>`;
+                    
+                    const statusEl = document.getElementById(`status-${model.id}`);
+                    if (statusEl) {
+                        statusEl.innerHTML = '<span class="error">❌ Failed</span>';
+                    }
+                }
+                
+                // Small delay to avoid overwhelming Firebase
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            progressText.innerHTML = `<span class="success">Migration complete! Success: ${successCount}, Failed: ${errorCount}</span>`;
+            
+            // Re-enable buttons
+            document.getElementById('checkBtn').disabled = false;
+            document.getElementById('migrateBtn').disabled = false;
+            
+            if (successCount > 0 && errorCount === 0) {
+                document.getElementById('clearBtn').disabled = false;
+            }
+            
+            // Refresh status
+            checkStatus();
+        }
+
+        function clearLocal() {
+            const confirmClear = confirm('Are you sure you want to clear localStorage? This cannot be undone!');
+            if (!confirmClear) return;
+            
+            localStorage.removeItem('xbrush_models');
+            localModelsData = [];
+            
+            alert('localStorage cleared!');
+            checkStatus();
+            viewLocalModels();
+            
+            document.getElementById('clearBtn').disabled = true;
+        }
+
+        // Check status on load
+        window.addEventListener('DOMContentLoaded', () => {
+            checkStatus();
+        });
+    </script>
+</body>
+</html>

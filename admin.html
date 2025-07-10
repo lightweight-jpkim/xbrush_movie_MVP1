@@ -458,8 +458,16 @@
         </div>
     </div>
 
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
     <!-- Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-model-storage.js"></script>
     <script src="js/model-storage.js"></script>
+    <script src="js/model-storage-adapter.js"></script>
     <script>
         let allModels = [];
         let filteredModels = [];
@@ -471,10 +479,15 @@
         }
 
         // Load all models
-        function loadModels() {
-            allModels = window.modelStorage.getAllModels();
-            filteredModels = [...allModels];
-            displayModels(filteredModels);
+        async function loadModels() {
+            try {
+                allModels = await window.modelStorage.getAllModels();
+                filteredModels = [...allModels];
+                displayModels(filteredModels);
+            } catch (error) {
+                console.error('Error loading models:', error);
+                document.getElementById('modelsTableBody').innerHTML = '<tr><td colspan="6" class="text-center">모델을 불러오는 중 오류가 발생했습니다.</td></tr>';
+            }
         }
 
         // Display models in table
@@ -588,30 +601,35 @@
         }
 
         // Delete model
-        function deleteModel(modelId) {
+        async function deleteModel(modelId) {
             const model = allModels.find(m => m.id === modelId);
             const modelName = model?.personalInfo?.name || '이 모델';
             
             if (confirm(`정말로 "${modelName}"을(를) 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
-                if (window.modelStorage.deleteModel(modelId)) {
-                    showToast('모델이 삭제되었습니다.', 'success');
-                    loadModels();
-                    updateStats();
-                } else {
+                try {
+                    if (await window.modelStorage.deleteModel(modelId)) {
+                        showToast('모델이 삭제되었습니다.', 'success');
+                        loadModels();
+                        updateStats();
+                    } else {
+                        showToast('삭제 중 오류가 발생했습니다.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting model:', error);
                     showToast('삭제 중 오류가 발생했습니다.', 'error');
                 }
             }
         }
 
         // Toggle model status
-        function toggleStatus(modelId) {
+        async function toggleStatus(modelId) {
             const model = allModels.find(m => m.id === modelId);
             if (!model) return;
             
             const newStatus = model.status === 'active' ? 'inactive' : 'active';
             
             try {
-                window.modelStorage.updateModel(modelId, { status: newStatus });
+                await window.modelStorage.updateModel(modelId, { status: newStatus });
                 showToast(`모델 상태가 ${newStatus === 'active' ? '활성' : '비활성'}으로 변경되었습니다.`, 'success');
                 loadModels();
                 updateStats();

@@ -27,28 +27,36 @@ class ModelDisplay {
     /**
      * Load and display models
      */
-    loadAndDisplayModels() {
+    async loadAndDisplayModels() {
         if (!window.modelStorage) {
             console.error('ModelStorage not initialized');
             return;
         }
 
-        // Get active models
-        const models = window.modelStorage.getActiveModels();
-        
-        if (models.length === 0) {
-            this.displayEmptyState();
-            return;
-        }
+        try {
+            // Show loading state
+            this.modelsContainer.innerHTML = '<div class="loading-state">모델을 불러오는 중...</div>';
+            
+            // Get active models (now async)
+            const models = await window.modelStorage.getActiveModels();
+            
+            if (models.length === 0) {
+                this.displayEmptyState();
+                return;
+            }
 
-        // Sort models
-        const sortedModels = this.sortModels(models, this.currentSort);
-        
-        // Filter models
-        const filteredModels = this.filterModels(sortedModels, this.currentFilter);
-        
-        // Display models
-        this.displayModels(filteredModels);
+            // Sort models
+            const sortedModels = this.sortModels(models, this.currentSort);
+            
+            // Filter models
+            const filteredModels = this.filterModels(sortedModels, this.currentFilter);
+            
+            // Display models
+            this.displayModels(filteredModels);
+        } catch (error) {
+            console.error('Error loading models:', error);
+            this.modelsContainer.innerHTML = '<div class="error-state">모델을 불러오는 중 오류가 발생했습니다.</div>';
+        }
     }
 
     /**
