@@ -7,6 +7,7 @@
     
     <!-- External CSS -->
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="model-showcase.css">
     <link rel="stylesheet" href="model-register.css">
     
     <!-- SEO Meta Tags -->
@@ -23,12 +24,27 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
+    <!-- Site Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <h1 class="logo">xBrush</h1>
+                <span class="logo-subtitle">Model Registration</span>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link">동영상 제작</a>
+                <a href="models.html" class="nav-link">모델 쇼케이스</a>
+                <a href="model-register.html" class="nav-link active">모델 등록</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container" style="padding-top: 0;">
+        <!-- Registration Header -->
         <header class="model-register-header">
             <div class="header-content">
                 <div class="brand-section">
-                    <h1 class="brand-title">xBrush 모델 등록</h1>
+                    <h1 class="brand-title">모델 등록</h1>
                     <p class="brand-subtitle">AI 모델이 되어 새로운 수익을 창출하세요</p>
                 </div>
                 <div class="progress-indicator">
@@ -985,10 +1001,32 @@
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 xBrush. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">이용약관</a>
+                <a href="#">개인정보처리방침</a>
+                <a href="#">문의하기</a>
+                <a href="admin.html" style="opacity: 0.5;">관리자</a>
+            </div>
+        </div>
+    </footer>
+
     <!-- JavaScript Files -->
     <script src="constants.js"></script>
     <script src="utils.js"></script>
     <script src="js/model-storage.js"></script>
     <script src="model-register.js"></script>
+    
+    <!-- Secret admin access: Press Ctrl+Shift+A -->
+    <script>
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                window.location.href = 'admin.html';
+            }
+        });
+    </script>
 </body>
 </html>

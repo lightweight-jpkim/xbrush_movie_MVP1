@@ -7,6 +7,7 @@
     
     <!-- External CSS -->
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="model-showcase.css">
     
     <!-- SEO Meta Tags -->
     <meta name="description" content="AI 기반 동영상 광고 제작 플랫폼 - xBrush로 전문적인 광고 영상을 쉽고 빠르게 제작하세요">
@@ -23,7 +24,22 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 <body>
-    <div class="container">
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <h1 class="logo">xBrush</h1>
+                <span class="logo-subtitle">AI Video Creator</span>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link active">동영상 제작</a>
+                <a href="models.html" class="nav-link">모델 쇼케이스</a>
+                <a href="model-register.html" class="nav-link btn-primary-small">모델 등록</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container" style="padding-top: 20px;">
         <!-- Progress Navigation -->
         <nav class="progress-nav" role="navigation" aria-label="제작 단계 진행률">
             <div class="progress-steps" id="progress-steps">
@@ -1024,9 +1040,31 @@
         </main>
     </div>
 
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 xBrush. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">이용약관</a>
+                <a href="#">개인정보처리방침</a>
+                <a href="#">문의하기</a>
+                <a href="admin.html" style="opacity: 0.5;">관리자</a>
+            </div>
+        </div>
+    </footer>
+
     <!-- JavaScript Files -->
     <script src="constants.js"></script>
     <script src="utils.js"></script>
     <script src="app.js"></script>
+    
+    <!-- Secret admin access: Press Ctrl+Shift+A -->
+    <script>
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                window.location.href = 'admin.html';
+            }
+        });
+    </script>
 </body>
 </html>
