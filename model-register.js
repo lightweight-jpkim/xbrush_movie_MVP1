@@ -1128,7 +1128,20 @@ class ModelRegistrationApp {
         const modal = document.getElementById('thumbnailModal');
         if (modal) {
             modal.style.display = 'flex';
+            // Ensure modal is properly positioned
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.zIndex = '1000';
             console.log('Modal should be visible now');
+            
+            // Focus on the modal for accessibility
+            const modalContent = modal.querySelector('.thumbnail-modal-content');
+            if (modalContent) {
+                modalContent.focus();
+            }
         } else {
             console.error('Thumbnail modal element not found');
             this.showToast('썸네일 선택 모달을 열 수 없습니다.', 'error');
@@ -1169,8 +1182,13 @@ class ModelRegistrationApp {
             return;
         }
 
-        // Clear existing content
+        // Clear existing content and remove old event listeners
         grid.innerHTML = '';
+        
+        // Remove any existing click handlers
+        const newGrid = grid.cloneNode(true);
+        grid.parentNode.replaceChild(newGrid, grid);
+        const gridElement = document.getElementById('portfolioThumbnailGrid');
         
         // Create thumbnails with proper error handling
         this.uploadedImages.forEach(image => {
@@ -1183,9 +1201,15 @@ class ModelRegistrationApp {
             thumbnailItem.className = 'portfolio-thumbnail-item';
             thumbnailItem.setAttribute('data-image-id', image.id);
             
+            // Make sure the item is clickable
+            thumbnailItem.style.cursor = 'pointer';
+            thumbnailItem.style.position = 'relative';
+            thumbnailItem.style.pointerEvents = 'auto';
+            
             const img = document.createElement('img');
             img.src = image.url;
             img.alt = 'Portfolio image';
+            img.style.pointerEvents = 'none'; // Prevent image from intercepting clicks
             img.onerror = () => {
                 console.error('Failed to load image:', image.url);
                 thumbnailItem.style.opacity = '0.5';
@@ -1194,36 +1218,38 @@ class ModelRegistrationApp {
             const indicator = document.createElement('div');
             indicator.className = 'selection-indicator';
             indicator.textContent = '✓';
+            indicator.style.pointerEvents = 'none'; // Prevent indicator from intercepting clicks
             
             thumbnailItem.appendChild(img);
             thumbnailItem.appendChild(indicator);
-            grid.appendChild(thumbnailItem);
+            
+            // Add click handler using closure to capture image ID
+            const imageId = image.id;
+            thumbnailItem.onclick = () => {
+                console.log('Thumbnail onclick triggered, ID:', imageId);
+                this.selectPortfolioThumbnail(imageId);
+                return false;
+            };
+            
+            gridElement.appendChild(thumbnailItem);
         });
         
-        // Use event delegation on the grid container instead
-        grid.onclick = (e) => {
-            console.log('Grid clicked, target:', e.target);
+        // Also add event delegation as backup
+        gridElement.addEventListener('click', (e) => {
+            console.log('Grid clicked (delegation), target:', e.target);
             
             // Find the closest portfolio-thumbnail-item
             const thumbnailItem = e.target.closest('.portfolio-thumbnail-item');
             if (thumbnailItem) {
                 const imageId = thumbnailItem.getAttribute('data-image-id');
-                console.log('Thumbnail item clicked with ID:', imageId);
+                console.log('Thumbnail item found via delegation, ID:', imageId);
                 if (imageId) {
                     e.preventDefault();
                     e.stopPropagation();
                     this.selectPortfolioThumbnail(imageId);
                 }
             }
-        };
-        
-        // Also add pointer cursor to all thumbnails
-        setTimeout(() => {
-            const allThumbnails = grid.querySelectorAll('.portfolio-thumbnail-item');
-            allThumbnails.forEach(thumbnail => {
-                thumbnail.style.cursor = 'pointer';
-            });
-        }, 50);
+        }, true); // Use capture phase to ensure we get the event
         
         console.log('Portfolio thumbnails loaded successfully with click handlers');
     }
@@ -1686,6 +1712,42 @@ class ModelRegistrationApp {
     }
 
     /**
+     * Debug thumbnail selection
+     */
+    debugThumbnailSelection() {
+        console.log('=== Debugging Thumbnail Selection ===');
+        console.log('Uploaded images:', this.uploadedImages);
+        
+        const modal = document.getElementById('thumbnailModal');
+        console.log('Modal found:', !!modal);
+        if (modal) {
+            console.log('Modal display:', window.getComputedStyle(modal).display);
+            console.log('Modal z-index:', window.getComputedStyle(modal).zIndex);
+        }
+        
+        const grid = document.getElementById('portfolioThumbnailGrid');
+        console.log('Grid found:', !!grid);
+        
+        const thumbnails = document.querySelectorAll('.portfolio-thumbnail-item');
+        console.log('Thumbnail items found:', thumbnails.length);
+        
+        thumbnails.forEach((thumb, index) => {
+            const imageId = thumb.getAttribute('data-image-id');
+            const computedStyle = window.getComputedStyle(thumb);
+            console.log(`Thumbnail ${index} (ID: ${imageId}):`, {
+                cursor: computedStyle.cursor,
+                pointerEvents: computedStyle.pointerEvents,
+                zIndex: computedStyle.zIndex,
+                hasOnclick: !!thumb.onclick,
+                eventListeners: thumb._listeners || 'Not accessible'
+            });
+        });
+        
+        console.log('Selected thumbnail ID:', this.selectedThumbnailId);
+        console.log('=== End Debug ===');
+    }
+
+    /**
      * Admin bypass for KYC-A (ID + Face)
      */
     adminBypassKYCA() {
@@ -1836,6 +1898,15 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Model Registration App initialized and stored globally');
 });
 
+// Global debug function
+window.debugThumbnailSelection = function() {
+    if (window.modelApp) {
+        window.modelApp.debugThumbnailSelection();
+    } else {
+        console.error('ModelApp not initialized');
+    }
+};
+
 // Add CSS animations
 const style = document.createElement('style');
 style.textContent = `
@@ -1850,3 +1921,32 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Debug helper function for thumbnail selection
+window.debugThumbnailSelection = function() {
+    console.log('=== Thumbnail Selection Debug Info ===');
+    console.log('1. ModelApp exists:', !!window.modelApp);
+    console.log('2. Uploaded images:', window.modelApp?.uploadedImages);
+    console.log('3. Modal element exists:', !!document.getElementById('thumbnailModal'));
+    console.log('4. Modal display style:', document.getElementById('thumbnailModal')?.style.display);
+    console.log('5. Grid element exists:', !!document.getElementById('portfolioThumbnailGrid'));
+    console.log('6. Thumbnail items count:', document.querySelectorAll('.portfolio-thumbnail-item').length);
+    console.log('7. Selected thumbnail ID:', window.modelApp?.selectedThumbnailId);
+    console.log('8. Confirm button element:', document.getElementById('confirmThumbnailBtn'));
+    console.log('9. Confirm button disabled:', document.getElementById('confirmThumbnailBtn')?.disabled);
+    
+    // Check click handlers
+    const firstThumbnail = document.querySelector('.portfolio-thumbnail-item');
+    if (firstThumbnail) {
+        console.log('10. First thumbnail element:', firstThumbnail);
+        console.log('11. First thumbnail data-image-id:', firstThumbnail.getAttribute('data-image-id'));
+        console.log('12. First thumbnail computed styles:');
+        const styles = window.getComputedStyle(firstThumbnail);
+        console.log('    - cursor:', styles.cursor);
+        console.log('    - pointer-events:', styles.pointerEvents);
+        console.log('    - z-index:', styles.zIndex);
+        console.log('    - position:', styles.position);
+    }
+    
+    console.log('=== End Debug Info ===');
+};
