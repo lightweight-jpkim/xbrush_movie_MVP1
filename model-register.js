@@ -246,7 +246,12 @@ class ModelRegistrationApp {
                 this.setupProductRegistration();
                 break;
             case 6:
-                this.startReviewProcess();
+                // Enable the review start button instead of auto-starting
+                const reviewButton = document.getElementById('step6Next');
+                if (reviewButton) {
+                    reviewButton.disabled = false;
+                    reviewButton.textContent = '검수 시작';
+                }
                 break;
         }
     }
@@ -1388,6 +1393,11 @@ class ModelRegistrationApp {
             };
             
             console.log('Thumbnail data stored:', this.registrationData.thumbnail);
+            
+            // Store the data in registrationData for persistence
+            this.registrationData.productInfo = this.registrationData.productInfo || {};
+            this.registrationData.productInfo.thumbnail = this.registrationData.thumbnail;
+            
             this.checkProductRegistrationCompletion();
         }
         
@@ -1489,6 +1499,15 @@ class ModelRegistrationApp {
      * Start review process
      */
     startReviewProcess() {
+        console.log('Starting review process...');
+        
+        // Disable the button to prevent multiple clicks
+        const startButton = document.getElementById('step6Next');
+        if (startButton) {
+            startButton.disabled = true;
+            startButton.textContent = '검수 진행 중...';
+        }
+        
         // Simulate review process
         this.simulateReviewProcess();
         
@@ -1498,8 +1517,20 @@ class ModelRegistrationApp {
             if (nextButton) {
                 nextButton.disabled = false;
                 nextButton.textContent = '승인 완료';
+                nextButton.onclick = () => this.nextModelStep();
             }
-        }, 3000);
+            
+            // Update status
+            const statusIcon = document.getElementById('reviewStatusIcon');
+            const statusTitle = document.getElementById('reviewStatusTitle');
+            const statusDesc = document.getElementById('reviewStatusDescription');
+            
+            if (statusIcon) statusIcon.textContent = '✅';
+            if (statusTitle) statusTitle.textContent = '검수 완료';
+            if (statusDesc) statusDesc.textContent = '모든 검수가 완료되었습니다. 다음 단계로 진행해주세요.';
+            
+            this.showToast('검수가 완료되었습니다! 다음 단계로 진행할 수 있습니다.', 'success');
+        }, 5000);
     }
 
     /**
