@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Migration Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            display: inline-block;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.warning { background: #fff3cd; color: #856404; }
+        .status.pending { background: #cce5ff; color: #004085; }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Firebase Migration Test</h1>
+    
+    <div class="test-card">
+        <h2>1. Firebase Connection Status</h2>
+        <div id="firebase-status">
+            <span class="status pending">Checking...</span>
+        </div>
+    </div>
+
+    <div class="test-card">
+        <h2>2. Authentication Status</h2>
+        <div id="auth-status">
+            <span class="status pending">Checking...</span>
+        </div>
+    </div>
+
+    <div class="test-card">
+        <h2>3. Local Storage Check</h2>
+        <div id="localstorage-status">
+            <span class="status pending">Checking...</span>
+        </div>
+        <button onclick="checkLocalStorage()">Re-check Local Storage</button>
+        <button onclick="clearLocalStorage()">Clear Local Storage</button>
+    </div>
+
+    <div class="test-card">
+        <h2>4. Firebase Data</h2>
+        <div id="firebase-data">
+            <span class="status pending">Loading...</span>
+        </div>
+        <button onclick="loadFirebaseData()">Reload Firebase Data</button>
+    </div>
+
+    <div class="test-card">
+        <h2>5. Test Operations</h2>
+        <button onclick="testSaveModel()">Test Save Model</button>
+        <button onclick="testRealTimeUpdates()">Test Real-time Updates</button>
+        <div id="operation-result"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>6. Migration Status</h2>
+        <div id="migration-status">
+            <span class="status pending">Checking...</span>
+        </div>
+        <button onclick="runMigration()">Run Migration</button>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Project Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-model-storage.js"></script>
+    <script src="js/model-storage.js"></script>
+    <script src="js/model-storage-adapter.js"></script>
+
+    <script>
+        // Test functions
+        async function checkFirebaseConnection() {
+            const statusEl = document.getElementById('firebase-status');
+            try {
+                if (window.firebaseDB) {
+                    // Try a simple read operation
+                    await window.firebaseDB.collection('models').limit(1).get();
+                    statusEl.innerHTML = '<span class="status success">✓ Firebase Connected</span>';
+                } else {
+                    statusEl.innerHTML = '<span class="status error">✗ Firebase not initialized</span>';
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<span class="status error">✗ Firebase Error: ${error.message}</span>`;
+            }
+        }
+
+        async function checkAuthentication() {
+            const statusEl = document.getElementById('auth-status');
+            try {
+                if (window.firebaseAuth) {
+                    const user = window.firebaseAuth.currentUser;
+                    if (user) {
+                        statusEl.innerHTML = `<span class="status success">✓ Authenticated (Anonymous: ${user.uid.substring(0, 8)}...)</span>`;
+                    } else {
+                        statusEl.innerHTML = '<span class="status warning">⚠ Not authenticated</span>';
+                    }
+                } else {
+                    statusEl.innerHTML = '<span class="status error">✗ Auth not initialized</span>';
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<span class="status error">✗ Auth Error: ${error.message}</span>`;
+            }
+        }
+
+        function checkLocalStorage() {
+            const statusEl = document.getElementById('localstorage-status');
+            try {
+                const localData = localStorage.getItem('xbrush_registered_models');
+                if (localData) {
+                    const models = JSON.parse(localData);
+                    statusEl.innerHTML = `<span class="status warning">⚠ Found ${models.length} models in localStorage (should be migrated)</span>`;
+                } else {
+                    statusEl.innerHTML = '<span class="status success">✓ No local storage data (good!)</span>';
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<span class="status error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        function clearLocalStorage() {
+            if (confirm('Clear all local storage data?')) {
+                localStorage.removeItem('xbrush_registered_models');
+                checkLocalStorage();
+            }
+        }
+
+        async function loadFirebaseData() {
+            const dataEl = document.getElementById('firebase-data');
+            try {
+                const models = await window.modelStorageAdapter.getAllModels();
+                dataEl.innerHTML = `
+                    <span class="status success">✓ Found ${models.length} models in Firebase</span>
+                    <pre>${JSON.stringify(models.map(m => ({
+                        id: m.id,
+                        name: m.personalInfo?.name,
+                        status: m.status
+                    })), null, 2)}</pre>
+                `;
+            } catch (error) {
+                dataEl.innerHTML = `<span class="status error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testSaveModel() {
+            const resultEl = document.getElementById('operation-result');
+            try {
+                const testModel = {
+                    personalInfo: {
+                        name: 'Test Model ' + new Date().toISOString(),
+                        intro: 'This is a test model',
+                        categories: ['test']
+                    },
+                    status: 'pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                const modelId = await window.modelStorageAdapter.saveModel(testModel);
+                resultEl.innerHTML = `<span class="status success">✓ Model saved successfully! ID: ${modelId}</span>`;
+                loadFirebaseData();
+            } catch (error) {
+                resultEl.innerHTML = `<span class="status error">✗ Save failed: ${error.message}</span>`;
+            }
+        }
+
+        async function testRealTimeUpdates() {
+            const resultEl = document.getElementById('operation-result');
+            try {
+                resultEl.innerHTML = '<span class="status pending">Setting up real-time listener...</span>';
+                
+                const unsubscribe = window.firebaseModelStorage.subscribeToModels((models) => {
+                    resultEl.innerHTML = `<span class="status success">✓ Real-time update received! ${models.length} models</span>`;
+                });
+                
+                // Clean up after 10 seconds
+                setTimeout(() => {
+                    unsubscribe();
+                    resultEl.innerHTML += '<br><span class="status warning">Listener unsubscribed after 10s</span>';
+                }, 10000);
+            } catch (error) {
+                resultEl.innerHTML = `<span class="status error">✗ Real-time setup failed: ${error.message}</span>`;
+            }
+        }
+
+        async function checkMigrationStatus() {
+            const statusEl = document.getElementById('migration-status');
+            try {
+                const localData = localStorage.getItem('xbrush_registered_models');
+                const firebaseModels = await window.modelStorageAdapter.getAllModels();
+                
+                if (localData) {
+                    const localModels = JSON.parse(localData);
+                    statusEl.innerHTML = `<span class="status warning">⚠ Migration needed: ${localModels.length} local models, ${firebaseModels.length} Firebase models</span>`;
+                } else {
+                    statusEl.innerHTML = `<span class="status success">✓ No migration needed. ${firebaseModels.length} models in Firebase</span>`;
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<span class="status error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function runMigration() {
+            const statusEl = document.getElementById('migration-status');
+            try {
+                statusEl.innerHTML = '<span class="status pending">Running migration...</span>';
+                await window.modelStorageAdapter.checkAndMigrateLocalData();
+                statusEl.innerHTML = '<span class="status success">✓ Migration completed!</span>';
+                checkLocalStorage();
+                loadFirebaseData();
+            } catch (error) {
+                statusEl.innerHTML = `<span class="status error">✗ Migration failed: ${error.message}</span>`;
+            }
+        }
+
+        // Run all checks on load
+        window.addEventListener('load', async () => {
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for Firebase to initialize
+            
+            checkFirebaseConnection();
+            checkAuthentication();
+            checkLocalStorage();
+            loadFirebaseData();
+            checkMigrationStatus();
+        });
+    </script>
+</body>
+</html>

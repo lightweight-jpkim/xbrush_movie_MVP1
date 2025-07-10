@@ -22,6 +22,7 @@ class ModelDisplay {
 
         this.loadAndDisplayModels();
         this.setupEventListeners();
+        this.setupRealtimeUpdates();
     }
 
     /**
@@ -264,6 +265,37 @@ class ModelDisplay {
                 this.loadAndDisplayModels();
             });
         }
+    }
+
+    /**
+     * Setup real-time updates from Firebase
+     */
+    setupRealtimeUpdates() {
+        if (!window.firebaseModelStorage) {
+            console.log('Firebase not available for real-time updates');
+            return;
+        }
+
+        // Subscribe to model changes
+        const unsubscribe = window.firebaseModelStorage.subscribeToModels((models) => {
+            console.log('Real-time update: Models changed', models.length);
+            
+            // Filter only active models
+            const activeModels = models.filter(model => model.status === 'active');
+            
+            if (activeModels.length === 0) {
+                this.displayEmptyState();
+                return;
+            }
+
+            // Sort and display models
+            const sortedModels = this.sortModels(activeModels, this.currentSort);
+            this.displayModels(sortedModels);
+        });
+
+        // Store unsubscribe function for cleanup if needed
+        this.unsubscribe = unsubscribe;
+        console.log('Real-time updates initialized');
     }
 
     /**

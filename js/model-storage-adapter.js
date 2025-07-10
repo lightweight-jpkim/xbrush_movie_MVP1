@@ -34,15 +34,15 @@ class ModelStorageAdapter {
      * Save a model
      */
     async saveModel(modelData) {
-        if (this.useFirebase) {
-            try {
-                return await this.firebaseStorage.saveModel(modelData);
-            } catch (error) {
-                console.error('Firebase save failed, falling back to localStorage:', error);
-                return this.localStorage.saveModel(modelData);
-            }
-        } else {
-            return this.localStorage.saveModel(modelData);
+        if (!this.useFirebase) {
+            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
+        }
+        
+        try {
+            return await this.firebaseStorage.saveModel(modelData);
+        } catch (error) {
+            console.error('Firebase save failed:', error);
+            throw new Error('Failed to save model to Firebase. Please check your internet connection.');
         }
     }
 
@@ -50,16 +50,15 @@ class ModelStorageAdapter {
      * Get a model by ID
      */
     async getModel(id) {
-        if (this.useFirebase) {
-            try {
-                const model = await this.firebaseStorage.getModel(id);
-                return model || this.localStorage.getModel(id);
-            } catch (error) {
-                console.error('Firebase get failed, falling back to localStorage:', error);
-                return this.localStorage.getModel(id);
-            }
-        } else {
-            return this.localStorage.getModel(id);
+        if (!this.useFirebase) {
+            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
+        }
+        
+        try {
+            return await this.firebaseStorage.getModel(id);
+        } catch (error) {
+            console.error('Firebase get failed:', error);
+            throw new Error('Failed to get model from Firebase. Please check your internet connection.');
         }
     }
 
@@ -67,30 +66,23 @@ class ModelStorageAdapter {
      * Get all models
      */
     async getAllModels() {
-        if (this.useFirebase) {
-            try {
-                const firebaseModels = await this.firebaseStorage.getAllModels();
-                // Also get localStorage models for migration
-                const localModels = this.localStorage.getAllModels();
-                
-                // Merge and deduplicate
-                const modelMap = new Map();
-                firebaseModels.forEach(model => modelMap.set(model.id, model));
-                localModels.forEach(model => {
-                    if (!modelMap.has(model.id)) {
-                        modelMap.set(model.id, model);
-                        // Migrate to Firebase in background
-                        this.migrateToFirebase(model);
-                    }
-                });
-                
-                return Array.from(modelMap.values());
-            } catch (error) {
-                console.error('Firebase getAllModels failed, falling back to localStorage:', error);
-                return this.localStorage.getAllModels();
+        if (!this.useFirebase) {
+            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
+        }
+        
+        try {
+            const firebaseModels = await this.firebaseStorage.getAllModels();
+            
+            // One-time migration check on first load
+            if (!this.migrationChecked) {
+                this.migrationChecked = true;
+                this.checkAndMigrateLocalData();
             }
-        } else {
-            return this.localStorage.getAllModels();
+            
+            return firebaseModels;
+        } catch (error) {
+            console.error('Firebase getAllModels failed:', error);
+            throw new Error('Failed to get models from Firebase. Please check your internet connection.');
         }
     }
 
@@ -98,30 +90,15 @@ class ModelStorageAdapter {
      * Get active models
      */
     async getActiveModels() {
-        if (this.useFirebase) {
-            try {
-                const firebaseModels = await this.firebaseStorage.getActiveModels();
-                // Also check localStorage for any not yet migrated
-                const localModels = this.localStorage.getActiveModels();
-                
-                // Merge and deduplicate
-                const modelMap = new Map();
-                firebaseModels.forEach(model => modelMap.set(model.id, model));
-                localModels.forEach(model => {
-                    if (!modelMap.has(model.id)) {
-                        modelMap.set(model.id, model);
-                        // Migrate to Firebase in background
-                        this.migrateToFirebase(model);
-                    }
-                });
-                
-                return Array.from(modelMap.values());
-            } catch (error) {
-                console.error('Firebase getActiveModels failed, falling back to localStorage:', error);
-                return this.localStorage.getActiveModels();
-            }
-        } else {
-            return this.localStorage.getActiveModels();
+        if (!this.useFirebase) {
+            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
+        }
+        
+        try {
+            return await this.firebaseStorage.getActiveModels();
+        } catch (error) {
+            console.error('Firebase getActiveModels failed:', error);
+            throw new Error('Failed to get active models from Firebase. Please check your internet connection.');
         }
     }
 
@@ -129,15 +106,15 @@ class ModelStorageAdapter {
      * Get pending models
      */
     async getPendingModels() {
-        if (this.useFirebase) {
-            try {
-                return await this.firebaseStorage.getPendingModels();
-            } catch (error) {
-                console.error('Firebase getPendingModels failed, falling back to localStorage:', error);
-                return this.localStorage.getPendingModels();
-            }
-        } else {
-            return this.localStorage.getPendingModels();
+        if (!this.useFirebase) {
+            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
+        }
+        
+        try {
+            return await this.firebaseStorage.getPendingModels();
+        } catch (error) {
+            console.error('Firebase getPendingModels failed:', error);
+            throw new Error('Failed to get pending models from Firebase. Please check your internet connection.');
         }
     }
 
@@ -145,18 +122,15 @@ class ModelStorageAdapter {
      * Update a model
      */
     async updateModel(id, updates) {
-        if (this.useFirebase) {
-            try {
-                const success = await this.firebaseStorage.updateModel(id, updates);
-                // Also update localStorage for consistency
-                this.localStorage.updateModel(id, updates);
-                return success;
-            } catch (error) {
-                console.error('Firebase update failed, falling back to localStorage:', error);
-                return this.localStorage.updateModel(id, updates);
-            }
-        } else {
-            return this.localStorage.updateModel(id, updates);
+        if (!this.useFirebase) {
+            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
+        }
+        
+        try {
+            return await this.firebaseStorage.updateModel(id, updates);
+        } catch (error) {
+            console.error('Firebase update failed:', error);
+            throw new Error('Failed to update model in Firebase. Please check your internet connection.');
         }
     }
 
@@ -164,18 +138,15 @@ class ModelStorageAdapter {
      * Delete a model
      */
     async deleteModel(id) {
-        if (this.useFirebase) {
-            try {
-                const success = await this.firebaseStorage.deleteModel(id);
-                // Also delete from localStorage
-                this.localStorage.deleteModel(id);
-                return success;
-            } catch (error) {
-                console.error('Firebase delete failed, falling back to localStorage:', error);
-                return this.localStorage.deleteModel(id);
-            }
-        } else {
-            return this.localStorage.deleteModel(id);
+        if (!this.useFirebase) {
+            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
+        }
+        
+        try {
+            return await this.firebaseStorage.deleteModel(id);
+        } catch (error) {
+            console.error('Firebase delete failed:', error);
+            throw new Error('Failed to delete model from Firebase. Please check your internet connection.');
         }
     }
 
@@ -183,15 +154,51 @@ class ModelStorageAdapter {
      * Search models
      */
     async searchModels(query) {
-        if (this.useFirebase) {
-            try {
-                return await this.firebaseStorage.searchModels(query);
-            } catch (error) {
-                console.error('Firebase search failed, falling back to localStorage:', error);
-                return this.localStorage.searchModels(query);
+        if (!this.useFirebase) {
+            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
+        }
+        
+        try {
+            return await this.firebaseStorage.searchModels(query);
+        } catch (error) {
+            console.error('Firebase search failed:', error);
+            throw new Error('Failed to search models in Firebase. Please check your internet connection.');
+        }
+    }
+
+    /**
+     * Check and migrate local data on first load
+     */
+    async checkAndMigrateLocalData() {
+        try {
+            const localData = localStorage.getItem('xbrush_registered_models');
+            if (localData) {
+                const localModels = JSON.parse(localData);
+                if (localModels.length > 0) {
+                    console.log(`Found ${localModels.length} models in localStorage. Starting migration...`);
+                    
+                    // Show migration notification to user
+                    if (window.showMigrationNotification) {
+                        window.showMigrationNotification();
+                    }
+                    
+                    // Migrate each model
+                    for (const model of localModels) {
+                        try {
+                            await this.firebaseStorage.saveModel(model);
+                            console.log(`Migrated model: ${model.id}`);
+                        } catch (error) {
+                            console.error(`Failed to migrate model ${model.id}:`, error);
+                        }
+                    }
+                    
+                    // Clear localStorage after successful migration
+                    localStorage.removeItem('xbrush_registered_models');
+                    console.log('Migration complete. Local storage cleared.');
+                }
             }
-        } else {
-            return this.localStorage.searchModels(query);
+        } catch (error) {
+            console.error('Error checking local data for migration:', error);
         }
     }
 

@@ -1795,7 +1795,7 @@ class ModelRegistrationApp {
     /**
      * Complete the registration process
      */
-    completeRegistration() {
+    async completeRegistration() {
         try {
             // Save all registration data
             const registrationSummary = {
@@ -1814,8 +1814,16 @@ class ModelRegistrationApp {
                 status: 'submitted'
             };
             
-            // Save to localStorage for demonstration
-            localStorage.setItem('modelRegistration', JSON.stringify(registrationSummary));
+            // Save registration summary to Firebase via adapter
+            if (window.modelStorageAdapter) {
+                try {
+                    await window.modelStorageAdapter.saveModel(registrationSummary);
+                    console.log('Registration summary saved to Firebase');
+                } catch (error) {
+                    console.error('Failed to save registration summary:', error);
+                    this.showToast('등록 데이터 저장 중 오류가 발생했습니다.', 'error');
+                }
+            }
             
             this.showToast('모델 등록이 성공적으로 완료되었습니다! 🎉', 'success');
             
@@ -2179,7 +2187,7 @@ class ModelRegistrationApp {
     /**
      * Activate model and add to model list
      */
-    activateModel() {
+    async activateModel() {
         console.log('Activating model...');
         console.log('Registration data:', this.registrationData);
         
@@ -2190,14 +2198,16 @@ class ModelRegistrationApp {
             activateBtn.innerHTML = '<span class="btn-icon">⏳</span><span class="btn-text">활성화 중...</span>';
         }
         
-        // Simulate activation process
-        setTimeout(() => {
+        // Process activation
+        try {
             // Prepare complete model data
             const modelData = {
                 // Basic info
                 id: `model-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 registrationDate: new Date().toISOString(),
                 status: 'active',
+                createdAt: window.firebase ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString(),
+                updatedAt: window.firebase ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString(),
                 
                 // Personal info from Step 5
                 personalInfo: {
@@ -2239,36 +2249,48 @@ class ModelRegistrationApp {
                 if (window.modelStorage) {
                     const modelId = window.modelStorage.saveModel(modelData);
                     console.log('Model saved with ID:', modelId);
+                } else if (window.modelStorageAdapter) {
+                    // Use Firebase adapter
+                    const modelId = await window.modelStorageAdapter.saveModel(modelData);
+                    console.log('Model saved to Firebase with ID:', modelId);
                     
-                    // Show success
-                    this.showToast('모델 등록이 완료되었습니다!', 'success');
+                    // Verify the model was saved
+                    const savedModel = await window.modelStorageAdapter.getModel(modelId);
+                    if (!savedModel) {
+                        throw new Error('Model verification failed');
+                    }
+                    
+                    console.log('Model verified in Firebase:', savedModel);
                 } else {
-                    // Fallback to direct localStorage if ModelStorage not loaded
-                    const existingModels = JSON.parse(localStorage.getItem('xbrush_registered_models') || '[]');
-                    existingModels.push(modelData);
-                    localStorage.setItem('xbrush_registered_models', JSON.stringify(existingModels));
-                    console.log('Model saved using fallback method');
+                    throw new Error('Storage adapter not available');
                 }
+                
+                // Show success and update UI
+                this.showToast('모델 등록이 완료되었습니다!', 'success');
+                
+                // Update button to show completion
+                if (activateBtn) {
+                    activateBtn.innerHTML = '<span class="btn-icon">✓</span><span class="btn-text">등록 완료!</span>';
+                    activateBtn.style.backgroundColor = '#10b981';
+                }
+                
+                // Redirect to models page after delay
+                setTimeout(() => {
+                    window.location.href = 'models.html';
+                }, 2000)
             } catch (error) {
                 console.error('Error saving model:', error);
-                this.showToast('모델 저장 중 오류가 발생했습니다.', 'error');
+                this.showToast('모델 저장 중 오류가 발생했습니다. 다시 시도해주세요.', 'error');
+                
+                // Re-enable button on error
+                if (activateBtn) {
+                    activateBtn.disabled = false;
+                    activateBtn.innerHTML = '<span class="btn-icon">⚡</span><span class="btn-text">모델 리스트에 등록하고 활동 시작하기</span>';
+                }
             }
-            
-            // Update button
-            if (activateBtn) {
-                activateBtn.disabled = true;
-                activateBtn.innerHTML = '<span class="btn-icon">✅</span><span class="btn-text">활성화 완료!</span>';
-                activateBtn.style.background = '#48bb78';
-                activateBtn.style.color = 'white';
-            }
-            
-            this.showToast('모델이 성공적으로 활성화되었습니다! 이제 모델 리스트에서 확인할 수 있습니다.', 'success');
-            
-            // Redirect to model list after 2 seconds
-            setTimeout(() => {
-                window.location.href = 'index.html#models';
-            }, 2000);
-        }, 1500);
+        } finally {
+            // Any cleanup code here
+        }
     }
 
     /**
