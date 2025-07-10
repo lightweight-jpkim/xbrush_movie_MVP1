@@ -1851,7 +1851,9 @@ class ModelRegistrationApp {
         
         // Mark KYC as complete
         this.registrationData.kycComplete = true;
-        this.validateAndUpdateKYCCompletion();
+        
+        // Enable next button
+        this.enableNextStep(this.currentStep);
         
         this.showToast('KYC-B 관리자 승인 완료', 'success');
     }
@@ -1913,14 +1915,16 @@ class ModelRegistrationApp {
         
         // Mark KYC as complete
         this.registrationData.kycComplete = true;
-        this.validateAndUpdateKYCCompletion();
+        
+        // Enable the next button for the current step
+        this.enableNextStep(this.currentStep);
         
         // Show success message
         this.showToast('모든 KYC 인증이 관리자 권한으로 완료되었습니다', 'success');
         
         // Automatically move to next step after a short delay
         setTimeout(() => {
-            this.goToStep(3);
+            this.nextModelStep();
         }, 1500);
     }
 }
