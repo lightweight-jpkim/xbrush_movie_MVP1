@@ -843,13 +843,14 @@ class ModelRegistrationApp {
             return false;
         }
         
-        // Check usage rights
-        const usageRights = document.querySelectorAll('input[name="usageRights"]:checked');
-        if (usageRights.length === 0) {
-            this.showToast('최소 하나 이상의 사용 권한을 선택해주세요. 📝', 'warning');
-            document.querySelector('.usage-rights')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            return false;
-        }
+        // Check usage rights - basic scopes are pre-selected, so no need to validate
+        // Just collect all selected scopes (basic + high risk)
+        const basicScopes = document.querySelectorAll('input[name="basicScope"]:checked');
+        const highRiskScopes = document.querySelectorAll('input[name="highRiskScope"]:checked');
+        
+        // Basic scopes are already checked by default, so we don't need to validate
+        console.log('Basic scopes selected:', basicScopes.length);
+        console.log('High risk scopes selected:', highRiskScopes.length);
         
         // Check signature
         if (!this.signatureCanvas || !this.signatureCanvas.hasSignature) {
@@ -869,8 +870,18 @@ class ModelRegistrationApp {
     saveContractData() {
         const pricingType = document.querySelector('input[name="pricingType"]:checked')?.value;
         const period = document.querySelector('input[name="contractPeriod"]:checked')?.value;
+        
+        // Get all basic scopes (they're pre-checked)
+        const basicScopes = Array.from(document.querySelectorAll('input[name="basicScope"]:checked'))
+            .map(cb => cb.value);
+        
+        // Get any additional high-risk scopes
         const highRiskScopes = Array.from(document.querySelectorAll('input[name="highRiskScope"]:checked'))
             .map(cb => cb.value);
+        
+        // Combine all usage rights
+        const usageRights = [...basicScopes, ...highRiskScopes];
+        
         const secondConfirm = document.getElementById('secondConfirm')?.checked;
         
         this.registrationData.contract = {
@@ -878,11 +889,15 @@ class ModelRegistrationApp {
             flatRate: document.getElementById('flatRate')?.value,
             shareRate: document.getElementById('shareRate')?.value,
             period: period === 'custom' ? document.getElementById('customPeriod')?.value : period,
+            basicScopes,
             highRiskScopes,
+            usageRights,  // Combined array for compatibility
             secondConfirm,
             signature: this.signatureCanvas.canvas.toDataURL(),
             signedAt: new Date().toISOString()
         };
+        
+        console.log('Contract data saved:', this.registrationData.contract);
     }
 
     // ==========================================

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Validation Test</title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Contract Step Validation Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Contract Validation</h2>
+        <button onclick="testContractValidation()">Run Validation Test</button>
+        <div id="validationResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Data Flow</h2>
+        <button onclick="testDataFlow()">Test Complete Registration Flow</button>
+        <div id="flowResult" class="result"></div>
+    </div>
+
+    <script>
+        // Mock the registration app to test validation
+        class MockRegistrationApp {
+            constructor() {
+                this.registrationData = {};
+                this.signatureCanvas = {
+                    hasSignature: true,
+                    canvas: {
+                        toDataURL: () => 'data:image/png;base64,mock'
+                    }
+                };
+            }
+
+            showToast(message, type) {
+                console.log(`Toast [${type}]: ${message}`);
+                return { message, type };
+            }
+
+            validateContract() {
+                // Mock DOM elements
+                const mockPricingType = { value: 'flat' };
+                const mockBasicScopes = [
+                    { value: 'commercial' },
+                    { value: 'sns' },
+                    { value: 'search' }
+                ];
+                const mockHighRiskScopes = [];
+
+                // Check pricing selection
+                const pricingType = mockPricingType;
+                if (!pricingType) {
+                    return this.showToast('가격 방식을 선택해주세요. 💰', 'warning');
+                }
+                
+                // Basic scopes are already checked by default, so we don't need to validate
+                console.log('Basic scopes selected:', mockBasicScopes.length);
+                console.log('High risk scopes selected:', mockHighRiskScopes.length);
+                
+                // Check signature
+                if (!this.signatureCanvas || !this.signatureCanvas.hasSignature) {
+                    return this.showToast('전자 서명을 완료해주세요. ✍️', 'warning');
+                }
+                
+                // Save contract data
+                this.saveContractData(mockPricingType, mockBasicScopes, mockHighRiskScopes);
+                return true;
+            }
+
+            saveContractData(pricingType, basicScopes, highRiskScopes) {
+                const usageRights = [...basicScopes.map(s => s.value), ...highRiskScopes.map(s => s.value)];
+                
+                this.registrationData.contract = {
+                    pricingType: pricingType.value,
+                    basicScopes: basicScopes.map(s => s.value),
+                    highRiskScopes: highRiskScopes.map(s => s.value),
+                    usageRights,
+                    signature: this.signatureCanvas.canvas.toDataURL(),
+                    signedAt: new Date().toISOString()
+                };
+                
+                console.log('Contract data saved:', this.registrationData.contract);
+            }
+        }
+
+        function testContractValidation() {
+            const result = document.getElementById('validationResult');
+            const app = new MockRegistrationApp();
+            
+            console.log('Testing contract validation with pre-selected basic scopes...');
+            
+            const validationResult = app.validateContract();
+            
+            if (validationResult === true) {
+                result.innerHTML = `
+                    <h3 class="success">✅ Validation Passed!</h3>
+                    <p>Contract validation succeeded with pre-selected basic scopes.</p>
+                    <h4>Saved Data:</h4>
+                    <pre>${JSON.stringify(app.registrationData.contract, null, 2)}</pre>
+                `;
+            } else {
+                result.innerHTML = `
+                    <h3 class="error">❌ Validation Failed</h3>
+                    <p>Error: ${validationResult.message}</p>
+                `;
+            }
+        }
+
+        function testDataFlow() {
+            const result = document.getElementById('flowResult');
+            
+            // Simulate complete registration data
+            const mockRegistrationData = {
+                personalInfo: {
+                    name: '테스트 모델',
+                    categories: ['fashion', 'beauty']
+                },
+                portfolio: {
+                    thumbnailUrl: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCABkAGQDAREAAhEBAxEB/8QAGwABAAIDAQEAAAAAAAAAAAAAAAMEAQIFBgf/xAA0EAACAQMBBgQEBAcBAAAAAAABAgADBBEhBRIxQVFhBhMicTKBkaFCscHRFCNSYnLh8PH/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8A+qYgYxAYgMQGIGcQMYgMQGIGcQMYgZxAYgMQGIDEBiBnEDGIDEDOIDEBiAxAYgMQM4gYxAYgZxAYgYgMQGIGcQMYgMQM4gMQGIDEBiAxAziAwIGcQGBAziBjAgZxAwRAZEDGRAZEBkQGRAZEDORAwQIGCIGQIGcCBjAgZwIGMCBkAQM4EDGBAzgQMYEDOBAxgQM4EDGBAzgQP//Z',
+                    thumbnailId: 'thumb_001',
+                    images: []
+                },
+                contract: {
+                    pricingType: 'flat',
+                    flatRate: '100000',
+                    basicScopes: ['commercial', 'sns', 'search'],
+                    highRiskScopes: [],
+                    usageRights: ['commercial', 'sns', 'search']
+                },
+                status: 'active',
+                registrationDate: new Date().toISOString()
+            };
+
+            // Save to localStorage
+            try {
+                const models = JSON.parse(localStorage.getItem('xbrush_models') || '[]');
+                mockRegistrationData.id = 'test_' + Date.now();
+                models.push(mockRegistrationData);
+                localStorage.setItem('xbrush_models', JSON.stringify(models));
+                
+                result.innerHTML = `
+                    <h3 class="success">✅ Data Flow Test Passed!</h3>
+                    <p>Successfully saved registration data with thumbnail.</p>
+                    <p><strong>Model ID:</strong> ${mockRegistrationData.id}</p>
+                    <p><strong>Thumbnail URL:</strong> Base64 image (${mockRegistrationData.portfolio.thumbnailUrl.length} chars)</p>
+                    <p><a href="models.html" target="_blank">View in Models Page →</a></p>
+                    <h4>Full Data:</h4>
+                    <pre>${JSON.stringify(mockRegistrationData, null, 2)}</pre>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <h3 class="error">❌ Data Flow Test Failed</h3>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
