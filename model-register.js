@@ -250,7 +250,7 @@ class ModelRegistrationApp {
                 const reviewButton = document.getElementById('step6Next');
                 if (reviewButton) {
                     reviewButton.disabled = false;
-                    reviewButton.textContent = '검수 시작';
+                    reviewButton.textContent = '검수 신청';
                 }
                 break;
         }
@@ -1318,9 +1318,10 @@ class ModelRegistrationApp {
             // Make selection indicator visible
             const indicator = selectedItem.querySelector('.selection-indicator');
             if (indicator) {
-                indicator.style.opacity = '1';
-                indicator.style.display = 'flex';
-                console.log('Selection indicator made visible');
+                indicator.style.cssText += 'opacity: 1 !important; display: flex !important;';
+                console.log('Selection indicator made visible with forced styles');
+            } else {
+                console.error('Selection indicator not found in selected item');
             }
             
             this.selectedThumbnailId = imageId;
@@ -1452,6 +1453,18 @@ class ModelRegistrationApp {
         if (nextButton) {
             nextButton.disabled = !isComplete;
             console.log('- Next button disabled:', nextButton.disabled);
+            
+            // Also save the form data if complete
+            if (isComplete) {
+                this.registrationData.productInfo = {
+                    name: modelName,
+                    intro: modelIntro,
+                    description: document.getElementById('modelDescription')?.value.trim() || '',
+                    categories: Array.from(categories).map(cb => cb.value),
+                    thumbnail: this.registrationData.thumbnail
+                };
+                console.log('Product info saved:', this.registrationData.productInfo);
+            }
         } else {
             console.error('Step 5 next button not found');
         }
@@ -1517,25 +1530,25 @@ class ModelRegistrationApp {
         // Simulate review process
         this.simulateReviewProcess();
         
-        // Enable completion after review
+        // After review simulation, show waiting status but DON'T enable next button
         setTimeout(() => {
-            const nextButton = document.getElementById('step6Next');
-            if (nextButton) {
-                nextButton.disabled = false;
-                nextButton.textContent = '승인 완료';
-                nextButton.onclick = () => this.nextModelStep();
-            }
-            
-            // Update status
+            // Update status to waiting for approval
             const statusIcon = document.getElementById('reviewStatusIcon');
             const statusTitle = document.getElementById('reviewStatusTitle');
             const statusDesc = document.getElementById('reviewStatusDescription');
             
-            if (statusIcon) statusIcon.textContent = '✅';
-            if (statusTitle) statusTitle.textContent = '검수 완료';
-            if (statusDesc) statusDesc.textContent = '모든 검수가 완료되었습니다. 다음 단계로 진행해주세요.';
+            if (statusIcon) statusIcon.textContent = '⏳';
+            if (statusTitle) statusTitle.textContent = '검수 대기 중';
+            if (statusDesc) statusDesc.textContent = '검수가 완료되었습니다. 관리자 승인을 기다리고 있습니다.';
             
-            this.showToast('검수가 완료되었습니다! 다음 단계로 진행할 수 있습니다.', 'success');
+            // Keep the button disabled - only admin approval can enable it
+            const nextButton = document.getElementById('step6Next');
+            if (nextButton) {
+                nextButton.disabled = true;
+                nextButton.textContent = '승인 대기 중';
+            }
+            
+            this.showToast('검수 신청이 완료되었습니다. 관리자 승인을 기다려주세요.', 'info');
         }, 5000);
     }
 
@@ -1936,8 +1949,12 @@ class ModelRegistrationApp {
         const nextButton = document.getElementById('step6Next');
         if (nextButton) {
             nextButton.disabled = false;
-            nextButton.textContent = '다음 단계로';
-            nextButton.onclick = () => this.nextModelStep();
+            nextButton.textContent = '최종 단계로 이동';
+            // Remove any existing onclick handler and use the default one
+            nextButton.onclick = () => {
+                console.log('Moving to final step from admin approval');
+                this.nextModelStep();
+            };
         }
         
         // Show success message
