@@ -1598,7 +1598,8 @@ class ModelRegistrationApp {
                     intro: modelIntro,
                     description: document.getElementById('modelDescription')?.value.trim() || '',
                     categories: Array.from(categories).map(cb => cb.value),
-                    thumbnail: this.registrationData.thumbnail
+                    thumbnailId: this.registrationData.productInfo?.thumbnailId || this.registrationData.thumbnail?.id,
+                    thumbnailUrl: this.registrationData.productInfo?.thumbnailUrl || this.registrationData.thumbnail?.url
                 };
                 console.log('Product info saved:', this.registrationData.productInfo);
             }
@@ -1651,8 +1652,11 @@ class ModelRegistrationApp {
             intro: modelIntro,
             description: document.getElementById('modelDescription')?.value.trim() || '',
             categories: Array.from(categories).map(cb => cb.value),
-            thumbnail: this.registrationData.thumbnail || null
+            thumbnailId: this.registrationData.thumbnail?.id || null,
+            thumbnailUrl: this.registrationData.thumbnail?.url || null
         };
+        
+        console.log('Product registration validated, thumbnailUrl:', this.registrationData.productInfo.thumbnailUrl);
         
         return true;
     }

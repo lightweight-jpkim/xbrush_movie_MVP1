@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Thumbnail Data Flow</title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .image-display {
+            margin: 20px 0;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .image-item {
+            text-align: center;
+        }
+        .image-item img {
+            width: 200px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+        }
+        .image-item p {
+            margin: 10px 0 5px 0;
+            font-weight: bold;
+        }
+        .image-item small {
+            color: #666;
+            font-size: 12px;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Thumbnail Data Flow Test</h1>
+    
+    <div class="test-section">
+        <h2>1. View Saved Models</h2>
+        <button onclick="viewSavedModels()">View All Saved Models</button>
+        <div id="savedModels"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Check Thumbnail URLs</h2>
+        <button onclick="checkThumbnails()">Check Thumbnail Data</button>
+        <div id="thumbnailData"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Display Actual Thumbnails</h2>
+        <button onclick="displayThumbnails()">Display Thumbnails</button>
+        <div id="thumbnailDisplay" class="image-display"></div>
+    </div>
+    
+    <script src="js/model-storage.js"></script>
+    <script>
+        function viewSavedModels() {
+            const models = window.modelStorage.getAllModels();
+            const display = document.getElementById('savedModels');
+            
+            if (models.length === 0) {
+                display.innerHTML = '<p>No models found. Please register a model first.</p>';
+                return;
+            }
+            
+            display.innerHTML = '<h3>Saved Models (' + models.length + '):</h3>' +
+                models.map((model, index) => `
+                    <div style="margin: 10px 0; padding: 10px; background: #f0f0f0; border-radius: 5px;">
+                        <strong>${index + 1}. ${model.personalInfo?.name || 'Unknown'}</strong><br>
+                        Status: ${model.status}<br>
+                        Has Thumbnail URL: ${model.portfolio?.thumbnailUrl ? 'Yes' : 'No'}<br>
+                        Thumbnail URL Type: ${model.portfolio?.thumbnailUrl ? (model.portfolio.thumbnailUrl.startsWith('data:') ? 'Base64' : 'External URL') : 'N/A'}<br>
+                        Thumbnail Length: ${model.portfolio?.thumbnailUrl ? model.portfolio.thumbnailUrl.length + ' chars' : 'N/A'}
+                    </div>
+                `).join('');
+        }
+        
+        function checkThumbnails() {
+            const models = window.modelStorage.getAllModels();
+            const display = document.getElementById('thumbnailData');
+            
+            const thumbnailInfo = models.map(model => ({
+                name: model.personalInfo?.name,
+                thumbnailUrl: model.portfolio?.thumbnailUrl,
+                thumbnailId: model.portfolio?.thumbnailId,
+                hasBase64: model.portfolio?.thumbnailUrl?.startsWith('data:'),
+                urlLength: model.portfolio?.thumbnailUrl?.length || 0,
+                firstChars: model.portfolio?.thumbnailUrl?.substring(0, 100) + '...'
+            }));
+            
+            display.innerHTML = '<h3>Thumbnail Data:</h3><pre>' + 
+                JSON.stringify(thumbnailInfo, null, 2) + '</pre>';
+        }
+        
+        function displayThumbnails() {
+            const models = window.modelStorage.getAllModels();
+            const display = document.getElementById('thumbnailDisplay');
+            
+            if (models.length === 0) {
+                display.innerHTML = '<p>No models to display.</p>';
+                return;
+            }
+            
+            display.innerHTML = models.map(model => {
+                const thumbnailUrl = model.portfolio?.thumbnailUrl;
+                const name = model.personalInfo?.name || 'Unknown';
+                
+                if (!thumbnailUrl) {
+                    return `
+                        <div class="image-item">
+                            <div style="width: 200px; height: 250px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                                No Thumbnail
+                            </div>
+                            <p>${name}</p>
+                            <small>No image data</small>
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div class="image-item">
+                        <img src="${thumbnailUrl}" alt="${name}" onerror="this.src='https://via.placeholder.com/200x250?text=Error'">
+                        <p>${name}</p>
+                        <small>${thumbnailUrl.startsWith('data:') ? 'User Uploaded' : 'External URL'}</small>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Auto-load on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            viewSavedModels();
+        });
+    </script>
+</body>
+</html>
