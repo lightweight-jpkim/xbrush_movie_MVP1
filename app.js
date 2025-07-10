@@ -1131,6 +1131,8 @@ let app; // Global app instance
 function initializeApp() {
     try {
         app = new VideoCreationApp();
+        // Load featured models on main page
+        loadFeaturedModels();
     } catch (error) {
         handleError(error, 'Application initialization');
     }
@@ -2878,6 +2880,109 @@ function initializeEnhancedImageSelection() {
         
     } catch (error) {
         console.error('Error in initializeEnhancedImageSelection:', error);
+    }
+}
+
+// ========================================
+// Featured Models Display
+// ========================================
+
+/**
+ * Load and display featured models on the main page
+ */
+async function loadFeaturedModels() {
+    const featuredModelsGrid = document.getElementById('featuredModelsGrid');
+    const modelCount = document.getElementById('modelCount');
+    
+    if (!featuredModelsGrid) return;
+    
+    try {
+        // Show loading state
+        featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>모델을 불러오는 중...</p></div>';
+        
+        // Wait for Firebase to be ready
+        await waitForFirebase();
+        
+        // Get active models from Firebase
+        const models = await window.modelStorageAdapter.getActiveModels();
+        
+        // Update count
+        modelCount.textContent = `총 ${models.length}개`;
+        
+        if (models.length === 0) {
+            featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>등록된 모델이 없습니다.</p></div>';
+            return;
+        }
+        
+        // Take only first 4 models
+        const featuredModels = models.slice(0, 4);
+        
+        // Create model cards HTML
+        const modelsHTML = featuredModels.map(model => `
+            <div class="featured-model-card" onclick="selectFeaturedModel('${model.id}', '${model.personalInfo?.name || ''}')">
+                <img src="${model.portfolio?.thumbnailUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg=='}" 
+                     alt="${model.personalInfo?.name || '모델'}" 
+                     class="featured-model-image"
+                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0E0QUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg=='">
+                <div class="featured-model-info">
+                    <div class="featured-model-name">${model.personalInfo?.name || '이름 없음'}</div>
+                    <div class="featured-model-intro">${model.personalInfo?.intro || '소개 없음'}</div>
+                    ${model.personalInfo?.categories?.length > 0 ? `
+                        <div class="featured-model-categories">
+                            ${model.personalInfo.categories.slice(0, 2).map(cat => 
+                                `<span class="featured-model-category">${cat}</span>`
+                            ).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `).join('');
+        
+        featuredModelsGrid.innerHTML = modelsHTML;
+        
+    } catch (error) {
+        console.error('Error loading featured models:', error);
+        featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>모델을 불러오는 중 오류가 발생했습니다.</p></div>';
+    }
+}
+
+/**
+ * Wait for Firebase to be ready
+ */
+async function waitForFirebase() {
+    let retries = 10;
+    while (retries > 0 && (!window.firebaseDB || !window.modelStorageAdapter)) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        retries--;
+    }
+    if (!window.modelStorageAdapter) {
+        throw new Error('Firebase not initialized');
+    }
+}
+
+/**
+ * Handle featured model selection
+ */
+function selectFeaturedModel(modelId, modelName) {
+    // Select the model in step 1
+    const registeredRadio = document.querySelector('input[value="registered"][name="modelType"]');
+    if (registeredRadio) {
+        registeredRadio.checked = true;
+        toggleModelType('registered');
+        
+        // Set the selected model
+        const registeredSelect = document.getElementById('registeredModelSelect');
+        if (registeredSelect) {
+            // Add option if not exists
+            if (!registeredSelect.querySelector(`option[value="${modelId}"]`)) {
+                const option = new Option(modelName, modelId);
+                registeredSelect.add(option);
+            }
+            registeredSelect.value = modelId;
+        }
+        
+        // Show toast
+        showToast(`${modelName} 모델이 선택되었습니다.`, 'success');
     }
 }
 
