@@ -1923,7 +1923,7 @@
     height: 30px !important;
     background: #667eea !important;
     border-radius: 50%;
-    display: flex !important;
+    display: none !important;
     align-items: center;
     justify-content: center;
     pointer-events: none !important;
@@ -1931,15 +1931,13 @@
     color: white !important;
     font-size: 18px !important;
     font-weight: bold !important;
-    opacity: 0;
-    transition: opacity 0.3s ease;
     z-index: 100 !important;
     border: 3px solid white !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
 .portfolio-thumbnail-item.selected .selection-indicator {
-    opacity: 1 !important;
+    display: flex !important;
 }
 
 .portfolio-thumbnail-item.selected {

@@ -178,16 +178,6 @@ class ModelRegistrationApp {
             checkbox.addEventListener('change', () => this.checkProductRegistrationCompletion());
         });
         
-        // Thumbnail selection button - add alternative click handler
-        const thumbnailSelectBtn = document.querySelector('button[onclick="openThumbnailSelector()"]');
-        if (thumbnailSelectBtn) {
-            thumbnailSelectBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                console.log('Thumbnail select button clicked via event listener');
-                this.openThumbnailSelector();
-            });
-        }
-        
         // Initial check for form completion
         setTimeout(() => {
             this.checkProductRegistrationCompletion();
@@ -1122,31 +1112,45 @@ class ModelRegistrationApp {
      * Open thumbnail selector modal
      */
     openThumbnailSelector() {
-        console.log('Opening thumbnail selector...');
+        console.log('=== Opening thumbnail selector ===');
+        console.log('Current step:', this.currentStep);
+        console.log('Uploaded images count:', this.uploadedImages ? this.uploadedImages.length : 0);
         console.log('Uploaded images:', this.uploadedImages);
         
         // Check if there are any uploaded images
         if (!this.uploadedImages || this.uploadedImages.length === 0) {
             console.warn('No uploaded images found. User needs to upload portfolio images first.');
             this.showToast('먼저 포트폴리오 이미지를 업로드해주세요.', 'warning');
+            // Navigate to portfolio step
+            this.goToStep(4);
             return;
         }
         
         // Reset selection state
         this.selectedThumbnailId = null;
         
+        // Load thumbnails first
         this.loadPortfolioThumbnails();
+        
         const modal = document.getElementById('thumbnailModal');
+        console.log('Modal element found:', !!modal);
+        
         if (modal) {
+            // Clear any previous styles
+            modal.removeAttribute('style');
+            
+            // Set modal to visible
             modal.style.display = 'flex';
-            // Ensure modal is properly positioned
             modal.style.position = 'fixed';
             modal.style.top = '0';
             modal.style.left = '0';
             modal.style.width = '100%';
             modal.style.height = '100%';
-            modal.style.zIndex = '1000';
-            console.log('Modal should be visible now');
+            modal.style.zIndex = '10000';
+            modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+            
+            console.log('Modal display set to:', modal.style.display);
+            console.log('Modal computed display:', window.getComputedStyle(modal).display);
             
             // Add diagnostic click handler to the modal
             const modalClickHandler = (e) => {

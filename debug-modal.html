@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Modal Display</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="model-register.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .debug-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .test-button:hover {
+            background: #5a67d8;
+        }
+        #debugLog {
+            background: #f5f5f5;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Modal Display Debug Test</h1>
+    
+    <div class="debug-section">
+        <h2>Test 1: Direct Modal Toggle</h2>
+        <button class="test-button" onclick="toggleModalDirectly()">Toggle Modal Directly</button>
+        <button class="test-button" onclick="checkModalState()">Check Modal State</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Test 2: Using Model App</h2>
+        <button class="test-button" onclick="initApp()">Initialize App</button>
+        <button class="test-button" onclick="addTestImages()">Add Test Images</button>
+        <button class="test-button" onclick="openThumbnailSelector()">Open Thumbnail Selector</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Debug Log</h2>
+        <button class="test-button" onclick="clearLog()">Clear Log</button>
+        <div id="debugLog"></div>
+    </div>
+    
+    <!-- Copy the modal HTML from model-register.html -->
+    <div class="thumbnail-modal" id="thumbnailModal" style="display: none;">
+        <div class="thumbnail-modal-content">
+            <div class="thumbnail-modal-header">
+                <h3>포트폴리오에서 썸네일 선택</h3>
+                <button class="btn btn-outline" onclick="closeThumbnailSelector()">×</button>
+            </div>
+            <div class="thumbnail-modal-body">
+                <p class="section-description">등록하신 포트폴리오 이미지 중에서 대표 썸네일로 사용할 이미지를 선택해주세요.</p>
+                <div class="portfolio-thumbnail-grid" id="portfolioThumbnailGrid">
+                    <!-- Portfolio images will be loaded here -->
+                </div>
+            </div>
+            <div class="thumbnail-modal-footer">
+                <button class="btn btn-outline" onclick="closeThumbnailSelector()">취소</button>
+                <button class="btn btn-primary" onclick="confirmThumbnailSelection()" disabled id="confirmThumbnailBtn">선택 완료</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="constants.js"></script>
+    <script src="model-register.js"></script>
+    <script>
+        function log(message) {
+            const logEl = document.getElementById('debugLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logEl.textContent += `${timestamp}: ${message}\n`;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            document.getElementById('debugLog').textContent = '';
+        }
+        
+        function toggleModalDirectly() {
+            const modal = document.getElementById('thumbnailModal');
+            log('Modal element exists: ' + !!modal);
+            
+            if (modal) {
+                const currentDisplay = modal.style.display;
+                log('Current display: ' + currentDisplay);
+                
+                if (currentDisplay === 'none' || !currentDisplay) {
+                    modal.style.display = 'flex';
+                    log('Set display to flex');
+                } else {
+                    modal.style.display = 'none';
+                    log('Set display to none');
+                }
+                
+                log('New display: ' + modal.style.display);
+                log('Computed display: ' + window.getComputedStyle(modal).display);
+            }
+        }
+        
+        function checkModalState() {
+            const modal = document.getElementById('thumbnailModal');
+            if (modal) {
+                const rect = modal.getBoundingClientRect();
+                log('Modal state:');
+                log('- Display: ' + modal.style.display);
+                log('- Computed display: ' + window.getComputedStyle(modal).display);
+                log('- Visibility: ' + window.getComputedStyle(modal).visibility);
+                log('- Opacity: ' + window.getComputedStyle(modal).opacity);
+                log('- Z-index: ' + window.getComputedStyle(modal).zIndex);
+                log('- Position: ' + window.getComputedStyle(modal).position);
+                log('- Dimensions: ' + rect.width + 'x' + rect.height);
+                log('- InnerHTML length: ' + modal.innerHTML.length);
+                
+                // Check parent elements
+                let parent = modal.parentElement;
+                let level = 1;
+                while (parent && parent !== document.body) {
+                    const parentDisplay = window.getComputedStyle(parent).display;
+                    const parentVisibility = window.getComputedStyle(parent).visibility;
+                    if (parentDisplay === 'none' || parentVisibility === 'hidden') {
+                        log(`WARNING: Parent level ${level} has display:${parentDisplay} visibility:${parentVisibility}`);
+                    }
+                    parent = parent.parentElement;
+                    level++;
+                }
+            } else {
+                log('Modal element not found!');
+            }
+        }
+        
+        function initApp() {
+            try {
+                window.modelApp = new ModelRegistrationApp();
+                log('ModelRegistrationApp initialized');
+            } catch (error) {
+                log('Error initializing app: ' + error.message);
+            }
+        }
+        
+        function addTestImages() {
+            if (!window.modelApp) {
+                log('Please initialize app first');
+                return;
+            }
+            
+            window.modelApp.uploadedImages = [
+                { id: 'test-1', url: 'https://via.placeholder.com/200x200/667eea/ffffff?text=Test+1' },
+                { id: 'test-2', url: 'https://via.placeholder.com/200x200/48bb78/ffffff?text=Test+2' },
+                { id: 'test-3', url: 'https://via.placeholder.com/200x200/f56565/ffffff?text=Test+3' }
+            ];
+            
+            log('Added ' + window.modelApp.uploadedImages.length + ' test images');
+        }
+        
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            log('Page loaded');
+            checkModalState();
+        });
+    </script>
+</body>
+</html>

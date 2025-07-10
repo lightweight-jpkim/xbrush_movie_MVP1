@@ -665,25 +665,6 @@
                                 <p class="note">포트폴리오에 업로드된 이미지 중에서 선택하세요</p>
                             </div>
                         </div>
-                        
-                        <!-- Thumbnail Selection Modal -->
-                        <div class="thumbnail-modal" id="thumbnailModal" style="display: none;">
-                            <div class="thumbnail-modal-content">
-                                <div class="thumbnail-modal-header">
-                                    <h3>포트폴리오에서 썸네일 선택</h3>
-                                    <button class="btn btn-outline" onclick="closeThumbnailSelector()">×</button>
-                                </div>
-                                <div class="thumbnail-modal-body">
-                                    <div class="portfolio-thumbnail-grid" id="portfolioThumbnailGrid">
-                                        <!-- Portfolio images will be loaded here -->
-                                    </div>
-                                </div>
-                                <div class="thumbnail-modal-footer">
-                                    <button class="btn btn-outline" onclick="closeThumbnailSelector()">취소</button>
-                                    <button class="btn btn-primary" onclick="confirmThumbnailSelection()" disabled id="confirmThumbnailBtn">선택 완료</button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Model Information -->
@@ -982,6 +963,26 @@
             </section>
             
         </main>
+    </div>
+
+    <!-- Thumbnail Selection Modal -->
+    <div class="thumbnail-modal" id="thumbnailModal" style="display: none;">
+        <div class="thumbnail-modal-content">
+            <div class="thumbnail-modal-header">
+                <h3>포트폴리오에서 썸네일 선택</h3>
+                <button class="btn btn-outline" onclick="closeThumbnailSelector()">×</button>
+            </div>
+            <div class="thumbnail-modal-body">
+                <p class="section-description">등록하신 포트폴리오 이미지 중에서 대표 썸네일로 사용할 이미지를 선택해주세요.</p>
+                <div class="portfolio-thumbnail-grid" id="portfolioThumbnailGrid">
+                    <!-- Portfolio images will be loaded here -->
+                </div>
+            </div>
+            <div class="thumbnail-modal-footer">
+                <button class="btn btn-outline" onclick="closeThumbnailSelector()">취소</button>
+                <button class="btn btn-primary" onclick="confirmThumbnailSelection()" disabled id="confirmThumbnailBtn">선택 완료</button>
+            </div>
+        </div>
     </div>
 
     <!-- JavaScript Files -->
