@@ -222,19 +222,41 @@ class ModelRegistrationApp {
      * Handle step entry actions
      */
     handleStepEntry(stepNumber) {
+        // Show helpful guide messages for each step
         switch(stepNumber) {
+            case 1:
+                this.showToast('xBrush AI 모델이 되어보세요! 🌟 시작하기 버튼을 눌러주세요.', 'info');
+                break;
+                
             case 2:
                 this.resetKYCState();
+                this.showToast('본인 인증을 진행합니다. 📋 신분증과 얼굴 사진이 필요해요.', 'info');
+                setTimeout(() => {
+                    this.showToast('💡 Tip: 신분증은 선명하게, 얼굴은 정면에서 촬영해주세요!', 'info');
+                }, 3000);
                 break;
+                
             case 3:
                 this.updateContractSummary();
+                this.showToast('계약 조건을 설정해주세요. 💰 가격과 사용 권한을 선택하고 서명하세요.', 'info');
                 break;
+                
             case 4:
                 this.updateImageCount();
+                this.showToast('포트폴리오를 업로드해주세요. 📸 다양한 각도의 사진을 올려주세요!', 'info');
+                setTimeout(() => {
+                    this.showToast('💡 Tip: 최소 3장 이상 업로드하면 선택 확률이 높아져요!', 'info');
+                }, 3000);
                 break;
+                
             case 5:
                 this.setupProductRegistration();
+                this.showToast('모델 정보를 입력해주세요. ✏️ 썸네일, 이름, 소개를 작성하세요.', 'info');
+                setTimeout(() => {
+                    this.showToast('💡 Tip: 매력적인 한 줄 소개로 고객의 관심을 끌어보세요!', 'info');
+                }, 3000);
                 break;
+                
             case 6:
                 // Enable the review start button instead of auto-starting
                 const reviewButton = document.getElementById('step6Next');
@@ -242,10 +264,13 @@ class ModelRegistrationApp {
                     reviewButton.disabled = false;
                     reviewButton.textContent = '검수 신청';
                 }
+                this.showToast('등록 정보를 확인하고 검수를 신청하세요. 🔍', 'info');
                 break;
+                
             case 7:
                 // Update final step with model information
                 this.updateFinalStep();
+                this.showToast('축하합니다! 🎉 모델 등록이 완료되었습니다. 활성화 버튼을 눌러주세요!', 'success');
                 break;
         }
     }
@@ -607,8 +632,24 @@ class ModelRegistrationApp {
         const hasFacePhoto = this.registrationData.facePhoto;
         const hasVerificationVideo = this.registrationData.verificationVideo;
         
-        if (!hasIdDocument || !hasFacePhoto || !hasVerificationVideo) {
-            this.showToast('모든 인증 단계를 완료해주세요.', 'warning');
+        if (!hasIdDocument) {
+            this.showToast('신분증을 업로드해주세요. 📋', 'warning');
+            // Scroll to ID upload section
+            document.getElementById('idUploadArea')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
+        
+        if (!hasFacePhoto) {
+            this.showToast('얼굴 사진을 촬영해주세요. 📸', 'warning');
+            // Scroll to face capture section
+            document.querySelector('.kyc-step.step-a2')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
+        
+        if (!hasVerificationVideo) {
+            this.showToast('인증 동영상을 녹화해주세요. 🎥', 'warning');
+            // Scroll to video section
+            document.querySelector('.kyc-step.step-b')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return false;
         }
         
@@ -782,6 +823,11 @@ class ModelRegistrationApp {
         const nextButton = document.getElementById('step2Next');
         if (nextButton) {
             nextButton.disabled = !isComplete;
+            if (!isComplete) {
+                nextButton.title = "전자 서명을 완료해주세요";
+            } else {
+                nextButton.title = "";
+            }
         }
     }
 
@@ -789,8 +835,26 @@ class ModelRegistrationApp {
      * Validate contract completion
      */
     validateContract() {
+        // Check pricing selection
+        const pricingType = document.querySelector('input[name="pricingType"]:checked');
+        if (!pricingType) {
+            this.showToast('가격 방식을 선택해주세요. 💰', 'warning');
+            document.querySelector('.form-group')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
+        
+        // Check usage rights
+        const usageRights = document.querySelectorAll('input[name="usageRights"]:checked');
+        if (usageRights.length === 0) {
+            this.showToast('최소 하나 이상의 사용 권한을 선택해주세요. 📝', 'warning');
+            document.querySelector('.usage-rights')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
+        
+        // Check signature
         if (!this.signatureCanvas || !this.signatureCanvas.hasSignature) {
-            this.showToast('전자 서명을 완료해주세요.', 'warning');
+            this.showToast('전자 서명을 완료해주세요. ✍️', 'warning');
+            document.getElementById('signatureCanvas')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return false;
         }
         
@@ -1075,10 +1139,15 @@ class ModelRegistrationApp {
      * Check portfolio completion
      */
     checkPortfolioCompletion() {
-        // Enable next button regardless of image count for testing
+        const hasImages = this.uploadedImages.length > 0;
         const nextButton = document.getElementById('step4Next');
         if (nextButton) {
-            nextButton.disabled = false;
+            nextButton.disabled = !hasImages;
+            if (!hasImages) {
+                nextButton.title = "포트폴리오 이미지를 업로드해주세요";
+            } else {
+                nextButton.title = "";
+            }
         }
     }
 
@@ -1086,7 +1155,16 @@ class ModelRegistrationApp {
      * Validate portfolio completion
      */
     validatePortfolio() {
-        // Allow any number of images for testing
+        if (this.uploadedImages.length === 0) {
+            this.showToast('최소 1장 이상의 포트폴리오 이미지를 업로드해주세요. 📷', 'warning');
+            document.getElementById('uploadArea')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
+        
+        if (this.uploadedImages.length < 3) {
+            this.showToast('더 많은 포트폴리오 이미지를 추가하면 선택 확률이 높아집니다! 💡', 'info');
+        }
+        
         this.registrationData.portfolio = this.uploadedImages;
         return true;
     }
@@ -1537,23 +1615,33 @@ class ModelRegistrationApp {
         const modelIntro = document.getElementById('modelIntro')?.value.trim();
         const categories = document.querySelectorAll('input[name="modelCategory"]:checked');
         
+        // Check thumbnail first
         if (!this.registrationData.thumbnail) {
-            this.showToast('썸네일 이미지를 선택해주세요.', 'warning');
+            this.showToast('대표 썸네일을 선택해주세요. 🖼️ "썸네일 선택" 버튼을 클릭하세요.', 'warning');
+            document.querySelector('.thumbnail-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return false;
         }
         
+        // Check model name
         if (!modelName) {
-            this.showToast('모델명을 입력해주세요.', 'warning');
+            this.showToast('모델명을 입력해주세요. ✏️ 실명 또는 활동명을 입력하세요.', 'warning');
+            document.getElementById('modelName')?.focus();
+            document.getElementById('modelName')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return false;
         }
         
+        // Check intro
         if (!modelIntro) {
-            this.showToast('한 줄 소개를 입력해주세요.', 'warning');
+            this.showToast('한 줄 소개를 입력해주세요. 💬 당신의 매력을 한 문장으로!', 'warning');
+            document.getElementById('modelIntro')?.focus();
+            document.getElementById('modelIntro')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return false;
         }
         
+        // Check categories
         if (categories.length === 0) {
-            this.showToast('최소 하나의 카테고리를 선택해주세요.', 'warning');
+            this.showToast('최소 하나의 카테고리를 선택해주세요. 📋 활동 분야를 선택하세요.', 'warning');
+            document.querySelector('.category-selection')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return false;
         }
         
