@@ -1217,6 +1217,8 @@ class ModelRegistrationApp {
             thumbnailItem.setAttribute('data-image-id', image.id);
             thumbnailItem.setAttribute('role', 'button');
             thumbnailItem.setAttribute('tabindex', '0');
+            // Ensure relative positioning for absolute child
+            thumbnailItem.style.position = 'relative';
             
             const img = document.createElement('img');
             img.src = image.url;
@@ -1225,6 +1227,27 @@ class ModelRegistrationApp {
             const indicator = document.createElement('div');
             indicator.className = 'selection-indicator';
             indicator.textContent = '✓';
+            // Add inline styles to ensure visibility
+            indicator.style.cssText = `
+                position: absolute !important;
+                top: 5px !important;
+                right: 5px !important;
+                width: 30px !important;
+                height: 30px !important;
+                background: #667eea !important;
+                border-radius: 50% !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                color: white !important;
+                font-size: 18px !important;
+                font-weight: bold !important;
+                opacity: 0 !important;
+                transition: opacity 0.3s ease !important;
+                z-index: 999 !important;
+                border: 3px solid white !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+            `;
             
             thumbnailItem.appendChild(img);
             thumbnailItem.appendChild(indicator);
@@ -1295,7 +1318,6 @@ class ModelRegistrationApp {
             const indicator = item.querySelector('.selection-indicator');
             if (indicator) {
                 indicator.style.opacity = '0';
-                indicator.style.display = '';
             }
             
             console.log('Removed selection from item:', item.getAttribute('data-image-id'));
@@ -1318,8 +1340,12 @@ class ModelRegistrationApp {
             // Make selection indicator visible
             const indicator = selectedItem.querySelector('.selection-indicator');
             if (indicator) {
-                indicator.style.cssText += 'opacity: 1 !important; display: flex !important;';
-                console.log('Selection indicator made visible with forced styles');
+                // Override just the opacity while keeping other styles
+                indicator.style.opacity = '1';
+                indicator.style.display = 'flex';
+                console.log('Selection indicator made visible');
+                console.log('Indicator element:', indicator);
+                console.log('Indicator computed style:', window.getComputedStyle(indicator).opacity);
             } else {
                 console.error('Selection indicator not found in selected item');
             }
