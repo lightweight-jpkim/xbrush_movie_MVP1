@@ -1200,25 +1200,30 @@ class ModelRegistrationApp {
             grid.appendChild(thumbnailItem);
         });
         
-        // Add click event listeners to each thumbnail using event delegation
+        // Use event delegation on the grid container instead
+        grid.onclick = (e) => {
+            console.log('Grid clicked, target:', e.target);
+            
+            // Find the closest portfolio-thumbnail-item
+            const thumbnailItem = e.target.closest('.portfolio-thumbnail-item');
+            if (thumbnailItem) {
+                const imageId = thumbnailItem.getAttribute('data-image-id');
+                console.log('Thumbnail item clicked with ID:', imageId);
+                if (imageId) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.selectPortfolioThumbnail(imageId);
+                }
+            }
+        };
+        
+        // Also add pointer cursor to all thumbnails
         setTimeout(() => {
             const allThumbnails = grid.querySelectorAll('.portfolio-thumbnail-item');
-            console.log('Found thumbnails:', allThumbnails.length);
-            
             allThumbnails.forEach(thumbnail => {
-                const imageId = thumbnail.getAttribute('data-image-id');
-                if (imageId) {
-                    thumbnail.style.cursor = 'pointer';
-                    thumbnail.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('Thumbnail clicked with ID:', imageId);
-                        this.selectPortfolioThumbnail(imageId);
-                    });
-                    console.log('Click handler added for image:', imageId);
-                }
+                thumbnail.style.cursor = 'pointer';
             });
-        }, 100); // Small delay to ensure DOM is ready
+        }, 50);
         
         console.log('Portfolio thumbnails loaded successfully with click handlers');
     }
@@ -1240,6 +1245,19 @@ class ModelRegistrationApp {
         // Remove previous selection
         document.querySelectorAll('.portfolio-thumbnail-item').forEach(item => {
             item.classList.remove('selected');
+            // Clear inline styles
+            item.style.borderColor = '';
+            item.style.borderWidth = '';
+            item.style.transform = '';
+            item.style.boxShadow = '';
+            
+            // Hide selection indicator
+            const indicator = item.querySelector('.selection-indicator');
+            if (indicator) {
+                indicator.style.opacity = '0';
+                indicator.style.display = '';
+            }
+            
             console.log('Removed selection from item:', item.getAttribute('data-image-id'));
         });
         
@@ -1250,10 +1268,28 @@ class ModelRegistrationApp {
         
         if (selectedItem) {
             selectedItem.classList.add('selected');
+            
+            // Force visual feedback with inline styles
+            selectedItem.style.borderColor = '#667eea';
+            selectedItem.style.borderWidth = '3px';
+            selectedItem.style.transform = 'scale(1.02)';
+            selectedItem.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.3)';
+            
+            // Make selection indicator visible
+            const indicator = selectedItem.querySelector('.selection-indicator');
+            if (indicator) {
+                indicator.style.opacity = '1';
+                indicator.style.display = 'flex';
+                console.log('Selection indicator made visible');
+            }
+            
             this.selectedThumbnailId = imageId;
             console.log('Selected thumbnail ID set to:', this.selectedThumbnailId);
             console.log('Classes after selection:', selectedItem.classList.toString());
             this.updateThumbnailConfirmButton();
+            
+            // Add toast notification for feedback
+            this.showToast('이미지가 선택되었습니다', 'success');
         } else {
             console.error('Could not find thumbnail item with ID:', imageId);
             console.log('All thumbnail items:', document.querySelectorAll('.portfolio-thumbnail-item'));
@@ -1648,6 +1684,80 @@ class ModelRegistrationApp {
             window.location.href = 'index.html';
         }
     }
+
+    /**
+     * Admin bypass for KYC-A (ID + Face)
+     */
+    adminBypassKYCA() {
+        console.log('Admin bypassing KYC-A verification');
+        
+        // Simulate successful verification
+        this.registrationData.idCardImage = 'admin-bypass';
+        this.registrationData.faceImage = 'admin-bypass';
+        this.registrationData.ocrData = {
+            name: '테스트 사용자',
+            idNumber: '000000-0000000',
+            issueDate: '2024-01-01'
+        };
+        
+        // Update UI
+        this.updateKYCStatus('kycAStatus', 'success', '인증 완료 (관리자)');
+        
+        const resultDiv = document.getElementById('verificationAResult');
+        const icon = document.getElementById('resultAIcon');
+        const text = document.getElementById('resultAText');
+        const details = document.getElementById('resultADetails');
+        
+        if (resultDiv) {
+            resultDiv.style.display = 'block';
+            icon.textContent = '✅';
+            text.textContent = '관리자 승인 완료';
+            details.textContent = '테스트용 관리자 승인';
+        }
+        
+        // Enable next step
+        this.enableKYCStepB();
+        
+        this.showToast('KYC-A 관리자 승인 완료', 'success');
+    }
+
+    /**
+     * Admin bypass for KYC-B (Video)
+     */
+    adminBypassKYCB() {
+        console.log('Admin bypassing KYC-B verification');
+        
+        // Simulate successful verification
+        this.registrationData.verificationVideo = 'admin-bypass';
+        this.registrationData.randomCode = '000000';
+        this.registrationData.videoAnalysis = {
+            speechText: '000000',
+            faceMatches: true,
+            deepfakeDetected: false,
+            audioQuality: 'good'
+        };
+        
+        // Update UI
+        this.updateKYCStatus('kycBStatus', 'success', '인증 완료 (관리자)');
+        
+        const resultDiv = document.getElementById('verificationBResult');
+        const icon = document.getElementById('resultBIcon');
+        const text = document.getElementById('resultBText');
+        const details = document.getElementById('resultBDetails');
+        
+        if (resultDiv) {
+            resultDiv.style.display = 'block';
+            icon.textContent = '✅';
+            text.textContent = '관리자 승인 완료';
+            details.textContent = '테스트용 관리자 승인';
+        }
+        
+        // Mark KYC as complete
+        this.registrationData.kycComplete = true;
+        this.validateAndUpdateKYCCompletion();
+        
+        this.showToast('KYC-B 관리자 승인 완료', 'success');
+    }
 }
 
 // Global functions for HTML onclick handlers
@@ -1701,6 +1811,21 @@ function resetThumbnail() {
 
 function startReviewProcess() {
     modelApp.startReviewProcess();
+}
+
+// Admin bypass functions for testing
+function adminBypassKYCA() {
+    console.log('Admin bypass for KYC-A triggered');
+    if (modelApp) {
+        modelApp.adminBypassKYCA();
+    }
+}
+
+function adminBypassKYCB() {
+    console.log('Admin bypass for KYC-B triggered');
+    if (modelApp) {
+        modelApp.adminBypassKYCB();
+    }
 }
 
 // Initialize app when DOM is ready

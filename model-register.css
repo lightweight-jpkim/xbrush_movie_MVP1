@@ -1956,6 +1956,26 @@
     margin-top: 5px;
 }
 
+/* Admin Bypass Button */
+.admin-bypass {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px dashed #e2e8f0;
+}
+
+.admin-btn {
+    background: #fef5e7 !important;
+    border-color: #f6e05e !important;
+    color: #744210 !important;
+    font-size: 0.9rem;
+    padding: 10px 20px;
+}
+
+.admin-btn:hover {
+    background: #f6e05e !important;
+    transform: translateY(-1px);
+}
+
 .pricing-preview {
     background: #f7fafc;
     border-radius: 12px;
