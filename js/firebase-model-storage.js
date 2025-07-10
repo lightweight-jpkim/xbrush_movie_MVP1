@@ -76,12 +76,15 @@ class FirebaseModelStorage {
      */
     async saveModel(modelData) {
         try {
+            console.log('[FirebaseModelStorage] Starting saveModel...');
             await this.ensureInitialized();
+            console.log('[FirebaseModelStorage] Firebase initialized');
             
             // Generate ID if not present
             if (!modelData.id) {
                 modelData.id = 'model_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             }
+            console.log('[FirebaseModelStorage] Model ID:', modelData.id);
             
             // Upload thumbnail if it's base64
             if (modelData.portfolio?.thumbnailUrl?.startsWith('data:')) {
@@ -118,10 +121,16 @@ class FirebaseModelStorage {
             modelData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
             modelData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
             
+            console.log('[FirebaseModelStorage] Saving to Firestore...');
+            console.log('[FirebaseModelStorage] Collection:', this.collection);
+            console.log('[FirebaseModelStorage] Document ID:', modelData.id);
+            console.log('[FirebaseModelStorage] Model status:', modelData.status);
+            
             // Save to Firestore
             await this.db.collection(this.collection).doc(modelData.id).set(modelData);
             
-            console.log('Model saved to Firebase:', modelData.id);
+            console.log('[FirebaseModelStorage] ✅ Model saved successfully!');
+            console.log('[FirebaseModelStorage] Model ID:', modelData.id);
             return modelData.id;
             
         } catch (error) {
@@ -184,6 +193,7 @@ class FirebaseModelStorage {
      */
     async getActiveModels() {
         try {
+            console.log('[FirebaseModelStorage] Getting active models...');
             await this.ensureInitialized();
             
             const snapshot = await this.db.collection(this.collection)
@@ -191,14 +201,23 @@ class FirebaseModelStorage {
                 .orderBy('createdAt', 'desc')
                 .get();
             
+            console.log('[FirebaseModelStorage] Query complete. Found:', snapshot.size, 'documents');
+            
             const models = [];
             snapshot.forEach(doc => {
+                const data = doc.data();
+                console.log('[FirebaseModelStorage] Model found:', {
+                    id: doc.id,
+                    status: data.status,
+                    name: data.personalInfo?.name
+                });
                 models.push({
                     id: doc.id,
-                    ...doc.data()
+                    ...data
                 });
             });
             
+            console.log('[FirebaseModelStorage] Returning', models.length, 'active models');
             return models;
         } catch (error) {
             console.error('Error getting active models:', error);
@@ -351,5 +370,17 @@ class FirebaseModelStorage {
     }
 }
 
-// Create global instance
-window.firebaseModelStorage = new FirebaseModelStorage();
+// Create global instance after Firebase is ready
+function initializeFirebaseModelStorage() {
+    if (!window.firebaseDB) {
+        console.log('Waiting for Firebase to initialize before creating FirebaseModelStorage...');
+        setTimeout(initializeFirebaseModelStorage, 100);
+        return;
+    }
+    
+    console.log('Creating FirebaseModelStorage instance...');
+    window.firebaseModelStorage = new FirebaseModelStorage();
+}
+
+// Start initialization
+initializeFirebaseModelStorage();

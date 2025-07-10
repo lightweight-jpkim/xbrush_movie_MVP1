@@ -35,7 +35,9 @@ db.enablePersistence()
         }
     });
 
-// Initialize anonymous authentication
+// Initialize anonymous authentication (commented out until enabled in Firebase Console)
+// Uncomment after enabling Anonymous auth in Firebase Console
+/*
 auth.signInAnonymously()
     .then(() => {
         console.log('Anonymous authentication successful');
@@ -44,6 +46,8 @@ auth.signInAnonymously()
         console.error('Authentication error:', error);
         // Continue without auth for now
     });
+*/
+console.log('Skipping authentication for now - enable Anonymous auth in Firebase Console');
 
 // Monitor auth state
 auth.onAuthStateChanged((user) => {

@@ -19,10 +19,18 @@ class ModelStorageAdapter {
     
     async initializeFirebase() {
         // Wait for Firebase to initialize with retries
-        let retries = 5;
+        let retries = 10;
         while (retries > 0) {
             await new Promise(resolve => setTimeout(resolve, 1000));
             
+            // Check if Firebase itself is loaded
+            if (!window.firebase) {
+                console.log('Model Storage Adapter: Firebase SDK not loaded yet...');
+                retries--;
+                continue;
+            }
+            
+            // Check if our Firebase services are initialized
             if (window.firebaseModelStorage && window.firebaseDB) {
                 this.firebaseStorage = window.firebaseModelStorage;
                 this.useFirebase = true;
@@ -30,11 +38,22 @@ class ModelStorageAdapter {
                 return;
             }
             
-            console.log(`Model Storage Adapter: Waiting for Firebase... (${retries} retries left)`);
+            console.log(`Model Storage Adapter: Waiting for Firebase services... (${retries} retries left)`);
+            console.log('Firebase status:', {
+                firebase: !!window.firebase,
+                firebaseDB: !!window.firebaseDB,
+                firebaseModelStorage: !!window.firebaseModelStorage,
+                firebaseAuth: !!window.firebaseAuth
+            });
             retries--;
         }
         
-        console.error('Model Storage Adapter: Firebase failed to initialize after 5 seconds');
+        console.error('Model Storage Adapter: Firebase failed to initialize after 10 seconds');
+        console.error('Final status:', {
+            firebase: !!window.firebase,
+            firebaseDB: !!window.firebaseDB,
+            firebaseModelStorage: !!window.firebaseModelStorage
+        });
         throw new Error('Firebase initialization failed. Please check your internet connection.');
     }
 
@@ -246,17 +265,23 @@ class ModelStorageAdapter {
     }
 }
 
-// Create global instance
-window.modelStorageAdapter = new ModelStorageAdapter();
+// Create global instance after Firebase is ready
+function initializeModelStorageAdapter() {
+    console.log('Creating ModelStorageAdapter instance...');
+    window.modelStorageAdapter = new ModelStorageAdapter();
+    
+    // For backward compatibility, override the global modelStorage
+    window.modelStorage = {
+        saveModel: (data) => window.modelStorageAdapter.saveModel(data),
+        getModel: (id) => window.modelStorageAdapter.getModel(id),
+        getAllModels: () => window.modelStorageAdapter.getAllModels(),
+        getActiveModels: () => window.modelStorageAdapter.getActiveModels(),
+        getPendingModels: () => window.modelStorageAdapter.getPendingModels(),
+        updateModel: (id, updates) => window.modelStorageAdapter.updateModel(id, updates),
+        deleteModel: (id) => window.modelStorageAdapter.deleteModel(id),
+        searchModels: (query) => window.modelStorageAdapter.searchModels(query)
+    };
+}
 
-// For backward compatibility, override the global modelStorage
-window.modelStorage = {
-    saveModel: (data) => window.modelStorageAdapter.saveModel(data),
-    getModel: (id) => window.modelStorageAdapter.getModel(id),
-    getAllModels: () => window.modelStorageAdapter.getAllModels(),
-    getActiveModels: () => window.modelStorageAdapter.getActiveModels(),
-    getPendingModels: () => window.modelStorageAdapter.getPendingModels(),
-    updateModel: (id, updates) => window.modelStorageAdapter.updateModel(id, updates),
-    deleteModel: (id) => window.modelStorageAdapter.deleteModel(id),
-    searchModels: (query) => window.modelStorageAdapter.searchModels(query)
-};
+// Initialize immediately (adapter will wait for Firebase internally)
+initializeModelStorageAdapter();

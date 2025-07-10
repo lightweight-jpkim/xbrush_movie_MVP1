@@ -2200,6 +2200,9 @@ class ModelRegistrationApp {
         
         // Process activation
         try {
+            console.log('=== STARTING MODEL ACTIVATION ===');
+            console.log('Registration data available:', this.registrationData);
+            
             // Prepare complete model data
             const modelData = {
                 // Basic info
@@ -2244,24 +2247,41 @@ class ModelRegistrationApp {
                 }
             };
             
+            console.log('=== MODEL DATA PREPARED ===');
+            console.log('Model data to save:', JSON.stringify(modelData, null, 2));
+            
             // Save using ModelStorage
             try {
-                if (window.modelStorage) {
+                if (window.modelStorage && !window.modelStorageAdapter) {
+                    console.log('Using old modelStorage (should not happen)');
                     const modelId = window.modelStorage.saveModel(modelData);
                     console.log('Model saved with ID:', modelId);
                 } else if (window.modelStorageAdapter) {
+                    console.log('Using Firebase adapter');
+                    console.log('Adapter status:', {
+                        useFirebase: window.modelStorageAdapter.useFirebase,
+                        firebaseStorage: !!window.modelStorageAdapter.firebaseStorage
+                    });
+                    
                     // Use Firebase adapter
                     const modelId = await window.modelStorageAdapter.saveModel(modelData);
-                    console.log('Model saved to Firebase with ID:', modelId);
+                    console.log('=== MODEL SAVED TO FIREBASE ===');
+                    console.log('Model ID:', modelId);
                     
                     // Verify the model was saved
+                    console.log('Verifying model in Firebase...');
                     const savedModel = await window.modelStorageAdapter.getModel(modelId);
                     if (!savedModel) {
+                        console.error('Model verification failed - not found in Firebase');
                         throw new Error('Model verification failed');
                     }
                     
-                    console.log('Model verified in Firebase:', savedModel);
+                    console.log('=== MODEL VERIFIED ===');
+                    console.log('Saved model:', savedModel);
+                    console.log('Model status:', savedModel.status);
                 } else {
+                    console.error('No storage adapter available');
+                    console.log('window.modelStorageAdapter:', window.modelStorageAdapter);
                     throw new Error('Storage adapter not available');
                 }
                 

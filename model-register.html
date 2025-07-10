@@ -1018,6 +1018,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <!-- JavaScript Files -->
     <script src="constants.js"></script>
@@ -1029,8 +1030,28 @@
     <script src="js/model-storage-adapter.js"></script>
     <script src="model-register.js?v=20250710-firebase"></script>
     
-    <!-- Secret admin access: Press Ctrl+Shift+A -->
+    <!-- Initialize Firebase and wait for it -->
     <script>
+        // Wait for Firebase to be fully initialized
+        window.addEventListener('load', async function() {
+            let retries = 10;
+            while (retries > 0) {
+                if (window.firebase && window.firebaseDB && window.firebaseModelStorage) {
+                    console.log('Firebase services ready!');
+                    break;
+                }
+                console.log('Waiting for Firebase initialization...');
+                await new Promise(resolve => setTimeout(resolve, 500));
+                retries--;
+            }
+            
+            if (!window.firebaseDB) {
+                console.error('Firebase failed to initialize properly');
+                alert('Firebase 초기화에 실패했습니다. 페이지를 새로고침해주세요.');
+            }
+        });
+        
+        // Secret admin access: Press Ctrl+Shift+A
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.shiftKey && e.key === 'A') {
                 window.location.href = 'admin.html';
