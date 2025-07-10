@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Add Real Models with Images</title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+        .image-preview {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        .image-preview img {
+            width: 150px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+        }
+        .image-preview p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Real Model Data Generator</h1>
+    <p>실제 이미지를 포함한 모델 데이터를 생성합니다.</p>
+    
+    <button onclick="addRealModels()">실제 이미지로 모델 추가</button>
+    <button onclick="clearAllModels()">모든 모델 삭제</button>
+    <button onclick="viewModels()">저장된 모델 보기</button>
+    
+    <div id="imagePreview"></div>
+    <div id="result"></div>
+    
+    <script src="js/model-storage.js"></script>
+    <script src="js/image-utils.js"></script>
+    <script>
+        // Sample image URLs to convert to base64
+        const sampleImages = [
+            {
+                name: "김지수",
+                url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&h=800&fit=crop",
+                intro: "밝고 친근한 20대 여성 모델입니다",
+                categories: ["fashion", "beauty"]
+            },
+            {
+                name: "이준호", 
+                url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=800&fit=crop",
+                intro: "전문적이고 신뢰감 있는 30대 남성 모델",
+                categories: ["lifestyle", "tech"]
+            },
+            {
+                name: "박서연",
+                url: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&h=800&fit=crop",
+                intro: "건강하고 활기찬 이미지의 피트니스 모델",
+                categories: ["lifestyle", "food"]
+            },
+            {
+                name: "최유진",
+                url: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=600&h=800&fit=crop",
+                intro: "세련되고 우아한 럭셔리 브랜드 전문 모델",
+                categories: ["fashion", "beauty", "lifestyle"]
+            }
+        ];
+
+        async function loadImageAsBase64(url) {
+            try {
+                // For demo purposes, we'll use a CORS proxy or simulate base64
+                // In real app, images would be uploaded by user
+                const response = await fetch(url);
+                const blob = await response.blob();
+                
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                });
+            } catch (error) {
+                console.error('Error loading image:', error);
+                // Return the URL as fallback
+                return url;
+            }
+        }
+
+        async function addRealModels() {
+            const result = document.getElementById('result');
+            const preview = document.getElementById('imagePreview');
+            
+            result.textContent = 'Loading images and creating models...';
+            preview.innerHTML = '';
+            
+            let addedCount = 0;
+            
+            for (const sample of sampleImages) {
+                try {
+                    // For demo, we'll use the URL directly since CORS prevents loading external images
+                    // In real registration, these would be base64 from user uploads
+                    
+                    const modelData = {
+                        personalInfo: {
+                            name: sample.name,
+                            intro: sample.intro,
+                            description: `${sample.intro} 다양한 광고 경험과 전문성을 갖춘 모델입니다.`,
+                            categories: sample.categories
+                        },
+                        portfolio: {
+                            thumbnailUrl: sample.url, // In real app, this would be base64
+                            thumbnailId: `thumb-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                            images: [
+                                {
+                                    id: `img-${Date.now()}-1`,
+                                    url: sample.url,
+                                    name: `portfolio-1.jpg`
+                                }
+                            ]
+                        },
+                        contract: {
+                            pricingType: "perProject",
+                            basePrice: 500000 + Math.floor(Math.random() * 500000),
+                            usageRights: ["commercial", "editorial"],
+                            contractPeriod: 12
+                        },
+                        kyc: {
+                            verified: true,
+                            verificationDate: new Date().toISOString()
+                        },
+                        status: "active"
+                    };
+                    
+                    window.modelStorage.saveModel(modelData);
+                    addedCount++;
+                    
+                    // Show preview
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'image-preview';
+                    previewItem.innerHTML = `
+                        <img src="${sample.url}" alt="${sample.name}">
+                        <p><strong>${sample.name}</strong></p>
+                        <p style="font-size: 12px; color: #666;">${sample.categories.join(', ')}</p>
+                    `;
+                    preview.appendChild(previewItem);
+                    
+                } catch (error) {
+                    console.error('Error adding model:', error);
+                }
+            }
+            
+            result.textContent = 
+                `${addedCount}개의 모델이 추가되었습니다.\n\n` +
+                `현재 저장된 모델 수: ${window.modelStorage.getAllModels().length}개\n\n` +
+                `참고: 실제 등록 시에는 사용자가 업로드한 이미지가 Base64로 저장됩니다.`;
+        }
+        
+        function clearAllModels() {
+            if (confirm('정말로 모든 모델을 삭제하시겠습니까?')) {
+                localStorage.removeItem('xbrush_registered_models');
+                window.modelStorage.initStorage();
+                document.getElementById('result').textContent = '모든 모델이 삭제되었습니다.';
+                document.getElementById('imagePreview').innerHTML = '';
+            }
+        }
+        
+        function viewModels() {
+            const models = window.modelStorage.getAllModels();
+            const result = document.getElementById('result');
+            
+            if (models.length === 0) {
+                result.textContent = '저장된 모델이 없습니다.';
+                return;
+            }
+            
+            result.textContent = `저장된 모델 (${models.length}개):\n\n` +
+                models.map((model, index) => 
+                    `${index + 1}. ${model.personalInfo?.name || '이름 없음'}\n` +
+                    `   - 상태: ${model.status}\n` +
+                    `   - 카테고리: ${model.personalInfo?.categories?.join(', ') || '없음'}\n` +
+                    `   - 썸네일: ${model.portfolio?.thumbnailUrl ? '있음' : '없음'}\n` +
+                    `   - ID: ${model.id}`
+                ).join('\n\n');
+        }
+        
+        // Show current status on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const modelCount = window.modelStorage.getAllModels().length;
+            document.getElementById('result').textContent = 
+                `현재 저장된 모델 수: ${modelCount}개\n\n` +
+                `Note: 실제 등록 프로세스에서는 사용자가 직접 업로드한 이미지가 저장됩니다.`;
+        });
+    </script>
+</body>
+</html>
