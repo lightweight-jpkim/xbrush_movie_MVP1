@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cache Bypass Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .result {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cache Bypass Test for model-register.js</h1>
+    
+    <div class="info">
+        <h3>Browser Caching Issue Detected</h3>
+        <p>Your browser may be caching the old version of model-register.js. Here are several ways to fix this:</p>
+        <ol>
+            <li><strong>Hard Refresh:</strong> Press Ctrl+Shift+R (Windows/Linux) or Cmd+Shift+R (Mac)</li>
+            <li><strong>Clear Browser Cache:</strong> Go to browser settings and clear cached files</li>
+            <li><strong>Incognito/Private Mode:</strong> Open the site in a private browsing window</li>
+            <li><strong>Force Reload:</strong> Click the button below to load with cache bypass</li>
+        </ol>
+    </div>
+
+    <button onclick="checkCurrentVersion()">Check Current Version</button>
+    <button onclick="loadWithCacheBust()">Load with Cache Bypass</button>
+    <button onclick="compareVersions()">Compare Local vs Remote</button>
+
+    <div id="results"></div>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+
+        async function checkCurrentVersion() {
+            resultsDiv.innerHTML = '<div class="result">Checking current version...</div>';
+            
+            try {
+                // Load the script and check for the fix
+                const response = await fetch('model-register.js');
+                const text = await response.text();
+                
+                // Look for the specific fix
+                const hasFix = text.includes('basic scopes are pre-selected, so no need to validate');
+                const hasOldValidation = text.includes('if (basicScopes.length === 0)');
+                
+                let status = '';
+                if (hasFix && !hasOldValidation) {
+                    status = '<div class="result success">✅ GOOD: The fix is present! Basic scopes validation has been updated.</div>';
+                } else if (hasOldValidation) {
+                    status = '<div class="result error">❌ OLD VERSION: Still has the old validation check that requires basic scopes.</div>';
+                } else {
+                    status = '<div class="result">⚠️ Cannot determine version status.</div>';
+                }
+                
+                resultsDiv.innerHTML = status + `
+                    <div class="result">
+                        <strong>Cache Headers:</strong>
+                        Cache-Control: ${response.headers.get('cache-control') || 'Not set'}
+                        Last-Modified: ${response.headers.get('last-modified') || 'Not set'}
+                        ETag: ${response.headers.get('etag') || 'Not set'}
+                    </div>
+                `;
+                
+                // Show relevant code section
+                const startIndex = text.indexOf('validateContract()');
+                if (startIndex !== -1) {
+                    const snippet = text.substring(startIndex, startIndex + 1000);
+                    resultsDiv.innerHTML += `<div class="result"><strong>validateContract function:</strong>\n${snippet}</div>`;
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function loadWithCacheBust() {
+            const timestamp = Date.now();
+            const url = `model-register.js?v=${timestamp}`;
+            
+            resultsDiv.innerHTML = '<div class="result">Loading with cache bypass...</div>';
+            
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                
+                const hasFix = text.includes('basic scopes are pre-selected, so no need to validate');
+                
+                if (hasFix) {
+                    resultsDiv.innerHTML = `
+                        <div class="result success">✅ Successfully loaded latest version with cache bypass!</div>
+                        <div class="result">
+                            <strong>Next Steps:</strong>
+                            1. Clear your browser cache completely
+                            2. Or add a version parameter to your script tag:
+                            <code>&lt;script src="model-register.js?v=${timestamp}"&gt;&lt;/script&gt;</code>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = '<div class="result error">Still loading old version even with cache bypass.</div>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function compareVersions() {
+            resultsDiv.innerHTML = '<div class="result">Comparing versions...</div>';
+            
+            try {
+                // Get GitHub version
+                const githubResponse = await fetch('https://raw.githubusercontent.com/JPJPKIMJP/xbrush_movie_MVP1/main/model-register.js');
+                const githubText = await githubResponse.text();
+                
+                // Get current version
+                const localResponse = await fetch('model-register.js');
+                const localText = await localResponse.text();
+                
+                const githubHasFix = githubText.includes('basic scopes are pre-selected, so no need to validate');
+                const localHasFix = localText.includes('basic scopes are pre-selected, so no need to validate');
+                
+                resultsDiv.innerHTML = `
+                    <div class="result">
+                        <strong>GitHub Version:</strong> ${githubHasFix ? '✅ Has fix' : '❌ Missing fix'}
+                        <strong>Your Browser Version:</strong> ${localHasFix ? '✅ Has fix' : '❌ Missing fix'}
+                        
+                        ${!localHasFix && githubHasFix ? '<strong class="error">⚠️ Your browser is caching the old version!</strong>' : ''}
+                    </div>
+                `;
+                
+                // Extract validateContract function from both versions
+                const extractFunction = (text) => {
+                    const start = text.indexOf('validateContract() {');
+                    if (start === -1) return 'Function not found';
+                    const end = text.indexOf('\n    }', start + 500);
+                    return text.substring(start, end + 6);
+                };
+                
+                resultsDiv.innerHTML += `
+                    <div class="result">
+                        <strong>GitHub validateContract():</strong>
+                        ${extractFunction(githubText)}
+                    </div>
+                    <div class="result">
+                        <strong>Your Browser validateContract():</strong>
+                        ${extractFunction(localText)}
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-check on load
+        window.onload = () => {
+            checkCurrentVersion();
+        };
+    </script>
+</body>
+</html>
