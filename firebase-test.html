@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .pending { background: #cce5ff; color: #004085; }
+        pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Firebase Connection Test</h1>
+    
+    <h2>1. Script Loading Status</h2>
+    <div id="script-status" class="status pending">Checking...</div>
+    
+    <h2>2. Firebase SDK Status</h2>
+    <div id="sdk-status" class="status pending">Checking...</div>
+    
+    <h2>3. Firebase Configuration</h2>
+    <div id="config-status" class="status pending">Checking...</div>
+    
+    <h2>4. Service Status</h2>
+    <div id="service-status" class="status pending">Checking...</div>
+    
+    <h2>5. Test Results</h2>
+    <pre id="test-results"></pre>
+
+    <!-- Load Firebase scripts in correct order -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <script>
+        const results = [];
+        
+        // Check script loading
+        function checkScripts() {
+            const scriptStatus = document.getElementById('script-status');
+            if (window.firebase) {
+                scriptStatus.className = 'status success';
+                scriptStatus.textContent = '✓ Firebase scripts loaded';
+                results.push('Scripts: Loaded successfully');
+            } else {
+                scriptStatus.className = 'status error';
+                scriptStatus.textContent = '✗ Firebase scripts failed to load';
+                results.push('Scripts: Failed to load');
+            }
+        }
+        
+        // Check SDK
+        function checkSDK() {
+            const sdkStatus = document.getElementById('sdk-status');
+            const sdkInfo = {
+                firebase: !!window.firebase,
+                app: !!(window.firebase && window.firebase.app),
+                auth: !!(window.firebase && window.firebase.auth),
+                firestore: !!(window.firebase && window.firebase.firestore),
+                storage: !!(window.firebase && window.firebase.storage)
+            };
+            
+            if (Object.values(sdkInfo).every(v => v)) {
+                sdkStatus.className = 'status success';
+                sdkStatus.textContent = '✓ All Firebase SDKs available';
+            } else {
+                sdkStatus.className = 'status error';
+                sdkStatus.textContent = '✗ Some Firebase SDKs missing';
+            }
+            
+            results.push('SDK Status: ' + JSON.stringify(sdkInfo, null, 2));
+        }
+        
+        // Initialize Firebase
+        function initializeFirebase() {
+            const configStatus = document.getElementById('config-status');
+            try {
+                const firebaseConfig = {
+                    apiKey: "AIzaSyCsQzvoYysNkHcxR4NztCdqTVkD_HgtJEU",
+                    authDomain: "xbrush-moviemaker-mvp.firebaseapp.com",
+                    projectId: "xbrush-moviemaker-mvp",
+                    storageBucket: "xbrush-moviemaker-mvp.firebasestorage.app",
+                    messagingSenderId: "138732810619",
+                    appId: "1:138732810619:web:a35c938d2d3b2880db4dde"
+                };
+                
+                firebase.initializeApp(firebaseConfig);
+                
+                configStatus.className = 'status success';
+                configStatus.textContent = '✓ Firebase initialized successfully';
+                results.push('Firebase Init: Success');
+                
+                return true;
+            } catch (error) {
+                configStatus.className = 'status error';
+                configStatus.textContent = '✗ Firebase initialization failed: ' + error.message;
+                results.push('Firebase Init Error: ' + error.message);
+                return false;
+            }
+        }
+        
+        // Test services
+        async function testServices() {
+            const serviceStatus = document.getElementById('service-status');
+            const services = {};
+            
+            try {
+                // Test Firestore
+                const db = firebase.firestore();
+                services.firestore = !!db;
+                
+                // Test Auth
+                const auth = firebase.auth();
+                services.auth = !!auth;
+                
+                // Test Storage
+                const storage = firebase.storage();
+                services.storage = !!storage;
+                
+                // Try a simple Firestore read
+                try {
+                    await db.collection('models').limit(1).get();
+                    services.firestoreRead = true;
+                } catch (error) {
+                    services.firestoreRead = false;
+                    services.firestoreError = error.message;
+                }
+                
+                serviceStatus.className = 'status success';
+                serviceStatus.textContent = '✓ Services tested';
+                results.push('Services: ' + JSON.stringify(services, null, 2));
+                
+            } catch (error) {
+                serviceStatus.className = 'status error';
+                serviceStatus.textContent = '✗ Service test failed: ' + error.message;
+                results.push('Service Error: ' + error.message);
+            }
+        }
+        
+        // Run tests
+        window.addEventListener('load', async () => {
+            checkScripts();
+            checkSDK();
+            
+            if (window.firebase) {
+                if (initializeFirebase()) {
+                    await testServices();
+                }
+            }
+            
+            // Display results
+            document.getElementById('test-results').textContent = results.join('\n\n');
+        });
+    </script>
+</body>
+</html>
