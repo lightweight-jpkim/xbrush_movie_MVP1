@@ -114,6 +114,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <!-- JavaScript Files -->
     <script src="constants.js"></script>
@@ -125,9 +126,19 @@
     <script src="js/model-display.js"></script>
     <script>
         // Initialize model display when page loads
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Wait for Firebase to be ready
+            let retries = 10;
+            while (retries > 0 && (!window.firebaseDB || !window.modelStorageAdapter)) {
+                console.log('Waiting for Firebase initialization...');
+                await new Promise(resolve => setTimeout(resolve, 500));
+                retries--;
+            }
+            
             if (window.modelDisplay) {
                 window.modelDisplay.init('modelsContainer');
+            } else {
+                console.error('Model display not initialized');
             }
         });
         

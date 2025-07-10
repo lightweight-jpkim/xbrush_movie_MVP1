@@ -31,12 +31,19 @@ class ModelDisplay {
     async loadAndDisplayModels() {
         if (!window.modelStorage) {
             console.error('ModelStorage not initialized');
+            this.modelsContainer.innerHTML = '<div class="error-state">저장소가 초기화되지 않았습니다. 페이지를 새로고침해주세요.</div>';
             return;
         }
 
         try {
             // Show loading state
             this.modelsContainer.innerHTML = '<div class="loading-state">모델을 불러오는 중...</div>';
+            
+            // Wait a bit for Firebase to initialize if needed
+            if (!window.firebaseDB) {
+                console.log('Waiting for Firebase initialization...');
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
             
             // Get active models (now async)
             const models = await window.modelStorage.getActiveModels();
@@ -56,7 +63,13 @@ class ModelDisplay {
             this.displayModels(filteredModels);
         } catch (error) {
             console.error('Error loading models:', error);
-            this.modelsContainer.innerHTML = '<div class="error-state">모델을 불러오는 중 오류가 발생했습니다.</div>';
+            console.error('Error details:', error.message);
+            console.error('Firebase status:', window.firebaseDB ? 'initialized' : 'not initialized');
+            this.modelsContainer.innerHTML = `<div class="error-state">
+                모델을 불러오는 중 오류가 발생했습니다.<br>
+                <small>${error.message}</small><br>
+                <button onclick="window.modelDisplay.loadAndDisplayModels()" style="margin-top: 10px;">다시 시도</button>
+            </div>`;
         }
     }
 

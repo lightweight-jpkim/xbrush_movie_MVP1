@@ -6,27 +6,47 @@
 
 class ModelStorageAdapter {
     constructor() {
-        // Initialize with localStorage first
+        // Initialize for Firebase only
         this.useFirebase = false;
-        this.localStorage = window.modelStorage;
         this.firebaseStorage = null;
+        this.initializationPromise = null;
         
-        // Try to initialize Firebase after a delay
-        this.initializeFirebase();
+        // Start Firebase initialization immediately
+        this.initializationPromise = this.initializeFirebase();
         
-        console.log('Model Storage Adapter initialized. Starting with localStorage');
+        console.log('Model Storage Adapter initialized. Connecting to Firebase...');
     }
     
     async initializeFirebase() {
-        // Wait a bit for Firebase to initialize
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Wait for Firebase to initialize with retries
+        let retries = 5;
+        while (retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            if (window.firebaseModelStorage && window.firebaseDB) {
+                this.firebaseStorage = window.firebaseModelStorage;
+                this.useFirebase = true;
+                console.log('Model Storage Adapter: Successfully connected to Firebase');
+                return;
+            }
+            
+            console.log(`Model Storage Adapter: Waiting for Firebase... (${retries} retries left)`);
+            retries--;
+        }
         
-        if (window.firebaseModelStorage && window.firebaseDB) {
-            this.firebaseStorage = window.firebaseModelStorage;
-            this.useFirebase = true;
-            console.log('Model Storage Adapter: Switched to Firebase');
-        } else {
-            console.log('Model Storage Adapter: Firebase not available, continuing with localStorage');
+        console.error('Model Storage Adapter: Firebase failed to initialize after 5 seconds');
+        throw new Error('Firebase initialization failed. Please check your internet connection.');
+    }
+
+    /**
+     * Ensure Firebase is initialized before operations
+     */
+    async ensureInitialized() {
+        if (!this.useFirebase && this.initializationPromise) {
+            await this.initializationPromise;
+        }
+        if (!this.useFirebase) {
+            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
         }
     }
 
@@ -34,9 +54,7 @@ class ModelStorageAdapter {
      * Save a model
      */
     async saveModel(modelData) {
-        if (!this.useFirebase) {
-            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
-        }
+        await this.ensureInitialized();
         
         try {
             return await this.firebaseStorage.saveModel(modelData);
@@ -50,9 +68,7 @@ class ModelStorageAdapter {
      * Get a model by ID
      */
     async getModel(id) {
-        if (!this.useFirebase) {
-            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
-        }
+        await this.ensureInitialized();
         
         try {
             return await this.firebaseStorage.getModel(id);
@@ -66,9 +82,7 @@ class ModelStorageAdapter {
      * Get all models
      */
     async getAllModels() {
-        if (!this.useFirebase) {
-            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
-        }
+        await this.ensureInitialized();
         
         try {
             const firebaseModels = await this.firebaseStorage.getAllModels();
@@ -90,9 +104,7 @@ class ModelStorageAdapter {
      * Get active models
      */
     async getActiveModels() {
-        if (!this.useFirebase) {
-            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
-        }
+        await this.ensureInitialized();
         
         try {
             return await this.firebaseStorage.getActiveModels();
@@ -106,9 +118,7 @@ class ModelStorageAdapter {
      * Get pending models
      */
     async getPendingModels() {
-        if (!this.useFirebase) {
-            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
-        }
+        await this.ensureInitialized();
         
         try {
             return await this.firebaseStorage.getPendingModels();
@@ -122,9 +132,7 @@ class ModelStorageAdapter {
      * Update a model
      */
     async updateModel(id, updates) {
-        if (!this.useFirebase) {
-            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
-        }
+        await this.ensureInitialized();
         
         try {
             return await this.firebaseStorage.updateModel(id, updates);
@@ -138,9 +146,7 @@ class ModelStorageAdapter {
      * Delete a model
      */
     async deleteModel(id) {
-        if (!this.useFirebase) {
-            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
-        }
+        await this.ensureInitialized();
         
         try {
             return await this.firebaseStorage.deleteModel(id);
@@ -154,9 +160,7 @@ class ModelStorageAdapter {
      * Search models
      */
     async searchModels(query) {
-        if (!this.useFirebase) {
-            throw new Error('Firebase not initialized. Please check your internet connection and refresh the page.');
-        }
+        await this.ensureInitialized();
         
         try {
             return await this.firebaseStorage.searchModels(query);
