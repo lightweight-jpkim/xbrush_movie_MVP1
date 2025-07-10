@@ -1085,12 +1085,28 @@
     
     <!-- Load featured models when Firebase is ready -->
     <script>
-        // Wait for Firebase to be ready before loading models
-        window.addEventListener('firebaseReady', function() {
-            console.log('[Main Page] Firebase ready event received, loading featured models...');
-            if (typeof loadFeaturedModels === 'function') {
+        // Function to load models when ready
+        function checkAndLoadModels() {
+            if (window.firebaseDB && window.modelStorageAdapter && typeof loadFeaturedModels === 'function') {
+                console.log('[Main Page] Firebase is ready, loading featured models...');
                 loadFeaturedModels();
+            } else {
+                console.log('[Main Page] Waiting for Firebase or loadFeaturedModels function...');
+                setTimeout(checkAndLoadModels, 500);
             }
+        }
+        
+        // Start checking after DOM is loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkAndLoadModels);
+        } else {
+            checkAndLoadModels();
+        }
+        
+        // Also listen for the firebaseReady event as backup
+        window.addEventListener('firebaseReady', function() {
+            console.log('[Main Page] Firebase ready event received');
+            checkAndLoadModels();
         });
         
         // Secret admin access: Press Ctrl+Shift+A
