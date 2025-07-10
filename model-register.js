@@ -253,6 +253,10 @@ class ModelRegistrationApp {
                     reviewButton.textContent = '검수 신청';
                 }
                 break;
+            case 7:
+                // Update final step with model information
+                this.updateFinalStep();
+                break;
         }
     }
 
@@ -1993,6 +1997,97 @@ class ModelRegistrationApp {
     }
 
     /**
+     * Update final step with model information
+     */
+    updateFinalStep() {
+        // Update model name
+        const modelName = this.registrationData.productInfo?.name || '모델명 없음';
+        const finalModelNameEl = document.getElementById('finalModelName');
+        if (finalModelNameEl) {
+            finalModelNameEl.textContent = modelName;
+        }
+        
+        // Update categories
+        const categories = this.registrationData.productInfo?.categories || [];
+        const categoryNames = categories.map(cat => {
+            const categoryMap = {
+                'fashion': '패션 모델',
+                'beauty': '뷰티 모델',
+                'lifestyle': '라이프스타일 모델',
+                'food': '푸드 모델',
+                'tech': '테크 모델'
+            };
+            return categoryMap[cat] || cat;
+        }).join(', ');
+        
+        const finalCategoriesEl = document.getElementById('finalCategories');
+        if (finalCategoriesEl) {
+            finalCategoriesEl.textContent = categoryNames || '카테고리 없음';
+        }
+        
+        // Update registration date
+        const registrationDateEl = document.getElementById('registrationDate');
+        if (registrationDateEl) {
+            const now = new Date();
+            const dateString = now.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            registrationDateEl.textContent = dateString;
+        }
+    }
+
+    /**
+     * Activate model and add to model list
+     */
+    activateModel() {
+        console.log('Activating model...');
+        
+        // Show loading state
+        const activateBtn = document.querySelector('.activate-model-btn');
+        if (activateBtn) {
+            activateBtn.disabled = true;
+            activateBtn.innerHTML = '<span class="btn-icon">⏳</span><span class="btn-text">활성화 중...</span>';
+        }
+        
+        // Simulate activation process
+        setTimeout(() => {
+            // Store model data (in real app, this would be sent to backend)
+            const modelData = {
+                id: `model-${Date.now()}`,
+                name: this.registrationData.productInfo?.name || '모델명 없음',
+                categories: this.registrationData.productInfo?.categories || [],
+                thumbnail: this.registrationData.thumbnail,
+                status: 'active',
+                registrationDate: new Date().toISOString()
+            };
+            
+            // Save to localStorage (temporary solution)
+            const existingModels = JSON.parse(localStorage.getItem('xbrush_models') || '[]');
+            existingModels.push(modelData);
+            localStorage.setItem('xbrush_models', JSON.stringify(existingModels));
+            
+            // Update button
+            if (activateBtn) {
+                activateBtn.disabled = true;
+                activateBtn.innerHTML = '<span class="btn-icon">✅</span><span class="btn-text">활성화 완료!</span>';
+                activateBtn.style.background = '#48bb78';
+                activateBtn.style.color = 'white';
+            }
+            
+            this.showToast('모델이 성공적으로 활성화되었습니다! 이제 모델 리스트에서 확인할 수 있습니다.', 'success');
+            
+            // Redirect to model list after 2 seconds
+            setTimeout(() => {
+                window.location.href = 'index.html#models';
+            }, 2000);
+        }, 1500);
+    }
+
+    /**
      * Admin skip all KYC steps
      */
     adminSkipKYC() {
@@ -2099,6 +2194,21 @@ function adminApproveRegistration() {
     if (modelApp) {
         modelApp.adminApproveRegistration();
     }
+}
+
+// Activate model function
+function activateModel() {
+    console.log('Activate model triggered');
+    if (modelApp) {
+        modelApp.activateModel();
+    }
+}
+
+// Go to dashboard function
+function goToDashboard() {
+    console.log('Going to dashboard...');
+    // For now, redirect to main page
+    window.location.href = 'index.html';
 }
 
 // Initialize app when DOM is ready
