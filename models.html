@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xBrush 모델 - AI 모델 쇼케이스</title>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="model-showcase.css">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="xBrush AI 모델 쇼케이스 - 다양한 AI 모델을 만나보세요">
+    <meta name="keywords" content="AI 모델, 얼굴 모델, xBrush, AI 광고 모델">
+    <meta name="author" content="xBrush">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="xBrush 모델 쇼케이스">
+    <meta property="og:description" content="다양한 AI 모델을 만나보세요">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <h1 class="logo">xBrush</h1>
+                <span class="logo-subtitle">AI Model Showcase</span>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link">동영상 제작</a>
+                <a href="models.html" class="nav-link active">모델 쇼케이스</a>
+                <a href="model-register.html" class="nav-link btn-primary-small">모델 등록</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">xBrush AI 모델 쇼케이스</h1>
+            <p class="hero-subtitle">당신의 프로젝트에 완벽한 AI 모델을 찾아보세요</p>
+            <div class="hero-actions">
+                <a href="model-register.html" class="btn btn-primary btn-large">
+                    모델로 등록하기
+                </a>
+                <a href="index.html" class="btn btn-outline btn-large">
+                    동영상 제작하기
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Models Section -->
+    <section class="models-section">
+        <div class="container">
+            <div class="models-header">
+                <h2>등록된 모델</h2>
+                <p>다양한 분야의 전문 AI 모델들을 만나보세요</p>
+            </div>
+
+            <!-- Filter and Sort Controls -->
+            <div class="models-controls">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">전체</button>
+                    <button class="filter-btn" data-filter="fashion">패션</button>
+                    <button class="filter-btn" data-filter="beauty">뷰티</button>
+                    <button class="filter-btn" data-filter="lifestyle">라이프스타일</button>
+                    <button class="filter-btn" data-filter="food">푸드</button>
+                    <button class="filter-btn" data-filter="tech">테크</button>
+                </div>
+                <div class="sort-control">
+                    <label for="modelSort">정렬:</label>
+                    <select id="modelSort">
+                        <option value="newest">최신순</option>
+                        <option value="oldest">오래된순</option>
+                        <option value="priceHigh">가격 높은순</option>
+                        <option value="priceLow">가격 낮은순</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Models Container -->
+            <div id="modelsContainer">
+                <!-- Model cards will be dynamically loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 xBrush. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">이용약관</a>
+                <a href="#">개인정보처리방침</a>
+                <a href="#">문의하기</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="constants.js"></script>
+    <script src="utils.js"></script>
+    <script src="js/model-storage.js"></script>
+    <script src="js/model-display.js"></script>
+    <script>
+        // Initialize model display when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.modelDisplay) {
+                window.modelDisplay.init('modelsContainer');
+            }
+        });
+    </script>
+</body>
+</html>

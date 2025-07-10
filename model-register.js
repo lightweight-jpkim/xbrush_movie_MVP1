@@ -2046,6 +2046,7 @@ class ModelRegistrationApp {
      */
     activateModel() {
         console.log('Activating model...');
+        console.log('Registration data:', this.registrationData);
         
         // Show loading state
         const activateBtn = document.querySelector('.activate-model-btn');
@@ -2056,20 +2057,67 @@ class ModelRegistrationApp {
         
         // Simulate activation process
         setTimeout(() => {
-            // Store model data (in real app, this would be sent to backend)
+            // Prepare complete model data
             const modelData = {
-                id: `model-${Date.now()}`,
-                name: this.registrationData.productInfo?.name || '모델명 없음',
-                categories: this.registrationData.productInfo?.categories || [],
-                thumbnail: this.registrationData.thumbnail,
+                // Basic info
+                id: `model-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                registrationDate: new Date().toISOString(),
                 status: 'active',
-                registrationDate: new Date().toISOString()
+                
+                // Personal info from Step 5
+                personalInfo: {
+                    name: this.registrationData.productInfo?.name || '모델명 없음',
+                    intro: this.registrationData.productInfo?.intro || '',
+                    description: this.registrationData.productInfo?.description || '',
+                    categories: this.registrationData.productInfo?.categories || []
+                },
+                
+                // Portfolio from Step 4
+                portfolio: {
+                    thumbnailUrl: this.registrationData.productInfo?.thumbnailUrl || '',
+                    thumbnailId: this.registrationData.productInfo?.thumbnailId || '',
+                    images: this.uploadedImages || []
+                },
+                
+                // Contract info from Step 3
+                contract: {
+                    pricingType: this.registrationData.contractInfo?.pricingType || 'perProject',
+                    basePrice: this.registrationData.contractInfo?.basePrice || 0,
+                    hourlyRate: this.registrationData.contractInfo?.hourlyRate || 0,
+                    usageRights: this.registrationData.contractInfo?.usageRights || [],
+                    contractPeriod: this.registrationData.contractInfo?.contractPeriod || 12,
+                    signature: this.registrationData.contractInfo?.signature || ''
+                },
+                
+                // KYC info from Step 2
+                kyc: {
+                    verified: true,
+                    verificationDate: new Date().toISOString(),
+                    idImage: this.registrationData.kycInfo?.idImage || '',
+                    faceImage: this.registrationData.kycInfo?.faceImage || '',
+                    videoVerified: this.registrationData.kycInfo?.videoCompleted || false
+                }
             };
             
-            // Save to localStorage (temporary solution)
-            const existingModels = JSON.parse(localStorage.getItem('xbrush_models') || '[]');
-            existingModels.push(modelData);
-            localStorage.setItem('xbrush_models', JSON.stringify(existingModels));
+            // Save using ModelStorage
+            try {
+                if (window.modelStorage) {
+                    const modelId = window.modelStorage.saveModel(modelData);
+                    console.log('Model saved with ID:', modelId);
+                    
+                    // Show success
+                    this.showToast('모델 등록이 완료되었습니다!', 'success');
+                } else {
+                    // Fallback to direct localStorage if ModelStorage not loaded
+                    const existingModels = JSON.parse(localStorage.getItem('xbrush_registered_models') || '[]');
+                    existingModels.push(modelData);
+                    localStorage.setItem('xbrush_registered_models', JSON.stringify(existingModels));
+                    console.log('Model saved using fallback method');
+                }
+            } catch (error) {
+                console.error('Error saving model:', error);
+                this.showToast('모델 저장 중 오류가 발생했습니다.', 'error');
+            }
             
             // Update button
             if (activateBtn) {
