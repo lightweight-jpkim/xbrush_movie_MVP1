@@ -830,7 +830,8 @@ class ModelRegistrationApp {
      * Set up portfolio upload
      */
     setupPortfolioUpload() {
-        this.uploadedImages = [];
+        // Don't reset uploadedImages here as it may be called when navigating between steps
+        console.log(`setupPortfolioUpload called. Current images: ${this.uploadedImages.length}`);
     }
 
     /**
@@ -862,7 +863,7 @@ class ModelRegistrationApp {
                 
                 // Create image object
                 const imageData = {
-                    id: Date.now() + Math.random(),
+                    id: `portfolio-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                     file: file,
                     name: file.name,
                     size: file.size,
@@ -871,6 +872,7 @@ class ModelRegistrationApp {
                 };
                 
                 this.uploadedImages.push(imageData);
+                console.log(`Portfolio image uploaded: ID=${imageData.id}, Total images: ${this.uploadedImages.length}`);
                 this.addImageToGallery(imageData);
                 
                 // Update progress

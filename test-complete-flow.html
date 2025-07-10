@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Flow Test - Portfolio Upload & Thumbnail Selection</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="model-register.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .uploaded-images-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .preview-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+        }
+        #testLog {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .status-indicator {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .debug-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            max-width: 300px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Complete Flow Test</h1>
+        
+        <!-- Step 1: Test Image Upload -->
+        <div class="test-section">
+            <h2>Step 1: Test Portfolio Upload 
+                <span id="uploadStatus" class="status-indicator"></span>
+            </h2>
+            
+            <div class="upload-section">
+                <label>Select test images:</label>
+                <input type="file" id="testFileInput" multiple accept="image/*" />
+                <button class="btn btn-primary" onclick="handleTestUpload()">Upload Selected Images</button>
+                <button class="btn btn-outline" onclick="createTestImages()">Create Test Images</button>
+            </div>
+            
+            <div class="uploaded-images-preview" id="uploadedPreview"></div>
+        </div>
+
+        <!-- Step 2: Test Thumbnail Selection -->
+        <div class="test-section">
+            <h2>Step 2: Test Thumbnail Selection
+                <span id="selectionStatus" class="status-indicator"></span>
+            </h2>
+            
+            <button class="btn btn-primary" onclick="testOpenThumbnailSelector()">
+                Open Thumbnail Selector
+            </button>
+            
+            <div style="margin-top: 20px;">
+                <h3>Selected Thumbnail:</h3>
+                <div id="selectedThumbnailPreview" style="width: 200px; height: 200px; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: #999;">No thumbnail selected</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Log -->
+        <div class="test-section">
+            <h2>Test Log</h2>
+            <button class="btn btn-outline" onclick="clearLog()">Clear Log</button>
+            <button class="btn btn-outline" onclick="runDiagnostics()">Run Diagnostics</button>
+            <div id="testLog"></div>
+        </div>
+    </div>
+
+    <!-- Debug Panel -->
+    <div class="debug-panel">
+        <h4>Debug Info</h4>
+        <div id="debugInfo">
+            <p>Images uploaded: <span id="imageCount">0</span></p>
+            <p>App initialized: <span id="appStatus">No</span></p>
+            <p>Selected thumbnail: <span id="selectedId">None</span></p>
+        </div>
+    </div>
+
+    <!-- Include the actual modal from model-register.html -->
+    <div class="thumbnail-modal" id="thumbnailModal" style="display: none;">
+        <div class="thumbnail-modal-content">
+            <div class="thumbnail-modal-header">
+                <h3>포트폴리오에서 썸네일 선택</h3>
+                <button class="btn btn-outline" onclick="closeThumbnailSelector()">×</button>
+            </div>
+            <div class="thumbnail-modal-body">
+                <p class="section-description">등록하신 포트폴리오 이미지 중에서 대표 썸네일로 사용할 이미지를 선택해주세요.</p>
+                <div class="portfolio-thumbnail-grid" id="portfolioThumbnailGrid">
+                    <!-- Portfolio images will be loaded here -->
+                </div>
+            </div>
+            <div class="thumbnail-modal-footer">
+                <button class="btn btn-outline" onclick="closeThumbnailSelector()">취소</button>
+                <button class="btn btn-primary" onclick="confirmThumbnailSelection()" disabled id="confirmThumbnailBtn">선택 완료</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="constants.js"></script>
+    <script src="model-register.js"></script>
+    <script>
+        let testUploadedImages = [];
+        
+        function log(message, type = 'info') {
+            const logEl = document.getElementById('testLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+            logEl.textContent += `${timestamp} ${prefix} ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(`[${type}] ${message}`);
+        }
+
+        function clearLog() {
+            document.getElementById('testLog').textContent = '';
+        }
+
+        function updateDebugInfo() {
+            document.getElementById('imageCount').textContent = testUploadedImages.length;
+            document.getElementById('appStatus').textContent = window.modelApp ? 'Yes' : 'No';
+            document.getElementById('selectedId').textContent = window.modelApp?.selectedThumbnailId || 'None';
+        }
+
+        // Handle file upload
+        async function handleTestUpload() {
+            const input = document.getElementById('testFileInput');
+            const files = input.files;
+            
+            if (files.length === 0) {
+                log('No files selected', 'error');
+                return;
+            }
+            
+            log(`Processing ${files.length} files...`);
+            testUploadedImages = [];
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                
+                await new Promise((resolve) => {
+                    reader.onload = (e) => {
+                        const imageData = {
+                            id: `uploaded-${Date.now()}-${i}`,
+                            url: e.target.result,
+                            file: file,
+                            name: file.name
+                        };
+                        testUploadedImages.push(imageData);
+                        log(`Uploaded: ${file.name}`, 'success');
+                        resolve();
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+            
+            displayUploadedImages();
+            initializeModelApp();
+            updateUploadStatus(true);
+        }
+
+        // Create test images programmatically
+        function createTestImages() {
+            log('Creating test images...');
+            testUploadedImages = [];
+            
+            const colors = ['FF6B6B', '4ECDC4', '45B7D1', 'F7DC6F', 'BB8FCE'];
+            
+            for (let i = 0; i < 5; i++) {
+                testUploadedImages.push({
+                    id: `test-image-${i + 1}`,
+                    url: `https://via.placeholder.com/300x300/${colors[i]}/FFFFFF?text=Test+${i + 1}`,
+                    file: new File([''], `test${i + 1}.jpg`, { type: 'image/jpeg' }),
+                    name: `test${i + 1}.jpg`
+                });
+            }
+            
+            log(`Created ${testUploadedImages.length} test images`, 'success');
+            displayUploadedImages();
+            initializeModelApp();
+            updateUploadStatus(true);
+        }
+
+        // Display uploaded images
+        function displayUploadedImages() {
+            const preview = document.getElementById('uploadedPreview');
+            preview.innerHTML = '';
+            
+            testUploadedImages.forEach(image => {
+                const img = document.createElement('img');
+                img.src = image.url;
+                img.className = 'preview-image';
+                img.alt = image.name;
+                preview.appendChild(img);
+            });
+            
+            updateDebugInfo();
+        }
+
+        // Initialize ModelRegistrationApp
+        function initializeModelApp() {
+            try {
+                if (!window.ModelRegistrationApp) {
+                    log('ModelRegistrationApp not found!', 'error');
+                    return;
+                }
+                
+                // Create new instance
+                window.modelApp = new ModelRegistrationApp();
+                window.modelApp.uploadedImages = testUploadedImages;
+                
+                log('ModelRegistrationApp initialized', 'success');
+                updateDebugInfo();
+            } catch (error) {
+                log(`Error initializing app: ${error.message}`, 'error');
+            }
+        }
+
+        // Test opening thumbnail selector
+        function testOpenThumbnailSelector() {
+            if (!window.modelApp) {
+                log('App not initialized. Please upload images first.', 'error');
+                return;
+            }
+            
+            if (testUploadedImages.length === 0) {
+                log('No images uploaded. Please upload images first.', 'error');
+                return;
+            }
+            
+            log('Opening thumbnail selector...');
+            
+            // Override selectPortfolioThumbnail to log calls
+            const originalSelect = window.modelApp.selectPortfolioThumbnail;
+            window.modelApp.selectPortfolioThumbnail = function(imageId) {
+                log(`selectPortfolioThumbnail called with ID: ${imageId}`, 'success');
+                originalSelect.call(this, imageId);
+                updateDebugInfo();
+            };
+            
+            // Override confirmThumbnailSelection to update preview
+            const originalConfirm = window.modelApp.confirmThumbnailSelection;
+            window.modelApp.confirmThumbnailSelection = function() {
+                log('confirmThumbnailSelection called', 'success');
+                originalConfirm.call(this);
+                
+                // Update preview
+                const selected = testUploadedImages.find(img => img.id === this.selectedThumbnailId);
+                if (selected) {
+                    const preview = document.getElementById('selectedThumbnailPreview');
+                    preview.innerHTML = `<img src="${selected.url}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                    updateSelectionStatus(true);
+                }
+            };
+            
+            window.modelApp.openThumbnailSelector();
+        }
+
+        // Update status indicators
+        function updateUploadStatus(success) {
+            const status = document.getElementById('uploadStatus');
+            status.className = `status-indicator ${success ? 'status-success' : 'status-error'}`;
+            status.textContent = success ? '✓ Uploaded' : '✗ Failed';
+        }
+
+        function updateSelectionStatus(success) {
+            const status = document.getElementById('selectionStatus');
+            status.className = `status-indicator ${success ? 'status-success' : 'status-error'}`;
+            status.textContent = success ? '✓ Selected' : '✗ Not Selected';
+        }
+
+        // Run diagnostics
+        function runDiagnostics() {
+            log('\n=== Running Diagnostics ===');
+            
+            // Check app
+            log(`ModelApp exists: ${!!window.modelApp}`);
+            log(`Uploaded images: ${testUploadedImages.length}`);
+            
+            // Check modal
+            const modal = document.getElementById('thumbnailModal');
+            log(`Modal exists: ${!!modal}`);
+            log(`Modal display: ${modal?.style.display}`);
+            
+            // Check grid
+            const grid = document.getElementById('portfolioThumbnailGrid');
+            log(`Grid exists: ${!!grid}`);
+            
+            // Check thumbnail items
+            const items = document.querySelectorAll('.portfolio-thumbnail-item');
+            log(`Thumbnail items: ${items.length}`);
+            
+            // Check each item
+            items.forEach((item, i) => {
+                const imageId = item.getAttribute('data-image-id');
+                const rect = item.getBoundingClientRect();
+                log(`Item ${i + 1}: ID=${imageId}, visible=${rect.width > 0 && rect.height > 0}`);
+            });
+            
+            // Test click simulation
+            if (items.length > 0) {
+                log('\nSimulating click on first item...');
+                items[0].click();
+            }
+            
+            updateDebugInfo();
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            log('Page loaded and ready');
+            updateDebugInfo();
+            
+            // Override console methods to capture all logs
+            const originalConsoleLog = console.log;
+            console.log = function(...args) {
+                originalConsoleLog.apply(console, args);
+                const message = args.join(' ');
+                if (message.includes('selectPortfolioThumbnail') || 
+                    message.includes('thumbnail') || 
+                    message.includes('click')) {
+                    log(`[Console] ${message}`);
+                }
+            };
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thumbnail Selection Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="model-register.css">
+    <style>
+        body {
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .test-button {
+            margin: 5px;
+        }
+        #testResults {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Thumbnail Selection Debug Test</h1>
+        
+        <div class="test-section">
+            <h2>Step 1: Simulate Portfolio Upload</h2>
+            <button class="btn btn-primary test-button" onclick="simulatePortfolioUpload()">
+                Simulate Upload of 5 Images
+            </button>
+            <div id="uploadStatus"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Step 2: Open Thumbnail Selector</h2>
+            <button class="btn btn-primary test-button" onclick="openThumbnailSelector()">
+                Open Thumbnail Selector
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h2>Step 3: Debug Information</h2>
+            <button class="btn btn-outline test-button" onclick="runDebugTests()">
+                Run Debug Tests
+            </button>
+            <button class="btn btn-outline test-button" onclick="testClickSimulation()">
+                Test Click Simulation
+            </button>
+            <button class="btn btn-outline test-button" onclick="checkEventListeners()">
+                Check Event Listeners
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h2>Test Results</h2>
+            <div id="testResults">Test results will appear here...</div>
+        </div>
+    </div>
+
+    <!-- Thumbnail Selection Modal (copied from model-register.html) -->
+    <div class="thumbnail-modal" id="thumbnailModal" style="display: none;">
+        <div class="thumbnail-modal-content">
+            <div class="thumbnail-modal-header">
+                <h3>포트폴리오에서 썸네일 선택</h3>
+                <button class="btn-close" onclick="closeThumbnailSelector()">×</button>
+            </div>
+            <div class="thumbnail-modal-body">
+                <p class="section-description">등록하신 포트폴리오 이미지 중에서 대표 썸네일로 사용할 이미지를 선택해주세요.</p>
+                <div class="portfolio-thumbnail-grid" id="portfolioThumbnailGrid">
+                    <!-- Thumbnails will be loaded here -->
+                </div>
+            </div>
+            <div class="thumbnail-modal-footer">
+                <button class="btn btn-outline" onclick="closeThumbnailSelector()">취소</button>
+                <button class="btn btn-primary" id="confirmThumbnailBtn" onclick="confirmThumbnailSelection()" disabled>선택 완료</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test variables
+        let testImages = [];
+        let testApp = null;
+        
+        function log(message) {
+            const results = document.getElementById('testResults');
+            results.textContent += `${new Date().toLocaleTimeString()}: ${message}\n`;
+            console.log(message);
+        }
+
+        function simulatePortfolioUpload() {
+            log('Simulating portfolio upload...');
+            
+            // Create fake image data
+            testImages = [];
+            for (let i = 1; i <= 5; i++) {
+                testImages.push({
+                    id: `test-image-${i}`,
+                    url: `https://via.placeholder.com/200x200?text=Image${i}`,
+                    file: new File([''], `test${i}.jpg`, { type: 'image/jpeg' })
+                });
+            }
+            
+            // Initialize a minimal version of ModelRegistrationApp for testing
+            if (!window.ModelRegistrationApp) {
+                log('ERROR: ModelRegistrationApp not found. Loading model-register.js...');
+                const script = document.createElement('script');
+                script.src = 'model-register.js';
+                script.onload = () => {
+                    log('model-register.js loaded successfully');
+                    initializeTestApp();
+                };
+                script.onerror = () => {
+                    log('ERROR: Failed to load model-register.js');
+                };
+                document.head.appendChild(script);
+            } else {
+                initializeTestApp();
+            }
+        }
+
+        function initializeTestApp() {
+            try {
+                testApp = new ModelRegistrationApp();
+                testApp.uploadedImages = testImages;
+                window.modelApp = testApp;
+                log(`Initialized test app with ${testImages.length} images`);
+                document.getElementById('uploadStatus').textContent = '✅ 5 images uploaded';
+            } catch (error) {
+                log(`ERROR initializing app: ${error.message}`);
+            }
+        }
+
+        function runDebugTests() {
+            log('\n=== Running Debug Tests ===');
+            
+            // Check if modal exists
+            const modal = document.getElementById('thumbnailModal');
+            log(`Modal element exists: ${!!modal}`);
+            
+            // Check if grid exists
+            const grid = document.getElementById('portfolioThumbnailGrid');
+            log(`Grid element exists: ${!!grid}`);
+            
+            // Check thumbnail items
+            const items = document.querySelectorAll('.portfolio-thumbnail-item');
+            log(`Thumbnail items found: ${items.length}`);
+            
+            // Check each item
+            items.forEach((item, index) => {
+                const imageId = item.getAttribute('data-image-id');
+                const styles = window.getComputedStyle(item);
+                log(`\nThumbnail ${index + 1}:`);
+                log(`  - ID: ${imageId}`);
+                log(`  - Cursor: ${styles.cursor}`);
+                log(`  - Pointer Events: ${styles.pointerEvents}`);
+                log(`  - Z-Index: ${styles.zIndex}`);
+                log(`  - Position: ${styles.position}`);
+                
+                // Check if it has click handlers
+                const hasOnclick = !!item.onclick;
+                log(`  - Has onclick: ${hasOnclick}`);
+            });
+            
+            // Check if modelApp exists
+            log(`\nModelApp exists: ${!!window.modelApp}`);
+            log(`Test app exists: ${!!testApp}`);
+        }
+
+        function testClickSimulation() {
+            log('\n=== Testing Click Simulation ===');
+            
+            const firstItem = document.querySelector('.portfolio-thumbnail-item');
+            if (firstItem) {
+                const imageId = firstItem.getAttribute('data-image-id');
+                log(`Simulating click on first thumbnail (ID: ${imageId})`);
+                
+                // Try different click methods
+                
+                // Method 1: Direct click
+                log('Method 1: Direct click()');
+                firstItem.click();
+                
+                // Method 2: Dispatch MouseEvent
+                setTimeout(() => {
+                    log('Method 2: Dispatch MouseEvent');
+                    const clickEvent = new MouseEvent('click', {
+                        bubbles: true,
+                        cancelable: true,
+                        view: window
+                    });
+                    firstItem.dispatchEvent(clickEvent);
+                }, 500);
+                
+                // Method 3: Direct function call
+                setTimeout(() => {
+                    if (window.modelApp) {
+                        log('Method 3: Direct selectPortfolioThumbnail call');
+                        window.modelApp.selectPortfolioThumbnail(imageId);
+                    }
+                }, 1000);
+            } else {
+                log('ERROR: No thumbnail items found to test');
+            }
+        }
+
+        function checkEventListeners() {
+            log('\n=== Checking Event Listeners ===');
+            
+            const grid = document.getElementById('portfolioThumbnailGrid');
+            if (grid) {
+                // Check if grid has stored handlers
+                log(`Grid has _thumbnailClickHandler: ${!!grid._thumbnailClickHandler}`);
+                log(`Grid has _thumbnailTouchHandler: ${!!grid._thumbnailTouchHandler}`);
+                
+                // Try to get event listeners (this doesn't work in all browsers)
+                if (window.getEventListeners) {
+                    const listeners = getEventListeners(grid);
+                    log(`Grid event listeners: ${JSON.stringify(Object.keys(listeners))}`);
+                } else {
+                    log('getEventListeners not available in this browser');
+                }
+            }
+            
+            // Check modal
+            const modal = document.getElementById('thumbnailModal');
+            if (modal && modal._diagnosticHandler) {
+                log('Modal has diagnostic handler attached');
+            }
+        }
+
+        // Override console.log to also display in test results
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            log(`[Console] ${message}`);
+        };
+    </script>
+    
+    <!-- Load the model registration script -->
+    <script src="constants.js"></script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Click Test</title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 150px);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .test-item {
+            width: 150px;
+            height: 150px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .test-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        .test-item.selected {
+            border-color: #667eea;
+            border-width: 3px;
+            background: #e0e7ff;
+        }
+        .test-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+        }
+        .indicator {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .test-item.selected .indicator {
+            opacity: 1;
+        }
+        #log {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal.show {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Click Test</h1>
+    
+    <button onclick="createItems()">Create Test Items</button>
+    <button onclick="testInModal()">Test in Modal</button>
+    <button onclick="clearLog()">Clear Log</button>
+    
+    <h2>Direct Test (No Modal)</h2>
+    <div class="test-grid" id="directGrid"></div>
+    
+    <h2>Modal Test</h2>
+    <div class="modal" id="testModal">
+        <div class="modal-content">
+            <h3>Modal Test Grid</h3>
+            <div class="test-grid" id="modalGrid"></div>
+            <button onclick="closeModal()">Close</button>
+        </div>
+    </div>
+    
+    <h2>Log</h2>
+    <div id="log"></div>
+
+    <script>
+        let selectedId = null;
+
+        function log(message) {
+            const logEl = document.getElementById('log');
+            logEl.textContent += `${new Date().toLocaleTimeString()}: ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(message);
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+        }
+
+        function createItems() {
+            log('Creating test items...');
+            
+            // Create items in direct grid
+            const directGrid = document.getElementById('directGrid');
+            directGrid.innerHTML = '';
+            
+            for (let i = 1; i <= 3; i++) {
+                const item = createTestItem(`direct-${i}`, `Direct ${i}`);
+                directGrid.appendChild(item);
+            }
+            
+            // Add event delegation to direct grid
+            directGrid.onclick = handleGridClick;
+            
+            log('Created 3 items in direct grid');
+        }
+
+        function createTestItem(id, label) {
+            const item = document.createElement('div');
+            item.className = 'test-item';
+            item.setAttribute('data-id', id);
+            item.innerHTML = `
+                <span>${label}</span>
+                <div class="indicator">✓</div>
+            `;
+            
+            // Test 1: Direct onclick
+            item.onclick = function(e) {
+                log(`Direct onclick fired for ${id}`);
+                e.stopPropagation();
+                selectItem(id);
+            };
+            
+            // Test 2: addEventListener
+            item.addEventListener('click', function(e) {
+                log(`addEventListener fired for ${id}`);
+            }, false);
+            
+            return item;
+        }
+
+        function handleGridClick(e) {
+            const item = e.target.closest('.test-item');
+            if (item) {
+                const id = item.getAttribute('data-id');
+                log(`Grid delegation fired for ${id}`);
+                selectItem(id);
+            }
+        }
+
+        function selectItem(id) {
+            log(`Selecting item: ${id}`);
+            
+            // Remove previous selection
+            document.querySelectorAll('.test-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Add new selection
+            const selected = document.querySelector(`[data-id="${id}"]`);
+            if (selected) {
+                selected.classList.add('selected');
+                selectedId = id;
+                log(`Item ${id} selected successfully`);
+            }
+        }
+
+        function testInModal() {
+            log('Opening modal test...');
+            
+            const modal = document.getElementById('testModal');
+            const modalGrid = document.getElementById('modalGrid');
+            modalGrid.innerHTML = '';
+            
+            // Create items in modal
+            for (let i = 1; i <= 3; i++) {
+                const item = createTestItem(`modal-${i}`, `Modal ${i}`);
+                modalGrid.appendChild(item);
+            }
+            
+            // Add event delegation to modal grid
+            modalGrid.onclick = handleGridClick;
+            
+            // Show modal
+            modal.classList.add('show');
+            
+            // Test click interception
+            modal.onclick = function(e) {
+                log(`Modal background clicked, target: ${e.target.className}`);
+            };
+            
+            modalGrid.parentElement.onclick = function(e) {
+                log(`Modal content clicked, target: ${e.target.className}`);
+                e.stopPropagation();
+            };
+            
+            log('Modal opened with 3 items');
+        }
+
+        function closeModal() {
+            document.getElementById('testModal').classList.remove('show');
+            log('Modal closed');
+        }
+
+        // Test CSS pointer-events
+        function testPointerEvents() {
+            const items = document.querySelectorAll('.test-item');
+            items.forEach((item, i) => {
+                const styles = window.getComputedStyle(item);
+                log(`Item ${i + 1} pointer-events: ${styles.pointerEvents}`);
+            });
+        }
+
+        // Initialize
+        window.onload = function() {
+            log('Page loaded, ready for testing');
+            createItems();
+        };
+    </script>
+</body>
+</html>
