@@ -96,7 +96,8 @@ class ModelDisplay {
         const name = personalInfo.name || '이름 없음';
         const intro = personalInfo.intro || '소개글이 없습니다';
         const categories = personalInfo.categories || [];
-        const thumbnail = portfolio.thumbnailUrl || 'images/default-avatar.png';
+        // Use actual thumbnail or fallback to a nice default
+        const thumbnail = portfolio.thumbnailUrl || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop';
         const price = contract.basePrice || 0;
 
         // Format categories

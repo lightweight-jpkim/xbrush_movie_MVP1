@@ -860,18 +860,28 @@ class ModelRegistrationApp {
                 // Validate image
                 await this.validateImageFile(file);
                 
+                // Compress image for storage
+                let compressedImage;
+                if (window.ImageUtils) {
+                    compressedImage = await window.ImageUtils.createPortfolioImage(file);
+                } else {
+                    // Fallback: read as base64 without compression
+                    compressedImage = await this.readFileAsBase64(file);
+                }
+                
                 // Create image object
                 const imageData = {
                     id: `portfolio-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                    file: file,
                     name: file.name,
-                    size: file.size,
-                    url: URL.createObjectURL(file),
+                    size: compressedImage.size || file.size,
+                    url: compressedImage.base64,
+                    width: compressedImage.width,
+                    height: compressedImage.height,
                     selected: false
                 };
                 
                 this.uploadedImages.push(imageData);
-                console.log(`Portfolio image uploaded: ID=${imageData.id}, Total images: ${this.uploadedImages.length}`);
+                console.log(`Portfolio image uploaded: ID=${imageData.id}, Size: ${window.ImageUtils ? window.ImageUtils.formatFileSize(imageData.size) : imageData.size}`);
                 this.addImageToGallery(imageData);
                 
                 // Update progress
@@ -887,6 +897,23 @@ class ModelRegistrationApp {
         this.showUploadProgress(false);
         this.updateImageCount();
         this.checkPortfolioCompletion();
+    }
+
+    /**
+     * Read file as base64 (fallback method)
+     */
+    readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                resolve({
+                    base64: e.target.result,
+                    size: file.size
+                });
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
     }
 
     /**
@@ -1427,14 +1454,15 @@ class ModelRegistrationApp {
             this.registrationData.thumbnail = {
                 id: selectedImage.id,
                 url: selectedImage.url,
-                file: selectedImage.file
+                name: selectedImage.name
             };
             
             console.log('Thumbnail data stored:', this.registrationData.thumbnail);
             
             // Store the data in registrationData for persistence
             this.registrationData.productInfo = this.registrationData.productInfo || {};
-            this.registrationData.productInfo.thumbnail = this.registrationData.thumbnail;
+            this.registrationData.productInfo.thumbnailId = selectedImage.id;
+            this.registrationData.productInfo.thumbnailUrl = selectedImage.url;
             
             this.checkProductRegistrationCompletion();
         }
