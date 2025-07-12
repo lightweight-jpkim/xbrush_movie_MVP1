@@ -414,13 +414,15 @@
 
     <!-- Edit Modal -->
     <div id="editModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header">
                 <h3>모델 정보 수정</h3>
             </div>
             <form id="editForm">
                 <input type="hidden" id="editModelId">
                 
+                <!-- Basic Info -->
+                <h4 style="margin-top: 20px; margin-bottom: 15px;">기본 정보</h4>
                 <div class="form-group">
                     <label for="editName">모델명</label>
                     <input type="text" id="editName" required>
@@ -433,12 +435,7 @@
                 
                 <div class="form-group">
                     <label for="editDescription">상세 설명</label>
-                    <textarea id="editDescription"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="editPrice">기본 가격</label>
-                    <input type="number" id="editPrice" min="0" step="10000">
+                    <textarea id="editDescription" rows="4"></textarea>
                 </div>
                 
                 <div class="form-group">
@@ -447,6 +444,106 @@
                         <option value="active">활성</option>
                         <option value="inactive">비활성</option>
                         <option value="pending">대기중</option>
+                    </select>
+                </div>
+                
+                <!-- Professional Profile -->
+                <h4 style="margin-top: 30px; margin-bottom: 15px;">전문 프로필</h4>
+                <div class="form-group">
+                    <label for="editTagline">프로 태그라인</label>
+                    <input type="text" id="editTagline" placeholder="예: 전문 패션 모델 | 10년 경력" maxlength="50">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editExperience">경력</label>
+                    <select id="editExperience">
+                        <option value="">선택하세요</option>
+                        <option value="0-1년">0-1년</option>
+                        <option value="1-3년">1-3년</option>
+                        <option value="3-5년">3-5년</option>
+                        <option value="5-10년">5-10년</option>
+                        <option value="10년+">10년 이상</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editLocation">활동 지역</label>
+                    <input type="text" id="editLocation" placeholder="예: 서울, 대한민국">
+                </div>
+                
+                <!-- Pricing Packages -->
+                <h4 style="margin-top: 30px; margin-bottom: 15px;">가격 패키지</h4>
+                
+                <!-- Basic Package -->
+                <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h5 style="margin-top: 0;">Basic 패키지</h5>
+                    <div class="form-group">
+                        <label for="editBasicPrice">가격 (원)</label>
+                        <input type="number" id="editBasicPrice" min="0" step="10000">
+                    </div>
+                    <div class="form-group">
+                        <label for="editBasicDescription">설명</label>
+                        <input type="text" id="editBasicDescription" placeholder="기본 촬영 패키지">
+                    </div>
+                    <div class="form-group">
+                        <label for="editBasicDelivery">완료 기간 (일)</label>
+                        <input type="number" id="editBasicDelivery" min="1" max="30" value="3">
+                    </div>
+                </div>
+                
+                <!-- Standard Package -->
+                <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h5 style="margin-top: 0;">Standard 패키지</h5>
+                    <div class="form-group">
+                        <label for="editStandardPrice">가격 (원)</label>
+                        <input type="number" id="editStandardPrice" min="0" step="10000">
+                    </div>
+                    <div class="form-group">
+                        <label for="editStandardDescription">설명</label>
+                        <input type="text" id="editStandardDescription" placeholder="표준 촬영 패키지">
+                    </div>
+                    <div class="form-group">
+                        <label for="editStandardDelivery">완료 기간 (일)</label>
+                        <input type="number" id="editStandardDelivery" min="1" max="30" value="5">
+                    </div>
+                </div>
+                
+                <!-- Premium Package -->
+                <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h5 style="margin-top: 0;">Premium 패키지</h5>
+                    <div class="form-group">
+                        <label for="editPremiumPrice">가격 (원)</label>
+                        <input type="number" id="editPremiumPrice" min="0" step="10000">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPremiumDescription">설명</label>
+                        <input type="text" id="editPremiumDescription" placeholder="프리미엄 촬영 패키지">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPremiumDelivery">완료 기간 (일)</label>
+                        <input type="number" id="editPremiumDelivery" min="1" max="30" value="7">
+                    </div>
+                </div>
+                
+                <!-- Availability Settings -->
+                <h4 style="margin-top: 30px; margin-bottom: 15px;">예약 가능 설정</h4>
+                <div class="form-group">
+                    <label for="editAvailabilityStatus">예약 가능 상태</label>
+                    <select id="editAvailabilityStatus">
+                        <option value="available">예약 가능</option>
+                        <option value="busy">바쁨</option>
+                        <option value="offline">오프라인</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editResponseTime">평균 응답 시간 (시간)</label>
+                    <select id="editResponseTime">
+                        <option value="1">1시간 이내</option>
+                        <option value="2">2시간 이내</option>
+                        <option value="4">4시간 이내</option>
+                        <option value="8">8시간 이내</option>
+                        <option value="24">24시간 이내</option>
                     </select>
                 </div>
                 
@@ -468,6 +565,7 @@
     <script src="js/firebase-model-storage.js"></script>
     <script src="js/model-storage.js"></script>
     <script src="js/model-storage-adapter.js"></script>
+    <script src="js/model-migration.js"></script>
     <script>
         let allModels = [];
         let filteredModels = [];
@@ -481,7 +579,12 @@
         // Load all models
         async function loadModels() {
             try {
-                allModels = await window.modelStorage.getAllModels();
+                // Use Firebase adapter if available
+                if (window.modelStorageAdapter) {
+                    allModels = await window.modelStorageAdapter.getAllModels();
+                } else {
+                    allModels = await window.modelStorage.getAllModels();
+                }
                 filteredModels = [...allModels];
                 displayModels(filteredModels);
             } catch (error) {
@@ -527,7 +630,9 @@
                     'pending': '대기중'
                 }[model.status] || '대기중';
                 
-                const price = new Intl.NumberFormat('ko-KR').format(contract.basePrice || 0);
+                // Get standard package price or fallback to contract price
+                const standardPackage = model.pricing?.packages?.find(p => p.id === 'standard');
+                const price = new Intl.NumberFormat('ko-KR').format(standardPackage?.price || contract.basePrice || 0);
                 const registrationDate = new Date(model.registrationDate).toLocaleDateString('ko-KR');
                 
                 return `
@@ -607,7 +712,8 @@
             
             if (confirm(`정말로 "${modelName}"을(를) 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
                 try {
-                    if (await window.modelStorage.deleteModel(modelId)) {
+                    const adapter = window.modelStorageAdapter || window.modelStorage;
+                    if (await adapter.deleteModel(modelId)) {
                         showToast('모델이 삭제되었습니다.', 'success');
                         loadModels();
                         updateStats();
@@ -629,7 +735,8 @@
             const newStatus = model.status === 'active' ? 'inactive' : 'active';
             
             try {
-                await window.modelStorage.updateModel(modelId, { status: newStatus });
+                const adapter = window.modelStorageAdapter || window.modelStorage;
+                await adapter.updateModel(modelId, { status: newStatus });
                 showToast(`모델 상태가 ${newStatus === 'active' ? '활성' : '비활성'}으로 변경되었습니다.`, 'success');
                 loadModels();
                 updateStats();
@@ -643,13 +750,37 @@
             const model = allModels.find(m => m.id === modelId);
             if (!model) return;
             
-            // Populate form
+            // Populate basic info
             document.getElementById('editModelId').value = modelId;
             document.getElementById('editName').value = model.personalInfo?.name || '';
             document.getElementById('editIntro').value = model.personalInfo?.intro || '';
             document.getElementById('editDescription').value = model.personalInfo?.description || '';
-            document.getElementById('editPrice').value = model.contract?.basePrice || 0;
             document.getElementById('editStatus').value = model.status || 'pending';
+            
+            // Populate professional profile
+            document.getElementById('editTagline').value = model.profile?.tagline || '';
+            document.getElementById('editExperience').value = model.profile?.experience || '';
+            document.getElementById('editLocation').value = model.profile?.location || '';
+            
+            // Populate pricing packages
+            const basicPackage = model.pricing?.packages?.find(p => p.id === 'basic') || {};
+            document.getElementById('editBasicPrice').value = basicPackage.price || 0;
+            document.getElementById('editBasicDescription').value = basicPackage.description || '';
+            document.getElementById('editBasicDelivery').value = basicPackage.deliveryTime || 3;
+            
+            const standardPackage = model.pricing?.packages?.find(p => p.id === 'standard') || {};
+            document.getElementById('editStandardPrice').value = standardPackage.price || 0;
+            document.getElementById('editStandardDescription').value = standardPackage.description || '';
+            document.getElementById('editStandardDelivery').value = standardPackage.deliveryTime || 5;
+            
+            const premiumPackage = model.pricing?.packages?.find(p => p.id === 'premium') || {};
+            document.getElementById('editPremiumPrice').value = premiumPackage.price || 0;
+            document.getElementById('editPremiumDescription').value = premiumPackage.description || '';
+            document.getElementById('editPremiumDelivery').value = premiumPackage.deliveryTime || 7;
+            
+            // Populate availability settings
+            document.getElementById('editAvailabilityStatus').value = model.availability?.status || 'available';
+            document.getElementById('editResponseTime').value = model.availability?.responseTime || 2;
             
             // Show modal
             document.getElementById('editModal').classList.add('active');
@@ -661,13 +792,14 @@
         }
 
         // Handle edit form submission
-        document.getElementById('editForm').addEventListener('submit', function(e) {
+        document.getElementById('editForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const modelId = document.getElementById('editModelId').value;
             const model = allModels.find(m => m.id === modelId);
             if (!model) return;
             
+            // Prepare updated data
             const updates = {
                 personalInfo: {
                     ...model.personalInfo,
@@ -675,20 +807,80 @@
                     intro: document.getElementById('editIntro').value,
                     description: document.getElementById('editDescription').value
                 },
-                contract: {
-                    ...model.contract,
-                    basePrice: parseInt(document.getElementById('editPrice').value)
+                profile: {
+                    ...model.profile,
+                    tagline: document.getElementById('editTagline').value,
+                    experience: document.getElementById('editExperience').value,
+                    location: document.getElementById('editLocation').value,
+                    bio: document.getElementById('editDescription').value
                 },
-                status: document.getElementById('editStatus').value
+                pricing: {
+                    currency: 'KRW',
+                    packages: [
+                        {
+                            id: 'basic',
+                            name: 'Basic',
+                            price: parseInt(document.getElementById('editBasicPrice').value) || 0,
+                            description: document.getElementById('editBasicDescription').value,
+                            deliveryTime: parseInt(document.getElementById('editBasicDelivery').value) || 3,
+                            revisions: 1,
+                            features: [
+                                '2시간 촬영',
+                                '편집된 사진 10장',
+                                '개인 사용 라이선스'
+                            ],
+                            popular: false
+                        },
+                        {
+                            id: 'standard',
+                            name: 'Standard',
+                            price: parseInt(document.getElementById('editStandardPrice').value) || 0,
+                            description: document.getElementById('editStandardDescription').value,
+                            deliveryTime: parseInt(document.getElementById('editStandardDelivery').value) || 5,
+                            revisions: 3,
+                            features: [
+                                '4시간 촬영',
+                                '편집된 사진 30장',
+                                '상업적 사용 라이선스',
+                                '헤어/메이크업 포함'
+                            ],
+                            popular: true
+                        },
+                        {
+                            id: 'premium',
+                            name: 'Premium',
+                            price: parseInt(document.getElementById('editPremiumPrice').value) || 0,
+                            description: document.getElementById('editPremiumDescription').value,
+                            deliveryTime: parseInt(document.getElementById('editPremiumDelivery').value) || 7,
+                            revisions: -1,
+                            features: [
+                                '종일 촬영',
+                                '편집된 사진 무제한',
+                                '모든 원본 파일 제공',
+                                '헤어/메이크업 포함',
+                                '무제한 수정'
+                            ],
+                            popular: false
+                        }
+                    ]
+                },
+                availability: {
+                    status: document.getElementById('editAvailabilityStatus').value,
+                    responseTime: parseInt(document.getElementById('editResponseTime').value) || 2,
+                    lastSeen: new Date().toISOString()
+                },
+                status: document.getElementById('editStatus').value,
+                updatedAt: window.firebase ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString()
             };
             
             try {
-                window.modelStorage.updateModel(modelId, updates);
+                await window.modelStorageAdapter.updateModel(modelId, updates);
                 showToast('모델 정보가 업데이트되었습니다.', 'success');
                 closeEditModal();
                 loadModels();
                 updateStats();
             } catch (error) {
+                console.error('Update error:', error);
                 showToast('업데이트 중 오류가 발생했습니다.', 'error');
             }
         });

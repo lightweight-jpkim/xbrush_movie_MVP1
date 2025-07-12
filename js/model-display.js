@@ -238,13 +238,17 @@ class ModelDisplay {
                     new Date(a.registrationDate) - new Date(b.registrationDate)
                 );
             case 'priceHigh':
-                return sortedModels.sort((a, b) => 
-                    (b.contract?.basePrice || 0) - (a.contract?.basePrice || 0)
-                );
+                return sortedModels.sort((a, b) => {
+                    const priceA = a.pricing?.packages?.find(p => p.id === 'standard')?.price || a.contract?.basePrice || 0;
+                    const priceB = b.pricing?.packages?.find(p => p.id === 'standard')?.price || b.contract?.basePrice || 0;
+                    return priceB - priceA;
+                });
             case 'priceLow':
-                return sortedModels.sort((a, b) => 
-                    (a.contract?.basePrice || 0) - (b.contract?.basePrice || 0)
-                );
+                return sortedModels.sort((a, b) => {
+                    const priceA = a.pricing?.packages?.find(p => p.id === 'standard')?.price || a.contract?.basePrice || 0;
+                    const priceB = b.pricing?.packages?.find(p => p.id === 'standard')?.price || b.contract?.basePrice || 0;
+                    return priceA - priceB;
+                });
             default:
                 return sortedModels;
         }

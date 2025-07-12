@@ -708,6 +708,103 @@
                         </div>
                     </div>
 
+                    <!-- Professional Profile Section -->
+                    <div class="form-section">
+                        <h3>💼 전문 프로필</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="modelTagline">프로 태그라인</label>
+                                <input type="text" id="modelTagline" 
+                                       placeholder="예: 전문 패션 모델 | 10년 경력" maxlength="50">
+                                <div class="form-help">전문성을 나타내는 한 줄</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="modelExperience">경력</label>
+                                <select id="modelExperience">
+                                    <option value="">선택하세요</option>
+                                    <option value="0-1년">0-1년</option>
+                                    <option value="1-3년">1-3년</option>
+                                    <option value="3-5년">3-5년</option>
+                                    <option value="5-10년">5-10년</option>
+                                    <option value="10년+">10년 이상</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="modelLocation">활동 지역</label>
+                                <input type="text" id="modelLocation" 
+                                       placeholder="예: 서울, 대한민국" maxlength="30">
+                            </div>
+                            <div class="form-group">
+                                <label>사용 가능 언어</label>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="modelLanguages" value="ko" checked> 한국어</label>
+                                    <label><input type="checkbox" name="modelLanguages" value="en"> 영어</label>
+                                    <label><input type="checkbox" name="modelLanguages" value="ja"> 일본어</label>
+                                    <label><input type="checkbox" name="modelLanguages" value="zh"> 중국어</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing Packages -->
+                    <div class="form-section">
+                        <h3>💰 가격 패키지 설정</h3>
+                        <p class="section-description">기본 가격은 계약 단계에서 설정한 금액을 기준으로 합니다</p>
+                        <div class="pricing-packages">
+                            <div class="package-card">
+                                <h4>베이직</h4>
+                                <div class="form-group">
+                                    <label>가격</label>
+                                    <input type="number" id="basicPrice" value="100000" min="50000">
+                                    <div class="form-help">AI 이미지 10장 기준</div>
+                                </div>
+                            </div>
+                            <div class="package-card popular">
+                                <div class="popular-badge">인기</div>
+                                <h4>스탠다드</h4>
+                                <div class="form-group">
+                                    <label>가격</label>
+                                    <input type="number" id="standardPrice" value="200000" min="100000">
+                                    <div class="form-help">AI 이미지 30장 기준</div>
+                                </div>
+                            </div>
+                            <div class="package-card">
+                                <h4>프리미엄</h4>
+                                <div class="form-group">
+                                    <label>가격</label>
+                                    <input type="number" id="premiumPrice" value="500000" min="300000">
+                                    <div class="form-help">맞춤형 패키지</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Availability Settings -->
+                    <div class="form-section">
+                        <h3>📅 가용성 설정</h3>
+                        <div class="form-group">
+                            <label>현재 상태</label>
+                            <select id="availabilityStatus">
+                                <option value="available">즉시 가능</option>
+                                <option value="busy">일정 조율 필요</option>
+                                <option value="vacation">휴가 중</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="responseTime">평균 응답 시간</label>
+                            <select id="responseTime">
+                                <option value="1">1시간 이내</option>
+                                <option value="2" selected>2시간 이내</option>
+                                <option value="4">4시간 이내</option>
+                                <option value="8">8시간 이내</option>
+                                <option value="24">24시간 이내</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- Category Selection -->
                     <div class="form-section">
                         <h3>🎯 모델 카테고리 선택</h3>
