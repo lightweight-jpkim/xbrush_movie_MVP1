@@ -110,58 +110,112 @@ class ModelDisplay {
         const {
             id,
             personalInfo = {},
+            profile = {},
             portfolio = {},
-            contract = {},
-            registrationDate
+            pricing = {},
+            ratings = {},
+            stats = {},
+            availability = {},
+            flags = {}
         } = model;
 
-        const name = personalInfo.name || '이름 없음';
-        const intro = personalInfo.intro || '소개글이 없습니다';
-        const categories = personalInfo.categories || [];
-        // Use actual thumbnail or fallback to a nice default
-        const thumbnail = portfolio.thumbnailUrl || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop';
-        const price = contract.basePrice || 0;
+        // Extract data with enhanced schema support
+        const name = personalInfo.name || profile?.displayName || '이름 없음';
+        const tagline = profile?.tagline || personalInfo.intro || '프로페셔널 AI 모델';
+        const specialties = profile?.specialties || personalInfo.categories || [];
+        const thumbnail = portfolio?.thumbnailUrl || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop';
+        const basePrice = pricing?.basePrice || pricing?.packages?.[0]?.price || 100000;
+        const rating = ratings?.overall || 0;
+        const reviewCount = ratings?.totalReviews || 0;
+        const completedProjects = stats?.completedProjects || 0;
+        const responseTime = stats?.responseTime || 2;
+        const isAvailable = availability?.status === 'available';
+        const isVerified = profile?.verificationStatus?.identity || false;
+        const isPremium = profile?.verificationStatus?.premium || false;
+        const isNew = flags?.newModel || false;
 
-        // Format categories
-        const categoryBadges = categories.map(cat => {
-            const categoryMap = {
-                'fashion': { name: '패션', color: '#667eea' },
-                'beauty': { name: '뷰티', color: '#f56565' },
-                'lifestyle': { name: '라이프스타일', color: '#48bb78' },
-                'food': { name: '푸드', color: '#ed8936' },
-                'tech': { name: '테크', color: '#38b2ac' }
+        // Format categories/specialties
+        const specialtyTags = specialties.slice(0, 3).map(spec => {
+            const specMap = {
+                'fashion': '패션',
+                'beauty': '뷰티',
+                'lifestyle': '라이프스타일',
+                'food': '푸드',
+                'tech': '테크'
             };
-            const catInfo = categoryMap[cat] || { name: cat, color: '#718096' };
-            
-            return `<span class="category-badge" style="background-color: ${catInfo.color}">${catInfo.name}</span>`;
+            return `<span class="specialty-tag">${specMap[spec] || spec}</span>`;
         }).join('');
 
+        // Trust badges
+        const trustBadges = [];
+        if (isVerified) trustBadges.push('<span class="trust-badge verified">✓ 인증</span>');
+        if (isPremium) trustBadges.push('<span class="trust-badge pro">PRO</span>');
+        if (rating >= 4.8 && reviewCount >= 10) trustBadges.push('<span class="trust-badge top-rated">⭐ 우수</span>');
+        
+        const trustBadgesHTML = trustBadges.length > 0 ? 
+            `<div class="model-trust-badges">${trustBadges.join('')}</div>` : '';
+
+        // Status badge
+        const statusClass = isAvailable ? '' : 'busy';
+        const availabilityText = isAvailable ? '즉시 가능' : '예약 중';
+
         // Format price
-        const formattedPrice = new Intl.NumberFormat('ko-KR').format(price);
+        const formattedPrice = new Intl.NumberFormat('ko-KR').format(basePrice);
 
         return `
-            <div class="model-card" data-model-id="${id}">
+            <div class="model-card model-card-commercial" data-model-id="${id}">
                 <div class="model-card-image">
-                    <img src="${thumbnail}" alt="${name}">
+                    ${trustBadgesHTML}
+                    <div class="model-status-badge ${statusClass}"></div>
+                    <img src="${thumbnail}" alt="${name}" loading="lazy">
                     <div class="model-card-overlay">
                         <button class="view-profile-btn">프로필 보기</button>
                     </div>
+                    <div class="model-quick-stats">
+                        <div class="quick-stat">
+                            <span>📷</span>
+                            <span>${completedProjects}개 완료</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span>⏱️</span>
+                            <span>${responseTime}시간 응답</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span>⭐</span>
+                            <span>${rating.toFixed(1)}점</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="model-card-content">
-                    <h3 class="model-name">${name}</h3>
-                    <p class="model-intro">${intro}</p>
-                    <div class="model-categories">
-                        ${categoryBadges}
+                <div class="model-card-content model-card-content-enhanced">
+                    <div class="model-meta-row">
+                        <h3 class="model-name">${name}</h3>
+                        <span class="model-availability ${statusClass}">${availabilityText}</span>
+                    </div>
+                    <p class="model-intro">${tagline}</p>
+                    <div class="model-specialties">
+                        ${specialtyTags}
                     </div>
                     <div class="model-card-footer">
-                        <div class="model-price">
-                            <span class="price-label">시작가</span>
-                            <span class="price-value">₩${formattedPrice}</span>
+                        <div class="model-price-enhanced">
+                            <span class="price-currency">₩</span>
+                            <span class="price-amount">${formattedPrice}</span>
+                            <span class="price-period">부터</span>
                         </div>
-                        <div class="model-rating">
-                            <span class="rating-stars">⭐⭐⭐⭐⭐</span>
-                            <span class="rating-count">(0)</span>
+                        <div class="model-rating-enhanced">
+                            <span class="rating-score">${rating.toFixed(1)}</span>
+                            <span class="rating-stars">★</span>
+                            <span class="rating-reviews">(${reviewCount})</span>
                         </div>
+                    </div>
+                    <div class="model-card-actions">
+                        <button class="action-btn" onclick="event.stopPropagation(); window.modelDetailModal.handleSave('${id}')">
+                            <span>♡</span>
+                            <span>저장</span>
+                        </button>
+                        <button class="action-btn primary" onclick="event.stopPropagation(); window.modelDetailModal.open('${id}')">
+                            <span>👁️</span>
+                            <span>상세보기</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -235,18 +289,19 @@ class ModelDisplay {
      * View model profile
      */
     viewModelProfile(modelId) {
-        // For now, just log - later this will navigate to profile page
         console.log('View profile for model:', modelId);
         
         // Store selected model ID
         sessionStorage.setItem('selectedModelId', modelId);
         
-        // Navigate to profile page (when implemented)
-        // window.location.href = `model-profile.html?id=${modelId}`;
-        
-        // For now, show a toast
-        if (window.showToast) {
-            window.showToast('프로필 페이지는 준비 중입니다', 'info');
+        // Open model detail modal
+        if (window.modelDetailModal) {
+            window.modelDetailModal.open(modelId);
+        } else {
+            // Fallback if modal not loaded
+            if (window.showToast) {
+                window.showToast('프로필을 불러오는 중입니다...', 'info');
+            }
         }
     }
 
