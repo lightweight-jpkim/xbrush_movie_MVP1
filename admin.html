@@ -39,6 +39,35 @@
             margin-top: 5px;
         }
         
+        .admin-header .btn {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-header .btn-primary {
+            background: #667eea;
+            color: white;
+            border: 1px solid #667eea;
+        }
+        
+        .admin-header .btn-primary:hover {
+            background: #5a67d8;
+            border-color: #5a67d8;
+        }
+        
+        .admin-header .btn-outline {
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+        }
+        
+        .admin-header .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
         .admin-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -342,8 +371,20 @@
     <!-- Admin Header -->
     <header class="admin-header">
         <div class="admin-container">
-            <h1 class="admin-title">관리자 대시보드</h1>
-            <p class="admin-subtitle">모델 관리 시스템</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 class="admin-title">관리자 대시보드</h1>
+                    <p class="admin-subtitle">모델 관리 시스템</p>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <a href="admin-plan-review.html" class="btn btn-primary">
+                        라이선스 플랜 검토
+                    </a>
+                    <a href="database-explorer.html" class="btn btn-outline" style="color: white; border-color: white;">
+                        데이터베이스 탐색기
+                    </a>
+                </div>
+            </div>
         </div>
     </header>
 
