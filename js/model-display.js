@@ -120,6 +120,8 @@ class ModelDisplay {
         // Calculate total pages
         const totalPages = Math.ceil(this.filteredModels.length / this.modelsPerPage);
         
+        const paginationHTML = this.createPaginationControls(totalPages);
+        
         this.modelsContainer.innerHTML = `
             <div class="models-grid">
                 ${modelsHTML.join('')}
@@ -322,7 +324,7 @@ class ModelDisplay {
                         </div>
                         <div class="quick-stat">
                             <span>⭐</span>
-                            <span>${rating.toFixed(1)}점</span>
+                            <span>${Number(rating || 0).toFixed(1)}점</span>
                         </div>
                     </div>
                 </div>
@@ -342,7 +344,7 @@ class ModelDisplay {
                             <span class="price-period">부터</span>
                         </div>
                         <div class="model-rating-enhanced">
-                            <span class="rating-score">${rating.toFixed(1)}</span>
+                            <span class="rating-score">${Number(rating || 0).toFixed(1)}</span>
                             <span class="rating-stars">★</span>
                             <span class="rating-reviews">(${reviewCount})</span>
                         </div>
