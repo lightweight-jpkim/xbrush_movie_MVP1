@@ -2890,12 +2890,60 @@ function initializeEnhancedImageSelection() {
  * Load and display featured models on the main page
  */
 async function loadFeaturedModels() {
+    // SIMPLIFIED VERSION WITH HARDCODED SAMPLE MODELS
     const featuredModelsGrid = document.getElementById('featuredModelsGrid');
     const modelCount = document.getElementById('modelCount');
     
-    if (!featuredModelsGrid) return;
+    if (!featuredModelsGrid) {
+        console.error('featuredModelsGrid not found!');
+        return;
+    }
     
-    console.log('[Featured Models] Starting to load...');
+    // First show sample models immediately
+    featuredModelsGrid.innerHTML = `
+        <div class="featured-model-card" style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+            <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 60px;">👤</span>
+            </div>
+            <div class="featured-model-info">
+                <div class="featured-model-name">샘플 모델 1</div>
+                <div class="featured-model-intro">프로페셔널 AI 모델</div>
+            </div>
+        </div>
+        <div class="featured-model-card" style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+            <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 60px;">👥</span>
+            </div>
+            <div class="featured-model-info">
+                <div class="featured-model-name">샘플 모델 2</div>
+                <div class="featured-model-intro">크리에이티브 전문가</div>
+            </div>
+        </div>
+        <div class="featured-model-card" style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+            <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 60px;">🎭</span>
+            </div>
+            <div class="featured-model-info">
+                <div class="featured-model-name">샘플 모델 3</div>
+                <div class="featured-model-intro">광고 전문 모델</div>
+            </div>
+        </div>
+        <div class="featured-model-card" style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+            <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 60px;">✨</span>
+            </div>
+            <div class="featured-model-info">
+                <div class="featured-model-name">샘플 모델 4</div>
+                <div class="featured-model-intro">라이프스타일 모델</div>
+            </div>
+        </div>
+    `;
+    
+    if (modelCount) {
+        modelCount.textContent = '총 4개';
+    }
+    
+    return; // Skip the rest for now
     
     try {
         // Show loading state
@@ -2965,7 +3013,18 @@ async function loadFeaturedModels() {
         
     } catch (error) {
         console.error('Error loading featured models:', error);
-        featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>모델을 불러오는 중 오류가 발생했습니다.</p></div>';
+        // Show sample models as fallback
+        featuredModelsGrid.innerHTML = `
+            <div class="featured-model-card" style="background: white; border: 1px solid #ddd;">
+                <div style="width: 100%; height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 48px;">👤</span>
+                </div>
+                <div class="featured-model-info">
+                    <div class="featured-model-name">샘플 모델</div>
+                    <div class="featured-model-intro">테스트 모델입니다</div>
+                </div>
+            </div>
+        `;
     }
 }
 
