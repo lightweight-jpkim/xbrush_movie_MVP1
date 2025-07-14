@@ -2940,11 +2940,10 @@ async function loadFeaturedModels() {
     `;
     
     if (modelCount) {
-        modelCount.textContent = '총 4개';
+        modelCount.textContent = '총 4개 (샘플)';
     }
     
-    return; // Skip the rest for now
-    
+    // Now try to load real models
     try {
         // Show loading state
         featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>모델을 불러오는 중...</p></div>';
@@ -3007,7 +3006,7 @@ async function loadFeaturedModels() {
                     ` : ''}
                 </div>
             </div>
-        `).join('');
+        `}).join('');
         
         featuredModelsGrid.innerHTML = modelsHTML;
         
