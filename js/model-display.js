@@ -167,12 +167,11 @@ class ModelDisplay {
                 <div class="model-card-image">
                     ${trustBadgesHTML}
                     <div class="model-status-badge ${statusClass}"></div>
-                    <div class="image-skeleton"></div>
                     <img src="${thumbnail}" 
                          alt="${name}" 
                          loading="lazy"
-                         onload="this.classList.add('loaded'); this.previousElementSibling.remove();"
-                         onerror="this.previousElementSibling.remove(); this.parentElement.innerHTML += '<div class=\\'image-error\\'><div class=\\'image-error-icon\\'>🖼️</div><div>이미지 로드 실패</div></div>';">
+                         onload="this.classList.add('loaded');"
+                         onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\\'image-error\\'><div class=\\'image-error-icon\\'>🖼️</div><div>이미지 로드 실패</div></div>';">
                     <div class="model-card-overlay">
                         <button class="view-profile-btn">프로필 보기</button>
                     </div>
