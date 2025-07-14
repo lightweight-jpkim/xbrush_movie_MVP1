@@ -75,7 +75,7 @@
 .hero-section {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 80px 20px;
+    padding: 40px 20px;
     text-align: center;
 }
 
@@ -85,26 +85,28 @@
 }
 
 .hero-title {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 20px;
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
 }
 
 .hero-subtitle {
-    font-size: 1.3rem;
-    margin-bottom: 40px;
+    font-size: 1.1rem;
+    margin-bottom: 24px;
     opacity: 0.9;
+    font-weight: 400;
 }
 
 .hero-actions {
     display: flex;
-    gap: 20px;
+    gap: 16px;
     justify-content: center;
 }
 
 .btn-large {
-    padding: 15px 30px;
-    font-size: 1.1rem;
+    padding: 12px 24px;
+    font-size: 1rem;
 }
 
 /* Container */
@@ -173,11 +175,15 @@
     }
     
     .hero-title {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
     
     .hero-subtitle {
-        font-size: 1.1rem;
+        font-size: 1rem;
+    }
+    
+    .hero-section {
+        padding: 30px 20px;
     }
     
     .hero-actions {
@@ -196,24 +202,24 @@
 
 /* Models Section */
 .models-section {
-    padding: 60px 0;
+    padding: 40px 0;
     background: #f7fafc;
 }
 
 .models-header {
     text-align: center;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
 }
 
 .models-header h2 {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: 1.8rem;
+    font-weight: 600;
     color: #2d3748;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .models-header p {
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: #718096;
 }
 
@@ -464,7 +470,7 @@
 /* Responsive */
 @media (max-width: 768px) {
     .models-header h2 {
-        font-size: 2rem;
+        font-size: 1.5rem;
     }
     
     .models-controls {
