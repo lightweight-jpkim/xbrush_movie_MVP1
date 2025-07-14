@@ -90,12 +90,30 @@ class ModelDisplay {
     /**
      * Display models grid
      */
-    displayModels(models) {
-        const modelsHTML = models.map(model => this.createModelCard(model)).join('');
+    async displayModels(models) {
+        // Show loading state
+        this.modelsContainer.innerHTML = '<div class="loading-state">모델 로딩 중...</div>';
+        
+        // Preload all images first
+        if (window.imageCache) {
+            const imageUrls = models
+                .map(model => model.portfolio?.thumbnailUrl || model.personalInfo?.thumbnailUrl)
+                .filter(url => url && url !== 'images/default-profile.jpg');
+                
+            if (imageUrls.length > 0) {
+                await window.imageCache.preloadImages(imageUrls);
+            }
+        }
+        
+        // Create model cards with cached images
+        const modelsHTML = [];
+        for (const model of models) {
+            modelsHTML.push(await this.createModelCard(model));
+        }
         
         this.modelsContainer.innerHTML = `
             <div class="models-grid">
-                ${modelsHTML}
+                ${modelsHTML.join('')}
             </div>
         `;
 
@@ -106,7 +124,7 @@ class ModelDisplay {
     /**
      * Create model card HTML
      */
-    createModelCard(model) {
+    async createModelCard(model) {
         const {
             id,
             personalInfo = {},
@@ -123,7 +141,20 @@ class ModelDisplay {
         const name = personalInfo.name || profile?.displayName || '이름 없음';
         const tagline = profile?.tagline || personalInfo.intro || '프로페셔널 AI 모델';
         const specialties = profile?.specialties || personalInfo.categories || [];
-        const thumbnail = portfolio?.thumbnailUrl || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop';
+        let thumbnail = portfolio?.thumbnailUrl || personalInfo?.thumbnailUrl || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop';
+        
+        // Get cached image if available
+        if (window.imageCache && thumbnail && !thumbnail.includes('unsplash.com')) {
+            try {
+                const cachedUrl = await window.imageCache.getImage(thumbnail);
+                if (cachedUrl) {
+                    thumbnail = cachedUrl;
+                }
+            } catch (error) {
+                console.error('Error getting cached image:', error);
+            }
+        }
+        
         const basePrice = pricing?.basePrice || pricing?.packages?.[0]?.price || 100000;
         const rating = ratings?.overall || 0;
         const reviewCount = ratings?.totalReviews || 0;

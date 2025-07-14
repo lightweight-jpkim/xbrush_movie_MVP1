@@ -2922,15 +2922,39 @@ async function loadFeaturedModels() {
         // Take only first 4 models
         const featuredModels = models.slice(0, 4);
         
-        // Create model cards HTML
-        const modelsHTML = featuredModels.map(model => `
+        // Preload images if cache is available
+        if (window.imageCache) {
+            const imageUrls = featuredModels
+                .map(m => m.portfolio?.thumbnailUrl)
+                .filter(url => url && url !== 'undefined');
+            window.imageCache.preloadImages(imageUrls);
+        }
+        
+        // Create model cards HTML with placeholder
+        const modelsHTML = await Promise.all(featuredModels.map(async model => {
+            const thumbnailUrl = model.portfolio?.thumbnailUrl;
+            let imageSrc = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg==';
+            
+            // Try to get cached image URL
+            if (window.imageCache && thumbnailUrl) {
+                try {
+                    imageSrc = await window.imageCache.getImage(thumbnailUrl) || imageSrc;
+                } catch (err) {
+                    console.error('Cache error:', err);
+                    imageSrc = thumbnailUrl || imageSrc;
+                }
+            } else if (thumbnailUrl) {
+                imageSrc = thumbnailUrl;
+            }
+            
+            return `
             <div class="featured-model-card" onclick="selectFeaturedModel('${model.id}', '${model.personalInfo?.name || ''}')">
-                <img src="${model.portfolio?.thumbnailUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg=='}" 
+                <img src="${imageSrc}" 
                      alt="${model.personalInfo?.name || '모델'}" 
                      class="featured-model-image"
-                     loading="lazy"
+                     loading="eager"
                      onload="this.classList.add('loaded');"
-                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0E0QUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg=='">
+                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg=='">
                 <div class="featured-model-info">
                     <div class="featured-model-name">${model.personalInfo?.name || '이름 없음'}</div>
                     <div class="featured-model-intro">${model.personalInfo?.intro || '소개 없음'}</div>
