@@ -1661,17 +1661,78 @@ class ModelRegistrationApp {
             return false;
         }
         
-        // Save product registration data
+        // Collect all commercial data
+        const modelTagline = document.getElementById('modelTagline')?.value.trim() || '';
+        const modelExperience = document.getElementById('modelExperience')?.value || '';
+        const modelLocation = document.getElementById('modelLocation')?.value.trim() || '';
+        const modelLanguages = Array.from(document.querySelectorAll('input[name="modelLanguages"]:checked')).map(cb => cb.value);
+        
+        // Collect pricing packages
+        const basicPrice = document.getElementById('basicPrice')?.value || '';
+        const basicDescription = document.getElementById('basicDescription')?.value.trim() || '';
+        const basicDelivery = document.getElementById('basicDelivery')?.value || '';
+        const basicRevisions = document.getElementById('basicRevisions')?.value || '';
+        
+        const standardPrice = document.getElementById('standardPrice')?.value || '';
+        const standardDescription = document.getElementById('standardDescription')?.value.trim() || '';
+        const standardDelivery = document.getElementById('standardDelivery')?.value || '';
+        const standardRevisions = document.getElementById('standardRevisions')?.value || '';
+        
+        const premiumPrice = document.getElementById('premiumPrice')?.value || '';
+        const premiumDescription = document.getElementById('premiumDescription')?.value.trim() || '';
+        const premiumDelivery = document.getElementById('premiumDelivery')?.value || '';
+        const premiumRevisions = document.getElementById('premiumRevisions')?.value || '';
+        
+        // Collect availability settings
+        const availabilityStatus = document.getElementById('availabilityStatus')?.value || 'available';
+        const responseTime = document.getElementById('responseTime')?.value || '2';
+        
+        // Save all product registration data including commercial fields
         this.registrationData.productInfo = {
+            // Basic info
             name: modelName,
             intro: modelIntro,
             description: document.getElementById('modelDescription')?.value.trim() || '',
             categories: Array.from(categories).map(cb => cb.value),
             thumbnailId: this.registrationData.thumbnail?.id || null,
-            thumbnailUrl: this.registrationData.thumbnail?.url || null
+            thumbnailUrl: this.registrationData.thumbnail?.url || null,
+            
+            // Professional profile
+            tagline: modelTagline,
+            experience: modelExperience,
+            location: modelLocation,
+            languages: modelLanguages,
+            
+            // Pricing packages
+            pricing: {
+                basic: {
+                    price: basicPrice ? parseInt(basicPrice) : 0,
+                    description: basicDescription,
+                    deliveryTime: basicDelivery ? parseInt(basicDelivery) : 3,
+                    revisions: basicRevisions ? parseInt(basicRevisions) : 1
+                },
+                standard: {
+                    price: standardPrice ? parseInt(standardPrice) : 0,
+                    description: standardDescription,
+                    deliveryTime: standardDelivery ? parseInt(standardDelivery) : 5,
+                    revisions: standardRevisions ? parseInt(standardRevisions) : 3
+                },
+                premium: {
+                    price: premiumPrice ? parseInt(premiumPrice) : 0,
+                    description: premiumDescription,
+                    deliveryTime: premiumDelivery ? parseInt(premiumDelivery) : 7,
+                    revisions: premiumRevisions ? parseInt(premiumRevisions) : -1
+                }
+            },
+            
+            // Availability
+            availability: {
+                status: availabilityStatus,
+                responseTime: parseInt(responseTime)
+            }
         };
         
-        console.log('Product registration validated, thumbnailUrl:', this.registrationData.productInfo.thumbnailUrl);
+        console.log('Product registration validated with commercial data:', this.registrationData.productInfo);
         
         return true;
     }
@@ -2220,30 +2281,139 @@ class ModelRegistrationApp {
                     categories: this.registrationData.productInfo?.categories || []
                 },
                 
+                // Professional profile (new commercial fields)
+                profile: {
+                    tagline: this.registrationData.productInfo?.tagline || '',
+                    experience: this.registrationData.productInfo?.experience || '1-3년',
+                    location: this.registrationData.productInfo?.location || '서울, 대한민국',
+                    languages: this.registrationData.productInfo?.languages || ['ko'],
+                    bio: this.registrationData.productInfo?.description || '',
+                    specialties: this.registrationData.productInfo?.categories || [],
+                    verificationStatus: {
+                        identity: true,  // KYC verified
+                        premium: false,  // Can be upgraded later
+                        featured: false  // Can be set by admin
+                    }
+                },
+                
                 // Portfolio from Step 4
                 portfolio: {
                     thumbnailUrl: this.registrationData.productInfo?.thumbnailUrl || '',
                     thumbnailId: this.registrationData.productInfo?.thumbnailId || '',
-                    images: this.uploadedImages || []
+                    images: this.uploadedImages || [],
+                    gallery: this.uploadedImages?.map(img => ({
+                        id: img.id,
+                        url: img.url,
+                        thumbnailUrl: img.url,  // Can be optimized later
+                        category: 'all',
+                        caption: img.name || ''
+                    })) || []
+                },
+                
+                // Pricing packages (new commercial fields)
+                pricing: {
+                    currency: 'KRW',
+                    packages: [
+                        {
+                            id: 'basic',
+                            name: 'Basic',
+                            price: this.registrationData.productInfo?.pricing?.basic?.price || 50000,
+                            description: this.registrationData.productInfo?.pricing?.basic?.description || '기본 촬영 패키지',
+                            features: [
+                                '2시간 촬영',
+                                '편집된 사진 10장',
+                                '개인 사용 라이선스'
+                            ],
+                            deliveryTime: this.registrationData.productInfo?.pricing?.basic?.deliveryTime || 3,
+                            revisions: this.registrationData.productInfo?.pricing?.basic?.revisions || 1,
+                            popular: false
+                        },
+                        {
+                            id: 'standard',
+                            name: 'Standard',
+                            price: this.registrationData.productInfo?.pricing?.standard?.price || 100000,
+                            description: this.registrationData.productInfo?.pricing?.standard?.description || '표준 촬영 패키지',
+                            features: [
+                                '4시간 촬영',
+                                '편집된 사진 30장',
+                                '상업적 사용 라이선스',
+                                '헤어/메이크업 포함'
+                            ],
+                            deliveryTime: this.registrationData.productInfo?.pricing?.standard?.deliveryTime || 5,
+                            revisions: this.registrationData.productInfo?.pricing?.standard?.revisions || 3,
+                            popular: true
+                        },
+                        {
+                            id: 'premium',
+                            name: 'Premium',
+                            price: this.registrationData.productInfo?.pricing?.premium?.price || 200000,
+                            description: this.registrationData.productInfo?.pricing?.premium?.description || '프리미엄 촬영 패키지',
+                            features: [
+                                '종일 촬영',
+                                '편집된 사진 무제한',
+                                '모든 원본 파일 제공',
+                                '헤어/메이크업 포함',
+                                '무제한 수정'
+                            ],
+                            deliveryTime: this.registrationData.productInfo?.pricing?.premium?.deliveryTime || 7,
+                            revisions: this.registrationData.productInfo?.pricing?.premium?.revisions || -1,
+                            popular: false
+                        }
+                    ]
+                },
+                
+                // Availability settings (new commercial fields)
+                availability: {
+                    status: this.registrationData.productInfo?.availability?.status || 'available',
+                    responseTime: this.registrationData.productInfo?.availability?.responseTime || 2,
+                    lastSeen: new Date().toISOString(),
+                    autoReply: '안녕하세요! 메시지 감사합니다. 곧 연락드리겠습니다.'
+                },
+                
+                // Stats (initialize with defaults)
+                stats: {
+                    completedProjects: 0,
+                    totalClients: 0,
+                    repeatClients: 0,
+                    responseTime: 2,
+                    joinedDate: new Date().toISOString()
+                },
+                
+                // Ratings (initialize with defaults)
+                ratings: {
+                    overall: 0,
+                    communication: 0,
+                    quality: 0,
+                    delivery: 0,
+                    value: 0,
+                    count: 0
+                },
+                
+                // Flags
+                flags: {
+                    featured: false,
+                    verified: true,
+                    newModel: true,
+                    premium: false
                 },
                 
                 // Contract info from Step 3
                 contract: {
-                    pricingType: this.registrationData.contractInfo?.pricingType || 'perProject',
-                    basePrice: this.registrationData.contractInfo?.basePrice || 0,
-                    hourlyRate: this.registrationData.contractInfo?.hourlyRate || 0,
-                    usageRights: this.registrationData.contractInfo?.usageRights || [],
-                    contractPeriod: this.registrationData.contractInfo?.contractPeriod || 12,
-                    signature: this.registrationData.contractInfo?.signature || ''
+                    pricingType: this.registrationData.contract?.pricingType || 'perProject',
+                    flatRate: this.registrationData.contract?.flatRate || 0,
+                    shareRate: this.registrationData.contract?.shareRate || 0,
+                    usageRights: this.registrationData.contract?.usageRights || [],
+                    contractPeriod: this.registrationData.contract?.period || '12',
+                    signature: this.registrationData.contract?.signature || ''
                 },
                 
                 // KYC info from Step 2
                 kyc: {
                     verified: true,
                     verificationDate: new Date().toISOString(),
-                    idImage: this.registrationData.kycInfo?.idImage || '',
-                    faceImage: this.registrationData.kycInfo?.faceImage || '',
-                    videoVerified: this.registrationData.kycInfo?.videoCompleted || false
+                    idImage: this.registrationData.idPhoto || '',
+                    faceImage: this.registrationData.facePhoto || '',
+                    videoVerified: !!this.registrationData.verificationVideo
                 }
             };
             
