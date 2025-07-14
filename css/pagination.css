@@ -1,0 +1,141 @@
+/* Pagination Controls Styles */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 48px;
+    padding: 24px 0;
+    border-top: 1px solid #e5e7eb;
+}
+
+.pagination-btn {
+    padding: 8px 16px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-btn:hover:not([disabled]) {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.pagination-btn:active:not([disabled]) {
+    transform: translateY(1px);
+}
+
+.pagination-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.pagination-btn.active:hover {
+    background: #5a67d8;
+    border-color: #5a67d8;
+}
+
+.pagination-prev,
+.pagination-next {
+    font-weight: 600;
+    padding: 8px 20px;
+}
+
+.pagination-numbers {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.pagination-ellipsis {
+    color: #9ca3af;
+    padding: 0 8px;
+    user-select: none;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: #6b7280;
+    margin-left: 16px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .pagination-controls {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px 0;
+    }
+    
+    .pagination-info {
+        width: 100%;
+        text-align: center;
+        margin-left: 0;
+        margin-top: 8px;
+        order: -1;
+    }
+    
+    .pagination-btn {
+        min-width: 36px;
+        height: 36px;
+        font-size: 13px;
+        padding: 6px 12px;
+    }
+    
+    .pagination-prev,
+    .pagination-next {
+        padding: 6px 16px;
+    }
+    
+    /* Hide some page numbers on mobile */
+    .pagination-numbers .pagination-number:not(.active) {
+        display: none;
+    }
+    
+    /* Show adjacent pages on mobile */
+    .pagination-numbers .pagination-number.active + .pagination-number,
+    .pagination-numbers .pagination-number:has(+ .pagination-number.active) {
+        display: flex;
+    }
+    
+    /* Always show first and last page */
+    .pagination-numbers .pagination-number:first-child,
+    .pagination-numbers .pagination-number:last-child {
+        display: flex;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .pagination-controls {
+        gap: 8px;
+    }
+    
+    .pagination-btn {
+        min-width: 32px;
+        height: 32px;
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+    
+    .pagination-prev,
+    .pagination-next {
+        padding: 4px 12px;
+    }
+}

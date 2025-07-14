@@ -8,6 +8,10 @@ class ModelDisplay {
         this.modelsContainer = null;
         this.currentFilter = 'all';
         this.currentSort = 'newest';
+        this.currentPage = 1;
+        this.modelsPerPage = 12; // 3x4 grid on desktop
+        this.allModels = [];
+        this.filteredModels = [];
     }
 
     /**
@@ -64,8 +68,15 @@ class ModelDisplay {
             // Filter models
             const filteredModels = this.filterModels(sortedModels, this.currentFilter);
             
-            // Display models
-            this.displayModels(filteredModels);
+            // Store filtered models for pagination
+            this.allModels = sortedModels;
+            this.filteredModels = filteredModels;
+            
+            // Reset to first page when loading new data
+            this.currentPage = 1;
+            
+            // Display models with pagination
+            this.displayModelsWithPagination();
         } catch (error) {
             console.error('Error loading models:', error);
             console.error('Error details:', error.message);
@@ -93,23 +104,135 @@ class ModelDisplay {
     }
 
     /**
-     * Display models grid
+     * Display models with pagination
      */
-    async displayModels(models) {
+    async displayModelsWithPagination() {
+        const startIndex = (this.currentPage - 1) * this.modelsPerPage;
+        const endIndex = startIndex + this.modelsPerPage;
+        const modelsToDisplay = this.filteredModels.slice(startIndex, endIndex);
+        
         // Create model cards
         const modelsHTML = [];
-        for (const model of models) {
+        for (const model of modelsToDisplay) {
             modelsHTML.push(await this.createModelCard(model));
         }
+        
+        // Calculate total pages
+        const totalPages = Math.ceil(this.filteredModels.length / this.modelsPerPage);
         
         this.modelsContainer.innerHTML = `
             <div class="models-grid">
                 ${modelsHTML.join('')}
             </div>
+            ${this.createPaginationControls(totalPages)}
         `;
 
         // Add click handlers
         this.attachCardClickHandlers();
+        this.attachPaginationHandlers();
+    }
+    
+    /**
+     * Create pagination controls
+     */
+    createPaginationControls(totalPages) {
+        if (totalPages <= 1) return '';
+        
+        let paginationHTML = '<div class="pagination-controls">';
+        
+        // Previous button
+        paginationHTML += `
+            <button class="pagination-btn pagination-prev" 
+                    ${this.currentPage === 1 ? 'disabled' : ''}
+                    data-page="${this.currentPage - 1}">
+                이전
+            </button>
+        `;
+        
+        // Page numbers
+        paginationHTML += '<div class="pagination-numbers">';
+        
+        // Show first page always
+        if (this.currentPage > 3) {
+            paginationHTML += `
+                <button class="pagination-btn pagination-number" data-page="1">1</button>
+                ${this.currentPage > 4 ? '<span class="pagination-ellipsis">...</span>' : ''}
+            `;
+        }
+        
+        // Show pages around current page
+        for (let i = Math.max(1, this.currentPage - 2); i <= Math.min(totalPages, this.currentPage + 2); i++) {
+            paginationHTML += `
+                <button class="pagination-btn pagination-number ${i === this.currentPage ? 'active' : ''}" 
+                        data-page="${i}">${i}</button>
+            `;
+        }
+        
+        // Show last page always
+        if (this.currentPage < totalPages - 2) {
+            paginationHTML += `
+                ${this.currentPage < totalPages - 3 ? '<span class="pagination-ellipsis">...</span>' : ''}
+                <button class="pagination-btn pagination-number" data-page="${totalPages}">${totalPages}</button>
+            `;
+        }
+        
+        paginationHTML += '</div>';
+        
+        // Next button
+        paginationHTML += `
+            <button class="pagination-btn pagination-next" 
+                    ${this.currentPage === totalPages ? 'disabled' : ''}
+                    data-page="${this.currentPage + 1}">
+                다음
+            </button>
+        `;
+        
+        // Page info
+        paginationHTML += `
+            <div class="pagination-info">
+                ${this.filteredModels.length}개 중 ${(this.currentPage - 1) * this.modelsPerPage + 1}-${Math.min(this.currentPage * this.modelsPerPage, this.filteredModels.length)}개 표시
+            </div>
+        `;
+        
+        paginationHTML += '</div>';
+        
+        return paginationHTML;
+    }
+    
+    /**
+     * Attach pagination handlers
+     */
+    attachPaginationHandlers() {
+        const paginationButtons = document.querySelectorAll('.pagination-btn:not([disabled])');
+        paginationButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const page = parseInt(e.target.getAttribute('data-page'));
+                this.goToPage(page);
+            });
+        });
+    }
+    
+    /**
+     * Go to specific page
+     */
+    goToPage(page) {
+        this.currentPage = page;
+        this.displayModelsWithPagination();
+        
+        // Scroll to top of models section
+        const modelsSection = document.querySelector('.models-section');
+        if (modelsSection) {
+            modelsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+    
+    /**
+     * Display models grid (legacy method for backward compatibility)
+     */
+    async displayModels(models) {
+        this.filteredModels = models;
+        this.currentPage = 1;
+        await this.displayModelsWithPagination();
     }
 
     /**
@@ -352,6 +475,18 @@ class ModelDisplay {
             sortSelect.addEventListener('change', (e) => {
                 this.currentSort = e.target.value;
                 this.loadAndDisplayModels();
+            });
+        }
+        
+        // Per page dropdown
+        const perPageSelect = document.getElementById('perPageSelect');
+        if (perPageSelect) {
+            perPageSelect.addEventListener('change', (e) => {
+                this.modelsPerPage = parseInt(e.target.value);
+                this.currentPage = 1; // Reset to first page
+                if (this.filteredModels.length > 0) {
+                    this.displayModelsWithPagination();
+                }
             });
         }
     }
