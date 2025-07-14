@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Database Integration Verification - xBrush</title>
     
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="model-showcase.css">
+    
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -167,6 +171,21 @@
     </style>
 </head>
 <body>
+    <!-- Site Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <h1 class="logo">xBrush</h1>
+                <span class="logo-subtitle">Admin Tools</span>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link">동영상 제작</a>
+                <a href="models.html" class="nav-link">모델 쇼케이스</a>
+                <a href="admin.html" class="nav-link">관리자</a>
+            </nav>
+        </div>
+    </header>
+
     <div class="container">
         <h1>데이터베이스 통합 검증</h1>
         <p class="subtitle">모든 페이지가 동일한 Firebase 데이터베이스를 사용하고 있는지 확인합니다.</p>
@@ -431,5 +450,18 @@
             runVerification();
         });
     </script>
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 xBrush. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">이용약관</a>
+                <a href="#">개인정보처리방침</a>
+                <a href="#">문의하기</a>
+                <a href="admin.html" style="opacity: 0.5;">관리자</a>
+            </div>
+        </div>
+    </footer>
+
 </body>
 </html>

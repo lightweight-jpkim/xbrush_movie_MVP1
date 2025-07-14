@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>모델 가격 설정 대시보드 - xBrush</title>
     
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="model-showcase.css">
+    
     <style>
         * {
             box-sizing: border-box;
@@ -441,12 +445,27 @@
     </style>
 </head>
 <body>
+    <!-- Site Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <h1 class="logo">xBrush</h1>
+                <span class="logo-subtitle">Model Dashboard</span>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link">동영상 제작</a>
+                <a href="models.html" class="nav-link">모델 쇼케이스</a>
+                <a href="model-register.html" class="nav-link">모델 등록</a>
+            </nav>
+        </div>
+    </header>
+    
     <header class="dashboard-header">
         <div class="header-content">
             <h1 class="page-title">가격 설정 대시보드</h1>
             <div class="model-info">
-                <span>채연님</span>
-                <div class="model-avatar">채</div>
+                <span id="modelName">로딩중...</span>
+                <div class="model-avatar" id="modelAvatar">-</div>
             </div>
         </div>
     </header>
@@ -725,7 +744,76 @@
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 xBrush. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">이용약관</a>
+                <a href="#">개인정보처리방침</a>
+                <a href="#">문의하기</a>
+                <a href="admin.html" style="opacity: 0.5;">관리자</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Application Configuration -->
+    <script src="js/config.js"></script>
+    <script src="js/app-namespace.js"></script>
+    
+    <!-- JavaScript Files -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-model-storage.js"></script>
+    <script src="js/model-storage.js"></script>
+    <script src="js/model-storage-adapter.js"></script>
+
     <script>
+        // Load model data from Firebase
+        async function loadModelData() {
+            try {
+                // Wait for Firebase to be ready
+                let retries = 10;
+                while (retries > 0 && (!window.firebaseDB || !window.modelStorageAdapter)) {
+                    console.log('Waiting for Firebase initialization...');
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    retries--;
+                }
+                
+                if (window.modelStorageAdapter) {
+                    // For now, load the first model from DB
+                    const models = await window.modelStorageAdapter.getModels();
+                    if (models && models.length > 0) {
+                        const model = models[0];
+                        
+                        // Update UI with model data
+                        document.getElementById('modelName').textContent = model.personalInfo.name + '님';
+                        document.getElementById('modelAvatar').textContent = model.personalInfo.name.charAt(0);
+                        
+                        // TODO: Load pricing data from modelLicensingPlans collection
+                        console.log('Model loaded:', model);
+                    } else {
+                        document.getElementById('modelName').textContent = '테스트 모델';
+                        document.getElementById('modelAvatar').textContent = '테';
+                    }
+                } else {
+                    console.error('ModelStorageAdapter not initialized');
+                    document.getElementById('modelName').textContent = '연결 오류';
+                }
+            } catch (error) {
+                console.error('Error loading model data:', error);
+                document.getElementById('modelName').textContent = '오류 발생';
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', loadModelData);
+        
         function toggleSwitch(element) {
             element.classList.toggle('active');
             
