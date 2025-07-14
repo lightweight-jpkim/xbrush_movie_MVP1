@@ -196,74 +196,16 @@
                     </div>
                 </section>
 
-                <!-- Additional Options Section -->
-                <section>
+                <!-- Celebrity Models Section -->
+                <section id="celebrityModelsSection" style="display: none;">
                     <header class="flex items-center mb-2">
-                        <h2 class="subheading mb-0 mr-3">추가 옵션</h2>
-                        <span class="badge badge-info">준비 중</span>
+                        <h2 class="subheading mb-0 mr-3">⭐ 연예인 모델</h2>
+                        <span class="badge badge-info">프리미엄</span>
                     </header>
-                    <p class="description mb-2">더 많은 모델 옵션이 곧 추가될 예정입니다.</p>
+                    <p class="description mb-2">검증된 연예인 모델들과 함께 프리미엄 광고를 제작하세요.</p>
                     
-                    <div class="card-grid">
-                        <div class="card" onclick="selectModel(this, 'actor1', 'premium')" role="button" tabindex="0"
-                             onkeydown="if(event.key==='Enter') selectModel(this, 'actor1', 'premium')"
-                             aria-label="채연 모델 선택">
-                            <div class="model-image" data-model="actor1">
-                                <div class="badge premium-badge">100💎</div>
-                            </div>
-                            <h3>채연</h3>
-                            <p>상큼한 20대 채연의 모습 그대로</p>
-                        </div>
-                        
-                        <div class="card" onclick="selectModel(this, 'actor2', 'premium')" role="button" tabindex="0"
-                             onkeydown="if(event.key==='Enter') selectModel(this, 'actor2', 'premium')"
-                             aria-label="이상아 모델 선택">
-                            <div class="model-image" data-model="actor2">
-                                <div class="badge premium-badge">100💎</div>
-                            </div>
-                            <h3>이상아</h3>
-                            <p>밝고 친근한 국민적 매력</p>
-                        </div>
-                        
-                        <div class="card" onclick="selectModel(this, 'actor3', 'premium')" role="button" tabindex="0"
-                             onkeydown="if(event.key==='Enter') selectModel(this, 'actor3', 'premium')"
-                             aria-label="이정재 모델 선택">
-                            <div class="model-image" data-model="actor3">
-                                <div class="badge premium-badge">100💎</div>
-                            </div>
-                            <h3>이정재</h3>
-                            <p>카리스마 있고 믿음직한 리더십</p>
-                        </div>
-                        
-                        <div class="card" onclick="selectModel(this, 'actor4', 'premium')" role="button" tabindex="0"
-                             onkeydown="if(event.key==='Enter') selectModel(this, 'actor4', 'premium')"
-                             aria-label="전지현 모델 선택">
-                            <div class="model-image" data-model="actor4">
-                                <div class="badge premium-badge">100💎</div>
-                            </div>
-                            <h3>전지현</h3>
-                            <p>우아하고 세련된 여성 매력</p>
-                        </div>
-                        
-                        <div class="card" onclick="selectModel(this, 'actor5', 'premium')" role="button" tabindex="0"
-                             onkeydown="if(event.key==='Enter') selectModel(this, 'actor5', 'premium')"
-                             aria-label="박서준 모델 선택">
-                            <div class="model-image" data-model="actor5">
-                                <div class="badge premium-badge">100💎</div>
-                            </div>
-                            <h3>박서준</h3>
-                            <p>젊고 역동적인 현대적 매력</p>
-                        </div>
-                        
-                        <div class="card" onclick="selectModel(this, 'actor6', 'premium')" role="button" tabindex="0"
-                             onkeydown="if(event.key==='Enter') selectModel(this, 'actor6', 'premium')"
-                             aria-label="손예진 모델 선택">
-                            <div class="model-image" data-model="actor6">
-                                <div class="badge premium-badge">100💎</div>
-                            </div>
-                            <h3>손예진</h3>
-                            <p>로맨틱하고 품격 있는 매력</p>
-                        </div>
+                    <div class="card-grid" id="celebrityModelsGrid">
+                        <!-- Celebrity models will be loaded here dynamically -->
                     </div>
                 </section>
                 
@@ -1114,6 +1056,10 @@
             if (window.firebaseDB && window.modelStorageAdapter && typeof loadFeaturedModels === 'function') {
                 console.log('[Main Page] Firebase is ready, loading models...');
                 loadFeaturedModels();
+                // Load celebrity models
+                if (typeof loadCelebrityModels === 'function') {
+                    loadCelebrityModels();
+                }
                 // Load premium models carousel
                 if (window.premiumManager) {
                     premiumManager.loadPremiumCarousel('premiumModelsCarousel');

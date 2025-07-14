@@ -3067,6 +3067,83 @@ async function waitForFirebase() {
 }
 
 /**
+ * Load and display celebrity models
+ */
+async function loadCelebrityModels() {
+    const celebritySection = document.getElementById('celebrityModelsSection');
+    const celebrityGrid = document.getElementById('celebrityModelsGrid');
+    
+    if (!celebritySection || !celebrityGrid) {
+        console.log('[Celebrity Models] Section not found, skipping...');
+        return;
+    }
+    
+    try {
+        console.log('[Celebrity Models] Loading celebrity models...');
+        
+        // Wait for Firebase
+        await waitForFirebase();
+        
+        // Query for celebrity models
+        const celebrityQuery = window.firebaseDB
+            .collection('models')
+            .where('isCelebrity', '==', true)
+            .where('featured', '==', true)
+            .orderBy('personalInfo.name');
+            
+        const snapshot = await celebrityQuery.get();
+        
+        if (snapshot.empty) {
+            console.log('[Celebrity Models] No celebrity models found');
+            celebritySection.style.display = 'none';
+            return;
+        }
+        
+        console.log(`[Celebrity Models] Found ${snapshot.size} celebrity models`);
+        
+        // Create celebrity model cards
+        const celebrityHTML = [];
+        
+        snapshot.forEach(doc => {
+            const model = doc.data();
+            const modelId = doc.id;
+            
+            // Get model details
+            const name = model.personalInfo?.name || 'Unknown';
+            const description = model.portfolio?.description || '';
+            const image = model.portfolio?.mainImage || 'https://via.placeholder.com/300x400';
+            const tier = model.pricing?.tier || 'premium';
+            const price = model.pricing?.basePrice || 100;
+            
+            celebrityHTML.push(`
+                <div class="card" onclick="selectModel(this, '${modelId}', '${tier}')" role="button" tabindex="0"
+                     onkeydown="if(event.key==='Enter') selectModel(this, '${modelId}', '${tier}')"
+                     aria-label="${name} 모델 선택"
+                     data-model-id="${modelId}">
+                    <div class="model-image" style="background-image: url('${image}'); background-size: cover; background-position: center;">
+                        <div class="badge ${tier === 'vip' ? 'vip-badge' : 'premium-badge'}">${price}💎</div>
+                    </div>
+                    <h3>${name}</h3>
+                    <p>${description}</p>
+                </div>
+            `);
+        });
+        
+        // Update grid
+        celebrityGrid.innerHTML = celebrityHTML.join('');
+        
+        // Show section
+        celebritySection.style.display = 'block';
+        
+        console.log('[Celebrity Models] Celebrity models loaded successfully');
+        
+    } catch (error) {
+        console.error('[Celebrity Models] Error loading celebrity models:', error);
+        celebritySection.style.display = 'none';
+    }
+}
+
+/**
  * Handle featured model selection
  */
 function selectFeaturedModel(modelId, modelName) {

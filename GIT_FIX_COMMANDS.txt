@@ -1,0 +1,22 @@
+COPY AND PASTE THESE COMMANDS ONE BY ONE INTO YOUR TERMINAL:
+
+# Step 1: Configure merge strategy
+git config pull.rebase false
+
+# Step 2: Pull and merge (this will create a merge commit)
+git pull origin main --no-rebase
+
+# Step 3: If you see merge conflicts, run these:
+git add .
+git commit -m "Merge remote changes"
+
+# Step 4: Push your changes
+git push origin main
+
+# Step 5: If push still fails, force push (BE CAREFUL - this overwrites remote)
+git push --force-with-lease origin main
+
+ALTERNATIVE SIMPLE SOLUTION (if above doesn't work):
+
+# This will force your local version to the remote
+git push --force origin main
