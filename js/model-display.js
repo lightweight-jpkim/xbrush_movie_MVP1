@@ -91,21 +91,7 @@ class ModelDisplay {
      * Display models grid
      */
     async displayModels(models) {
-        // Show loading state
-        this.modelsContainer.innerHTML = '<div class="loading-state">모델 로딩 중...</div>';
-        
-        // Preload all images first
-        if (window.imageCache) {
-            const imageUrls = models
-                .map(model => model.portfolio?.thumbnailUrl || model.personalInfo?.thumbnailUrl)
-                .filter(url => url && url !== 'images/default-profile.jpg');
-                
-            if (imageUrls.length > 0) {
-                await window.imageCache.preloadImages(imageUrls);
-            }
-        }
-        
-        // Create model cards with cached images
+        // Create model cards
         const modelsHTML = [];
         for (const model of models) {
             modelsHTML.push(await this.createModelCard(model));
@@ -143,17 +129,8 @@ class ModelDisplay {
         const specialties = profile?.specialties || personalInfo.categories || [];
         let thumbnail = portfolio?.thumbnailUrl || personalInfo?.thumbnailUrl || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop';
         
-        // Get cached image if available
-        if (window.imageCache && thumbnail && !thumbnail.includes('unsplash.com')) {
-            try {
-                const cachedUrl = await window.imageCache.getImage(thumbnail);
-                if (cachedUrl) {
-                    thumbnail = cachedUrl;
-                }
-            } catch (error) {
-                console.error('Error getting cached image:', error);
-            }
-        }
+        // Skip caching for now - use original URLs
+        // TODO: Fix blob URL persistence issue
         
         const basePrice = pricing?.basePrice || pricing?.packages?.[0]?.price || 100000;
         const rating = ratings?.overall || 0;

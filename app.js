@@ -2922,28 +2922,13 @@ async function loadFeaturedModels() {
         // Take only first 4 models
         const featuredModels = models.slice(0, 4);
         
-        // Preload images if cache is available
-        if (window.imageCache) {
-            const imageUrls = featuredModels
-                .map(m => m.portfolio?.thumbnailUrl)
-                .filter(url => url && url !== 'undefined');
-            window.imageCache.preloadImages(imageUrls);
-        }
-        
         // Create model cards HTML with placeholder
         const modelsHTML = await Promise.all(featuredModels.map(async model => {
-            const thumbnailUrl = model.portfolio?.thumbnailUrl;
+            const thumbnailUrl = model.portfolio?.thumbnailUrl || model.personalInfo?.thumbnailUrl;
             let imageSrc = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg==';
             
-            // Try to get cached image URL
-            if (window.imageCache && thumbnailUrl) {
-                try {
-                    imageSrc = await window.imageCache.getImage(thumbnailUrl) || imageSrc;
-                } catch (err) {
-                    console.error('Cache error:', err);
-                    imageSrc = thumbnailUrl || imageSrc;
-                }
-            } else if (thumbnailUrl) {
+            // Use thumbnail URL directly for now (temporary fix)
+            if (thumbnailUrl && thumbnailUrl !== 'undefined' && thumbnailUrl !== 'null') {
                 imageSrc = thumbnailUrl;
             }
             
