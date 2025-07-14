@@ -3010,6 +3010,30 @@ async function loadFeaturedModels() {
         
         featuredModelsGrid.innerHTML = modelsHTML;
         
+        // Optimize image loading by deferring large base64 images
+        setTimeout(() => {
+            const images = featuredModelsGrid.querySelectorAll('img');
+            images.forEach((img, index) => {
+                // If the image src is a large base64 string, load it progressively
+                if (img.src && img.src.startsWith('data:image') && img.src.length > 10000) {
+                    const originalSrc = img.src;
+                    // Show placeholder first
+                    img.style.filter = 'blur(10px)';
+                    img.style.transition = 'filter 0.3s ease';
+                    
+                    // Load the image after a small delay
+                    setTimeout(() => {
+                        img.onload = () => {
+                            img.style.filter = 'none';
+                        };
+                        // Force reload to trigger the transition
+                        img.src = '';
+                        img.src = originalSrc;
+                    }, index * 100); // Stagger loading
+                }
+            });
+        }, 100);
+        
     } catch (error) {
         console.error('Error loading featured models:', error);
         // Show sample models as fallback
