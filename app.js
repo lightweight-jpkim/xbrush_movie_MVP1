@@ -2911,45 +2911,30 @@ async function loadFeaturedModels() {
         const allModels = await window.modelStorageAdapter.getActiveModels();
         console.log('[Featured Models] Got all models:', allModels.length);
         
-        // Filter out premium models (only show regular models in featured section)
-        const regularModels = allModels.filter(model => 
-            !model.tier || model.tier === 'basic'
-        );
-        console.log('[Featured Models] Regular models:', regularModels.length);
+        // Show ALL models temporarily (including premium) to debug image display
+        const regularModels = allModels; // Temporarily show all models
+        console.log('[Featured Models] Showing all models (debug):', regularModels.length);
         
-        // Update count (only regular models)
+        // Update count
         modelCount.textContent = `총 ${regularModels.length}개`;
         
         if (regularModels.length === 0) {
-            featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>등록된 일반 모델이 없습니다.</p></div>';
+            featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>등록된 모델이 없습니다.</p></div>';
             return;
         }
         
-        // Take only first 4 regular models
+        // Take only first 4 models
         const featuredModels = regularModels.slice(0, 4);
         
         // Create model cards HTML with placeholder
         const modelsHTML = await Promise.all(featuredModels.map(async model => {
-            console.log('[Debug] Model data:', {
-                name: model.personalInfo?.name,
-                portfolio: model.portfolio,
-                personalInfo: model.personalInfo
-            });
-            
             const thumbnailUrl = model.portfolio?.thumbnailUrl || model.personalInfo?.thumbnailUrl;
-            console.log('[Debug] Thumbnail URL:', thumbnailUrl);
-            
-            let imageSrc = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMC40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg==';
+            let imageSrc = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMC40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTk5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg==';
             
             // Use thumbnail URL directly
             if (thumbnailUrl && thumbnailUrl !== 'undefined' && thumbnailUrl !== 'null' && thumbnailUrl !== '') {
                 imageSrc = thumbnailUrl;
-                console.log('[Debug] Using thumbnail URL as imageSrc');
-            } else {
-                console.log('[Debug] Using placeholder image');
             }
-            
-            console.log('[Debug] Final imageSrc:', imageSrc.substring(0, 100) + '...');
             
             return `
             <div class="featured-model-card" onclick="selectFeaturedModel('${model.id}', '${model.personalInfo?.name || ''}')">
