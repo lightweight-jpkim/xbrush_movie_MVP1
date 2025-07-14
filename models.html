@@ -195,16 +195,20 @@
                 
                 // Apply filter
                 if (filter === 'all') {
-                    filteredModels = allModels;
+                    // For 'all', show only non-premium models (basic tier)
+                    filteredModels = allModels.filter(model => 
+                        !model.tier || model.tier === 'basic'
+                    );
                 } else if (filter === 'premium') {
                     filteredModels = allModels.filter(model => 
                         model.tier === 'premium' || model.tier === 'vip'
                     );
                 } else {
-                    // Category filter
+                    // Category filter - exclude premium models
                     filteredModels = allModels.filter(model => {
                         const categories = model.personalInfo?.categories || model.categories || [];
-                        return categories.includes(filter);
+                        const isBasicTier = !model.tier || model.tier === 'basic';
+                        return categories.includes(filter) && isBasicTier;
                     });
                 }
                 
@@ -269,17 +273,44 @@
             });
             
             if (window.modelDisplay) {
-                // Always initialize model display first
+                // For showcase page, we need to filter premium models out of regular display
+                const originalInit = window.modelDisplay.loadAndDisplayModels.bind(window.modelDisplay);
+                window.modelDisplay.loadAndDisplayModels = async function() {
+                    // Get all models
+                    const allModels = await window.modelStorageAdapter.getActiveModels();
+                    
+                    // Filter based on current filter
+                    let modelsToDisplay;
+                    if (currentFilter === 'all') {
+                        // Show only basic tier models in regular section
+                        modelsToDisplay = allModels.filter(model => !model.tier || model.tier === 'basic');
+                    } else if (currentFilter === 'premium') {
+                        modelsToDisplay = allModels.filter(model => model.tier === 'premium' || model.tier === 'vip');
+                    } else {
+                        // Category filter - only basic tier
+                        modelsToDisplay = allModels.filter(model => {
+                            const categories = model.personalInfo?.categories || model.categories || [];
+                            const isBasicTier = !model.tier || model.tier === 'basic';
+                            return categories.includes(currentFilter) && isBasicTier;
+                        });
+                    }
+                    
+                    // Display the filtered models
+                    this.allModels = modelsToDisplay;
+                    this.filteredModels = modelsToDisplay;
+                    if (modelsToDisplay.length === 0) {
+                        this.displayEmptyState();
+                    } else {
+                        await this.displayModelsWithPagination();
+                    }
+                };
+                
+                // Initialize model display
                 window.modelDisplay.init('modelsContainer');
                 
                 // Load premium showcase only when showing all models
                 if (window.premiumManager && currentFilter === 'all') {
                     await premiumManager.loadPremiumShowcase('premiumModelsContainer');
-                }
-                
-                // Apply filter if not 'all'
-                if (currentFilter !== 'all') {
-                    filterModels(currentFilter);
                 }
             } else {
                 console.error('Model display not initialized');
