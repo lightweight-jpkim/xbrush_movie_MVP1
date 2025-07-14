@@ -264,7 +264,7 @@ class PremiumModelManager {
                     <img src="${model.profileImage}" alt="${model.displayName}" loading="lazy">
                 </div>
                 <div class="model-details">
-                    <div class="premium-indicator">
+                    <div class="model-header">
                         <h4>${model.displayName}</h4>
                         <span class="premium-badge ${model.tier === 'vip' ? 'vip-badge' : ''}">${badge}</span>
                     </div>
