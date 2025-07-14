@@ -4,7 +4,7 @@
  */
 
 /* Smooth loading transitions for all images */
-.featured-model-image,
+.featured-model-image:not([loading="eager"]),
 .model-card-image img,
 .model-thumbnail {
     transition: opacity 0.3s ease;
@@ -13,6 +13,7 @@
 
 /* Show images when loaded */
 .featured-model-image.loaded,
+.featured-model-image[loading="eager"],
 .model-card-image img.loaded,
 .model-thumbnail.loaded {
     opacity: 1;
@@ -67,8 +68,3 @@
     min-height: 480px; /* Approximate height to prevent shift */
 }
 
-/* Preload critical images */
-.featured-model-image[loading="eager"],
-.model-thumbnail[loading="eager"] {
-    opacity: 1; /* Show immediately for critical images */
-}
