@@ -76,7 +76,7 @@ class ModelDisplay {
             this.currentPage = 1;
             
             // Display models with pagination
-            this.displayModelsWithPagination();
+            await this.displayModelsWithPagination();
         } catch (error) {
             console.error('Error loading models:', error);
             console.error('Error details:', error.message);
@@ -124,7 +124,7 @@ class ModelDisplay {
             <div class="models-grid">
                 ${modelsHTML.join('')}
             </div>
-            ${this.createPaginationControls(totalPages)}
+            ${paginationHTML}
         `;
 
         // Add click handlers
@@ -205,9 +205,9 @@ class ModelDisplay {
     attachPaginationHandlers() {
         const paginationButtons = document.querySelectorAll('.pagination-btn:not([disabled])');
         paginationButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 const page = parseInt(e.target.getAttribute('data-page'));
-                this.goToPage(page);
+                await this.goToPage(page);
             });
         });
     }
@@ -215,9 +215,9 @@ class ModelDisplay {
     /**
      * Go to specific page
      */
-    goToPage(page) {
+    async goToPage(page) {
         this.currentPage = page;
-        this.displayModelsWithPagination();
+        await this.displayModelsWithPagination();
         
         // Scroll to top of models section
         const modelsSection = document.querySelector('.models-section');

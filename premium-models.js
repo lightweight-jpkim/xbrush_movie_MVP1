@@ -5,7 +5,15 @@
  */
 class PremiumModelManager {
     constructor() {
-        this.storageAdapter = window.modelStorageAdapter;
+        // Don't set storageAdapter in constructor as it might not be ready
+        this.storageAdapter = null;
+    }
+    
+    getStorageAdapter() {
+        if (!this.storageAdapter) {
+            this.storageAdapter = window.modelStorageAdapter;
+        }
+        return this.storageAdapter;
     }
 
     /**
@@ -81,8 +89,15 @@ class PremiumModelManager {
      * Get premium models from database
      */
     async getPremiumModels(limit = 50) {
+        // Get storage adapter
+        const adapter = this.getStorageAdapter();
+        if (!adapter) {
+            console.error('Storage adapter not available');
+            return [];
+        }
+        
         // Get all active models
-        const allModels = await this.storageAdapter.getActiveModels();
+        const allModels = await adapter.getActiveModels();
         
         // Filter and sort premium models
         let premiumModels = allModels
