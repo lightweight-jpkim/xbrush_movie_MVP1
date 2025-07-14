@@ -257,21 +257,7 @@
 }
 
 .filter-btn.premium-filter {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    font-weight: 600;
-    border: none;
-    padding: 8px 20px;
-}
-
-.filter-btn.premium-filter:hover {
-    background: linear-gradient(135deg, #5a67d8 0%, #693d88 100%);
-    transform: translateY(-1px);
-}
-
-.filter-btn.premium-filter.active {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    /* Remove fixed styles - let it behave like other buttons */
 }
 
 .sort-control {

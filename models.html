@@ -232,10 +232,10 @@
                 return;
             }
             
-            // If premium filter is active, hide premium container
+            // Always hide premium container when any filter is active (except 'all')
             const premiumContainer = document.getElementById('premiumModelsContainer');
             if (premiumContainer) {
-                premiumContainer.style.display = currentFilter === 'premium' ? 'none' : 'block';
+                premiumContainer.style.display = currentFilter === 'all' ? 'block' : 'none';
             }
             
             // Update model display
@@ -269,16 +269,17 @@
             });
             
             if (window.modelDisplay) {
-                // Load premium models first (only if not filtering by premium)
-                if (window.premiumManager && currentFilter !== 'premium') {
+                // Always initialize model display first
+                window.modelDisplay.init('modelsContainer');
+                
+                // Load premium showcase only when showing all models
+                if (window.premiumManager && currentFilter === 'all') {
                     await premiumManager.loadPremiumShowcase('premiumModelsContainer');
                 }
                 
-                // Then load models based on filter
-                if (currentFilter === 'premium') {
-                    filterModels('premium');
-                } else {
-                    window.modelDisplay.init('modelsContainer');
+                // Apply filter if not 'all'
+                if (currentFilter !== 'all') {
+                    filterModels(currentFilter);
                 }
             } else {
                 console.error('Model display not initialized');
