@@ -256,18 +256,18 @@ class PremiumModelManager {
      * Create simplified premium card for index page
      */
     createSimplifiedPremiumCard(model) {
-        const badge = model.tier === 'vip' ? '💎 VIP' : '⭐ 프리미엄';
+        const badge = model.tier === 'vip' ? 'VIP' : '프리미엄';
 
         return `
             <div class="premium-model-card simplified" onclick="selectModel('${model.id}')">
                 <div class="model-visual">
                     <img src="${model.profileImage}" alt="${model.displayName}" loading="lazy">
-                    <div class="premium-indicator">
-                        <span class="premium-badge ${model.tier === 'vip' ? 'vip-badge' : ''}">${badge}</span>
-                    </div>
                 </div>
                 <div class="model-details">
-                    <h4>${model.displayName}</h4>
+                    <div class="premium-indicator">
+                        <h4>${model.displayName}</h4>
+                        <span class="premium-badge ${model.tier === 'vip' ? 'vip-badge' : ''}">${badge}</span>
+                    </div>
                     <p class="premium-tagline">${model.tagline || '프로페셔널 모델'}</p>
                 </div>
             </div>
@@ -340,69 +340,93 @@ class PremiumModelManager {
         let scrollLeft;
         let velocity = 0;
         let rafId;
+        let hasMoved = false;
         
         const container = this.carouselContainer;
         
+        // Prevent text selection while dragging
+        const preventDefault = (e) => {
+            e.preventDefault();
+        };
+        
         // Mouse events
         container.addEventListener('mousedown', (e) => {
+            // Only start drag if clicking on the container, not buttons
+            if (e.target.closest('.premium-carousel-nav')) return;
+            
             isDown = true;
+            hasMoved = false;
+            container.style.cursor = 'grabbing';
             startX = e.pageX - container.offsetLeft;
             scrollLeft = container.scrollLeft;
             cancelAnimationFrame(rafId);
+            velocity = 0;
+            
+            // Prevent text selection
+            document.addEventListener('selectstart', preventDefault);
         });
         
-        container.addEventListener('mouseleave', () => {
+        document.addEventListener('mouseup', () => {
+            if (!isDown) return;
+            
             isDown = false;
+            container.style.cursor = 'grab';
+            
+            // Remove text selection prevention
+            document.removeEventListener('selectstart', preventDefault);
+            
+            // Apply momentum only if we moved
+            if (Math.abs(velocity) > 2) {
+                const momentumScroll = () => {
+                    if (Math.abs(velocity) > 0.5) {
+                        container.scrollLeft += velocity;
+                        velocity *= 0.92; // Friction
+                        rafId = requestAnimationFrame(momentumScroll);
+                    }
+                };
+                momentumScroll();
+            }
         });
         
-        container.addEventListener('mouseup', () => {
-            isDown = false;
-            // Apply momentum
-            const momentumScroll = () => {
-                if (Math.abs(velocity) > 0.5) {
-                    container.scrollLeft += velocity;
-                    velocity *= 0.95; // Friction
-                    rafId = requestAnimationFrame(momentumScroll);
-                }
-            };
-            momentumScroll();
-        });
-        
-        container.addEventListener('mousemove', (e) => {
+        document.addEventListener('mousemove', (e) => {
             if (!isDown) return;
             e.preventDefault();
+            
             const x = e.pageX - container.offsetLeft;
-            const walk = (x - startX) * 2; // Scroll speed multiplier
+            const walk = (x - startX) * 1.5; // Scroll speed multiplier
             container.scrollLeft = scrollLeft - walk;
-            velocity = walk * 0.2; // Calculate velocity for momentum
+            velocity = (x - startX) * 0.1; // Calculate velocity for momentum
+            
+            // Mark that we've moved
+            if (Math.abs(walk) > 5) {
+                hasMoved = true;
+            }
         });
         
         // Touch events for mobile
         container.addEventListener('touchstart', (e) => {
             startX = e.touches[0].pageX - container.offsetLeft;
             scrollLeft = container.scrollLeft;
+            hasMoved = false;
         }, { passive: true });
         
         container.addEventListener('touchmove', (e) => {
             const x = e.touches[0].pageX - container.offsetLeft;
-            const walk = (x - startX) * 2;
+            const walk = (x - startX) * 1.5;
             container.scrollLeft = scrollLeft - walk;
+            
+            if (Math.abs(walk) > 5) {
+                hasMoved = true;
+            }
         }, { passive: true });
         
         // Prevent clicking on cards while dragging
-        let moved = false;
-        container.addEventListener('mousedown', () => moved = false);
-        container.addEventListener('mousemove', () => moved = true);
-        
-        const cards = container.querySelectorAll('.premium-model-card');
-        cards.forEach(card => {
-            card.addEventListener('click', (e) => {
-                if (moved) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            });
-        });
+        container.addEventListener('click', (e) => {
+            if (hasMoved) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
     }
 
 

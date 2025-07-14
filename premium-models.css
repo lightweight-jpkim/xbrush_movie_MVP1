@@ -153,13 +153,9 @@
 }
 
 .premium-model-card.simplified .premium-indicator {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    right: 10px;
-    display: flex;
-    justify-content: space-between;
-    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .premium-model-card.simplified .model-details {
@@ -174,13 +170,21 @@
 
 .premium-model-card.simplified h4 {
     font-size: 1rem;
-    margin: 0 0 5px 0;
+    margin: 0;
     color: #2d3748;
     transition: color 0.3s ease;
+    display: inline;
 }
 
 .premium-model-card.simplified:hover h4 {
     color: #667eea;
+}
+
+.premium-model-card.simplified .premium-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
 }
 
 .premium-model-card.simplified .premium-tagline {
@@ -301,20 +305,19 @@
 
 /* Premium Badge */
 .premium-badge {
-    position: absolute;
-    top: 12px;
-    right: 12px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.8em;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.7em;
     font-weight: 600;
-    z-index: 10;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
+}
+
+.premium-badge.vip-badge {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
 }
 
 /* Premium Image Container */
