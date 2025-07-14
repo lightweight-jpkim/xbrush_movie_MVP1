@@ -70,6 +70,7 @@
             <div class="models-controls">
                 <div class="filter-buttons">
                     <button class="filter-btn active" data-filter="all">전체</button>
+                    <button class="filter-btn premium-filter" data-filter="premium">⭐ 프리미엄</button>
                     <button class="filter-btn" data-filter="fashion">패션</button>
                     <button class="filter-btn" data-filter="beauty">뷰티</button>
                     <button class="filter-btn" data-filter="lifestyle">라이프스타일</button>
@@ -153,8 +154,104 @@
     <script src="js/model-display.js"></script>
     <script src="premium-models.js"></script>
     <script>
+        // Current filter state
+        let currentFilter = 'all';
+        let allModels = [];
+        let filteredModels = [];
+        
+        // Check if we should filter by premium from URL
+        function checkUrlFilter() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const filter = urlParams.get('filter');
+            if (filter === 'premium') {
+                currentFilter = 'premium';
+                // Update active button
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.getAttribute('data-filter') === 'premium') {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+        }
+        
+        // Filter models based on selected filter
+        async function filterModels(filter) {
+            currentFilter = filter;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-filter') === filter) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            if (!window.modelStorageAdapter) return;
+            
+            try {
+                // Get all models
+                allModels = await window.modelStorageAdapter.getActiveModels();
+                
+                // Apply filter
+                if (filter === 'all') {
+                    filteredModels = allModels;
+                } else if (filter === 'premium') {
+                    filteredModels = allModels.filter(model => 
+                        model.tier === 'premium' || model.tier === 'vip'
+                    );
+                } else {
+                    // Category filter
+                    filteredModels = allModels.filter(model => {
+                        const categories = model.personalInfo?.categories || model.categories || [];
+                        return categories.includes(filter);
+                    });
+                }
+                
+                // Display filtered results
+                displayFilteredModels();
+                
+            } catch (error) {
+                console.error('Error filtering models:', error);
+            }
+        }
+        
+        // Display filtered models
+        function displayFilteredModels() {
+            const container = document.getElementById('modelsContainer');
+            if (!container) return;
+            
+            if (filteredModels.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-models-state">
+                        <div class="empty-icon">🔍</div>
+                        <h3>${currentFilter === 'premium' ? '프리미엄 모델이 없습니다' : '해당 카테고리에 모델이 없습니다'}</h3>
+                        <p>다른 카테고리를 선택해보세요</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // If premium filter is active, hide premium container
+            const premiumContainer = document.getElementById('premiumModelsContainer');
+            if (premiumContainer) {
+                premiumContainer.style.display = currentFilter === 'premium' ? 'none' : 'block';
+            }
+            
+            // Update model display
+            if (window.modelDisplay) {
+                window.modelDisplay.allModels = filteredModels;
+                window.modelDisplay.filteredModels = filteredModels;
+                window.modelDisplay.currentFilter = currentFilter;
+                window.modelDisplay.displayModelsWithPagination();
+            }
+        }
+        
         // Initialize model display when page loads
         document.addEventListener('DOMContentLoaded', async function() {
+            // Check URL filter
+            checkUrlFilter();
+            
             // Wait for Firebase to be ready
             let retries = 10;
             while (retries > 0 && (!window.firebaseDB || !window.modelStorageAdapter)) {
@@ -163,13 +260,26 @@
                 retries--;
             }
             
+            // Add filter button click handlers
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const filter = btn.getAttribute('data-filter');
+                    filterModels(filter);
+                });
+            });
+            
             if (window.modelDisplay) {
-                // Load premium models first
-                if (window.premiumManager) {
+                // Load premium models first (only if not filtering by premium)
+                if (window.premiumManager && currentFilter !== 'premium') {
                     await premiumManager.loadPremiumShowcase('premiumModelsContainer');
                 }
-                // Then load regular models
-                window.modelDisplay.init('modelsContainer');
+                
+                // Then load models based on filter
+                if (currentFilter === 'premium') {
+                    filterModels('premium');
+                } else {
+                    window.modelDisplay.init('modelsContainer');
+                }
             } else {
                 console.error('Model display not initialized');
             }

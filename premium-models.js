@@ -60,7 +60,7 @@ class PremiumModelManager {
         if (!container) return;
 
         try {
-            const models = await this.getPremiumModels(10);
+            const models = await this.getPremiumModels(6); // Show only 6 models
             
             if (models.length === 0) {
                 // Hide the entire premium section if no premium models
@@ -71,14 +71,25 @@ class PremiumModelManager {
                 return;
             }
 
-            container.innerHTML = models.map(model => `
-                <div class="premium-model-slide">
-                    ${this.createLargePremiumCard(model)}
-                </div>
-            `).join('');
+            container.innerHTML = models.map(model => 
+                this.createSimplifiedPremiumCard(model)
+            ).join('');
 
-            // Initialize carousel controls
-            this.initializeCarousel(container);
+            // Add view all button
+            const premiumSection = document.getElementById('premiumModelsSection');
+            if (premiumSection && !premiumSection.querySelector('.view-all-premium')) {
+                const viewAllDiv = document.createElement('div');
+                viewAllDiv.className = 'view-all-premium';
+                viewAllDiv.innerHTML = `
+                    <a href="models.html?filter=premium" class="btn">
+                        모든 프리미엄 모델 보기
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                        </svg>
+                    </a>
+                `;
+                premiumSection.appendChild(viewAllDiv);
+            }
 
         } catch (error) {
             console.error('Error loading premium carousel:', error);
@@ -197,6 +208,28 @@ class PremiumModelManager {
                     <div class="price-preview">
                         <span class="from-price">₩${(model.lowestPrice || 300000).toLocaleString()}부터</span>
                     </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Create simplified premium card for index page
+     */
+    createSimplifiedPremiumCard(model) {
+        const badge = model.tier === 'vip' ? '💎 VIP' : '⭐ 프리미엄';
+
+        return `
+            <div class="premium-model-card simplified" onclick="selectModel('${model.id}')">
+                <div class="model-visual">
+                    <img src="${model.profileImage}" alt="${model.displayName}" loading="lazy">
+                    <div class="premium-indicator">
+                        <span class="premium-badge ${model.tier === 'vip' ? 'vip-badge' : ''}">${badge}</span>
+                    </div>
+                </div>
+                <div class="model-details">
+                    <h4>${model.displayName}</h4>
+                    <p class="premium-tagline">${model.tagline || '프로페셔널 모델'}</p>
                 </div>
             </div>
         `;
