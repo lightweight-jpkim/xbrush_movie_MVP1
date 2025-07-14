@@ -71,10 +71,19 @@ class PremiumModelManager {
                 return;
             }
 
+            // Ensure we have enough models for smooth scrolling
+            // Triple the models if we have less than 10
+            let duplicatedModels;
+            if (models.length < 10) {
+                duplicatedModels = [...models, ...models, ...models];
+            } else {
+                duplicatedModels = [...models, ...models];
+            }
+            
             // Create wrapper for horizontal scrolling
             container.innerHTML = `
                 <div class="premium-models-wrapper">
-                    ${models.map(model => this.createSimplifiedPremiumCard(model)).join('')}
+                    ${duplicatedModels.map(model => this.createSimplifiedPremiumCard(model)).join('')}
                 </div>
             `;
 
@@ -114,9 +123,11 @@ class PremiumModelManager {
                 }
             }
 
-            // Initialize scroll position and auto-scroll
+            // Store references
             this.carouselContainer = container;
-            this.initializeAutoScroll();
+            this.carouselWrapper = container.querySelector('.premium-models-wrapper');
+            
+            // No need for JavaScript auto-scroll as CSS handles it
 
         } catch (error) {
             console.error('Error loading premium carousel:', error);
@@ -304,101 +315,54 @@ class PremiumModelManager {
      * Scroll carousel
      */
     scrollCarousel(direction) {
-        if (!this.carouselContainer) return;
+        if (!this.carouselWrapper) return;
         
-        // Stop auto-scroll when manually scrolling
-        this.stopAutoScroll();
+        // Get current transform value
+        const computedStyle = window.getComputedStyle(this.carouselWrapper);
+        const matrix = computedStyle.transform;
+        let currentX = 0;
         
-        const scrollAmount = 220; // Width of card + gap
-        const currentScroll = this.carouselContainer.scrollLeft;
-        
-        if (direction === 'prev') {
-            this.carouselContainer.scrollTo({
-                left: currentScroll - scrollAmount,
-                behavior: 'smooth'
-            });
-        } else {
-            this.carouselContainer.scrollTo({
-                left: currentScroll + scrollAmount,
-                behavior: 'smooth'
-            });
+        if (matrix && matrix !== 'none') {
+            const values = matrix.match(/matrix.*\((.+)\)/)[1].split(', ');
+            currentX = parseFloat(values[4]);
         }
         
-        // Resume auto-scroll after manual scroll
-        setTimeout(() => this.startAutoScroll(), 5000);
-    }
-
-    /**
-     * Initialize auto-scroll functionality
-     */
-    initializeAutoScroll() {
-        if (!this.carouselContainer) return;
+        // Pause animation
+        this.carouselWrapper.style.animation = 'none';
         
-        // Start auto-scroll
-        this.startAutoScroll();
+        // Calculate new position (3 cards at a time for smoother navigation)
+        const scrollAmount = 220 * 3; // Width of 3 cards + gaps
+        let newX = direction === 'prev' ? currentX + scrollAmount : currentX - scrollAmount;
         
-        // Stop on hover
-        this.carouselContainer.addEventListener('mouseenter', () => {
-            this.stopAutoScroll();
-        });
+        // Get boundaries
+        const maxScroll = -(this.carouselWrapper.scrollWidth / 2);
         
-        // Resume on mouse leave
-        this.carouselContainer.addEventListener('mouseleave', () => {
-            this.startAutoScroll();
-        });
-        
-        // Stop on manual scroll
-        let isScrolling;
-        this.carouselContainer.addEventListener('scroll', () => {
-            this.stopAutoScroll();
-            window.clearTimeout(isScrolling);
-            isScrolling = setTimeout(() => {
-                this.startAutoScroll();
-            }, 3000);
-        });
-    }
-
-    /**
-     * Start auto-scrolling
-     */
-    startAutoScroll() {
-        if (this.autoScrollInterval) return;
-        
-        this.autoScrollInterval = setInterval(() => {
-            if (!this.carouselContainer) {
-                this.stopAutoScroll();
-                return;
-            }
-            
-            const maxScroll = this.carouselContainer.scrollWidth - this.carouselContainer.clientWidth;
-            const currentScroll = this.carouselContainer.scrollLeft;
-            
-            // Check if we've reached the end
-            if (currentScroll >= maxScroll - 10) {
-                // Scroll back to beginning
-                this.carouselContainer.scrollTo({
-                    left: 0,
-                    behavior: 'smooth'
-                });
-            } else {
-                // Scroll one card width
-                this.carouselContainer.scrollBy({
-                    left: 220,
-                    behavior: 'smooth'
-                });
-            }
-        }, 3000); // Auto-scroll every 3 seconds
-    }
-
-    /**
-     * Stop auto-scrolling
-     */
-    stopAutoScroll() {
-        if (this.autoScrollInterval) {
-            clearInterval(this.autoScrollInterval);
-            this.autoScrollInterval = null;
+        // Handle wrapping
+        if (newX > 0) {
+            newX = maxScroll + newX;
+        } else if (newX < maxScroll) {
+            newX = newX - maxScroll;
         }
+        
+        // Apply smooth transition
+        this.carouselWrapper.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+        this.carouselWrapper.style.transform = `translateX(${newX}px)`;
+        
+        // Resume animation after transition
+        setTimeout(() => {
+            // Remove transition
+            this.carouselWrapper.style.transition = '';
+            
+            // Calculate position percentage
+            const percentage = Math.abs(newX) / Math.abs(maxScroll);
+            const remainingDuration = 60 * (1 - percentage);
+            
+            // Resume animation from current position
+            this.carouselWrapper.style.animation = `smoothScroll ${remainingDuration}s linear infinite`;
+            this.carouselWrapper.style.animationDelay = `-${60 * percentage}s`;
+        }, 800);
     }
+
 
     /**
      * Update carousel button visibility
