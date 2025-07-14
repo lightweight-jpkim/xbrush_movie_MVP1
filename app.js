@@ -2895,20 +2895,24 @@ async function loadFeaturedModels() {
     
     if (!featuredModelsGrid) return;
     
+    console.log('[Featured Models] Starting to load...');
+    
     try {
         // Show loading state
         featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>모델을 불러오는 중...</p></div>';
         
         // Wait for Firebase to be ready
+        console.log('[Featured Models] Waiting for Firebase...');
         await waitForFirebase();
+        console.log('[Featured Models] Firebase ready!');
         
         // Get active models from Firebase
+        console.log('[Featured Models] Fetching models from Firebase...');
         const models = await window.modelStorageAdapter.getActiveModels();
+        console.log('[Featured Models] Got models:', models.length);
         
         // Update count
-        if (modelCount) {
-            modelCount.textContent = `총 ${models.length}개`;
-        }
+        modelCount.textContent = `총 ${models.length}개`;
         
         if (models.length === 0) {
             featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>등록된 모델이 없습니다.</p></div>';
@@ -2918,15 +2922,31 @@ async function loadFeaturedModels() {
         // Take only first 4 models
         const featuredModels = models.slice(0, 4);
         
+        // Debug: log first model structure
+        if (featuredModels.length > 0) {
+            console.log('[Featured Models] First model structure:', featuredModels[0]);
+            console.log('[Featured Models] Portfolio:', featuredModels[0].portfolio);
+            console.log('[Featured Models] PersonalInfo:', featuredModels[0].personalInfo);
+        }
+        
         // Create model cards HTML
         const modelsHTML = featuredModels.map(model => {
-            const thumbnailUrl = model.portfolio?.thumbnailUrl || model.personalInfo?.thumbnailUrl || 'images/default-profile.jpg';
+            // Try multiple possible locations for thumbnail
+            const thumbnailUrl = model.portfolio?.thumbnailUrl || 
+                                model.personalInfo?.thumbnailUrl || 
+                                model.thumbnailUrl ||
+                                model.photos?.[0] ||
+                                model.profileImage ||
+                                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg==';
             
             return `
             <div class="featured-model-card" onclick="selectFeaturedModel('${model.id}', '${model.personalInfo?.name || ''}')">
                 <img src="${thumbnailUrl}" 
                      alt="${model.personalInfo?.name || '모델'}" 
-                     class="featured-model-image">
+                     class="featured-model-image"
+                     loading="lazy"
+                     onload="this.classList.add('loaded');"
+                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0E0QUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg=='">
                 <div class="featured-model-info">
                     <div class="featured-model-name">${model.personalInfo?.name || '이름 없음'}</div>
                     <div class="featured-model-intro">${model.personalInfo?.intro || '소개 없음'}</div>
@@ -2939,7 +2959,7 @@ async function loadFeaturedModels() {
                     ` : ''}
                 </div>
             </div>
-        `}).join('');
+        `).join('');
         
         featuredModelsGrid.innerHTML = modelsHTML;
         
