@@ -78,27 +78,6 @@
     cursor: grabbing;
 }
 
-/* Fade Effects */
-.premium-models-carousel::before,
-.premium-models-carousel::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 8px; /* Account for scrollbar */
-    width: 60px;
-    z-index: 2;
-    pointer-events: none;
-}
-
-.premium-models-carousel::before {
-    left: 0;
-    background: linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
-}
-
-.premium-models-carousel::after {
-    right: 0;
-    background: linear-gradient(to left, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
-}
 
 .premium-models-wrapper {
     display: flex;
