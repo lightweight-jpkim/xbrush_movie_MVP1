@@ -2893,65 +2893,40 @@ async function loadFeaturedModels() {
     const featuredModelsGrid = document.getElementById('featuredModelsGrid');
     const modelCount = document.getElementById('modelCount');
     
-    if (!featuredModelsGrid) {
-        console.error('[Featured Models] featuredModelsGrid element not found!');
-        return;
-    }
-    
-    console.log('[Featured Models] Starting to load...');
-    console.log('[Featured Models] Grid element:', featuredModelsGrid);
+    if (!featuredModelsGrid) return;
     
     try {
         // Show loading state
         featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>모델을 불러오는 중...</p></div>';
         
         // Wait for Firebase to be ready
-        console.log('[Featured Models] Waiting for Firebase...');
         await waitForFirebase();
-        console.log('[Featured Models] Firebase ready!');
         
         // Get active models from Firebase
-        console.log('[Featured Models] Fetching models from Firebase...');
-        const allModels = await window.modelStorageAdapter.getActiveModels();
-        console.log('[Featured Models] Got all models:', allModels.length);
-        console.log('[Featured Models] First model data:', allModels[0]);
-        
-        // Show ALL models temporarily (including premium) to debug image display
-        const regularModels = allModels; // Temporarily show all models
-        console.log('[Featured Models] Showing all models (debug):', regularModels.length);
+        const models = await window.modelStorageAdapter.getActiveModels();
         
         // Update count
         if (modelCount) {
-            modelCount.textContent = `총 ${regularModels.length}개`;
+            modelCount.textContent = `총 ${models.length}개`;
         }
         
-        if (regularModels.length === 0) {
-            console.log('[Featured Models] No models found, showing empty message');
+        if (models.length === 0) {
             featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>등록된 모델이 없습니다.</p></div>';
             return;
         }
         
         // Take only first 4 models
-        const featuredModels = regularModels.slice(0, 4);
+        const featuredModels = models.slice(0, 4);
         
-        // Create model cards HTML with placeholder
-        const modelsHTML = await Promise.all(featuredModels.map(async model => {
-            const thumbnailUrl = model.portfolio?.thumbnailUrl || model.personalInfo?.thumbnailUrl;
-            let imageSrc = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMC40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTk5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg==';
-            
-            // Use thumbnail URL directly
-            if (thumbnailUrl && thumbnailUrl !== 'undefined' && thumbnailUrl !== 'null' && thumbnailUrl !== '') {
-                imageSrc = thumbnailUrl;
-            }
+        // Create model cards HTML
+        const modelsHTML = featuredModels.map(model => {
+            const thumbnailUrl = model.portfolio?.thumbnailUrl || model.personalInfo?.thumbnailUrl || 'images/default-profile.jpg';
             
             return `
             <div class="featured-model-card" onclick="selectFeaturedModel('${model.id}', '${model.personalInfo?.name || ''}')">
-                <img src="${imageSrc}" 
+                <img src="${thumbnailUrl}" 
                      alt="${model.personalInfo?.name || '모델'}" 
-                     class="featured-model-image"
-                     loading="eager"
-                     onload="this.classList.add('loaded');"
-                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg=='">
+                     class="featured-model-image">
                 <div class="featured-model-info">
                     <div class="featured-model-name">${model.personalInfo?.name || '이름 없음'}</div>
                     <div class="featured-model-intro">${model.personalInfo?.intro || '소개 없음'}</div>
@@ -2966,46 +2941,12 @@ async function loadFeaturedModels() {
             </div>
         `}).join('');
         
-        console.log('[Featured Models] Generated HTML:', modelsHTML);
-        console.log('[Featured Models] Setting innerHTML...');
         featuredModelsGrid.innerHTML = modelsHTML;
-        console.log('[Featured Models] innerHTML set successfully');
-        
-        // Check if images are in DOM
-        const images = featuredModelsGrid.querySelectorAll('img');
-        console.log('[Featured Models] Found images in DOM:', images.length);
-        images.forEach((img, index) => {
-            console.log(`[Featured Models] Image ${index}:`, {
-                src: img.src.substring(0, 100) + '...',
-                className: img.className,
-                loading: img.getAttribute('loading'),
-                naturalWidth: img.naturalWidth,
-                naturalHeight: img.naturalHeight,
-                complete: img.complete
-            });
-            
-            // Force images to be visible
-            img.style.opacity = '1';
-            img.style.display = 'block';
-        });
         
     } catch (error) {
-        console.error('[Featured Models] Error loading models:', error);
-        console.error('[Featured Models] Error stack:', error.stack);
+        console.error('Error loading featured models:', error);
         featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>모델을 불러오는 중 오류가 발생했습니다.</p></div>';
     }
-    
-    // TEST: Add a manual test image to verify display works
-    console.log('[Featured Models] Adding test image...');
-    const testHTML = `
-        <div style="border: 2px solid red; padding: 10px; margin-top: 20px;">
-            <p>TEST IMAGE (should be visible):</p>
-            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg==" 
-                 style="width: 100px; height: 100px; display: block; opacity: 1; border: 1px solid blue;" 
-                 alt="Test Image">
-        </div>
-    `;
-    featuredModelsGrid.insertAdjacentHTML('beforeend', testHTML);
 }
 
 /**

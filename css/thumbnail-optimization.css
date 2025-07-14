@@ -4,16 +4,18 @@
  */
 
 /* Smooth loading transitions for all images */
-.featured-model-image:not([loading="eager"]),
 .model-card-image img,
 .model-thumbnail {
     transition: opacity 0.3s ease;
     opacity: 0;
 }
 
+/* Featured model images should always be visible */
+.featured-model-image {
+    opacity: 1 !important;
+}
+
 /* Show images when loaded */
-.featured-model-image.loaded,
-.featured-model-image[loading="eager"],
 .model-card-image img.loaded,
 .model-thumbnail.loaded {
     opacity: 1;
