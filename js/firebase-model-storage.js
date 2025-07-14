@@ -86,21 +86,36 @@ class FirebaseModelStorage {
             }
             console.log('[FirebaseModelStorage] Model ID:', modelData.id);
             
-            // Upload thumbnail if it's base64
+            // Upload thumbnail using the new image storage service
             if (modelData.portfolio?.thumbnailUrl?.startsWith('data:')) {
                 console.log('Uploading thumbnail to Firebase Storage...');
                 try {
-                    modelData.portfolio.thumbnailUrl = await this.uploadImage(
-                        modelData.portfolio.thumbnailUrl,
-                        `thumbnail_${modelData.id}.jpg`
-                    );
+                    // Wait for image storage service to be ready
+                    if (window.imageStorageService) {
+                        modelData.portfolio.thumbnailUrl = await window.imageStorageService.uploadImage(
+                            modelData.portfolio.thumbnailUrl,
+                            `${window.AppConfig.storage.modelImagesPath}thumbnails/${modelData.id}_${Date.now()}.jpg`,
+                            {
+                                customMetadata: {
+                                    modelId: modelData.id,
+                                    type: 'thumbnail'
+                                }
+                            }
+                        ).then(result => result.url);
+                    } else {
+                        // Fallback to old method
+                        modelData.portfolio.thumbnailUrl = await this.uploadImage(
+                            modelData.portfolio.thumbnailUrl,
+                            `thumbnail_${modelData.id}.jpg`
+                        );
+                    }
                 } catch (error) {
-                    console.error('Thumbnail upload failed (CORS issue), keeping base64:', error);
-                    // Keep base64 for now - will work but less efficient
+                    console.error('Thumbnail upload failed, keeping base64:', error);
+                    // Keep base64 as fallback
                 }
             }
             
-            // Upload portfolio images if they're base64
+            // Upload portfolio images using the new image storage service
             if (modelData.portfolio?.images?.length > 0) {
                 console.log('Uploading portfolio images...');
                 const uploadedImages = [];
@@ -108,16 +123,33 @@ class FirebaseModelStorage {
                     const img = modelData.portfolio.images[i];
                     if (img.url?.startsWith('data:')) {
                         try {
-                            const uploadedUrl = await this.uploadImage(
-                                img.url,
-                                `portfolio_${modelData.id}_${i}.jpg`
-                            );
+                            let uploadedUrl;
+                            if (window.imageStorageService) {
+                                const result = await window.imageStorageService.uploadImage(
+                                    img.url,
+                                    `${window.AppConfig.storage.portfolioPath}${modelData.id}/${Date.now()}_${i}.jpg`,
+                                    {
+                                        customMetadata: {
+                                            modelId: modelData.id,
+                                            type: 'portfolio',
+                                            index: i.toString()
+                                        }
+                                    }
+                                );
+                                uploadedUrl = result.url;
+                            } else {
+                                // Fallback to old method
+                                uploadedUrl = await this.uploadImage(
+                                    img.url,
+                                    `portfolio_${modelData.id}_${i}.jpg`
+                                );
+                            }
                             uploadedImages.push({
                                 ...img,
                                 url: uploadedUrl
                             });
                         } catch (error) {
-                            console.error(`Portfolio image ${i} upload failed (CORS), keeping base64:`, error);
+                            console.error(`Portfolio image ${i} upload failed, keeping base64:`, error);
                             uploadedImages.push(img); // Keep base64 version
                         }
                     } else {

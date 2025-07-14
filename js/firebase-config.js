@@ -11,18 +11,18 @@ function initializeFirebaseServices() {
         setTimeout(initializeFirebaseServices, 100);
         return;
     }
+    
+    // Check if AppConfig is loaded
+    if (!window.AppConfig) {
+        console.log('Waiting for AppConfig...');
+        setTimeout(initializeFirebaseServices, 100);
+        return;
+    }
 
     console.log('Firebase SDK detected, initializing...');
 
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyCsQzvoYysNkHcxR4NztCdqTVkD_HgtJEU",
-        authDomain: "xbrush-moviemaker-mvp.firebaseapp.com",
-        projectId: "xbrush-moviemaker-mvp",
-        storageBucket: "xbrush-moviemaker-mvp.firebasestorage.app",
-        messagingSenderId: "138732810619",
-        appId: "1:138732810619:web:a35c938d2d3b2880db4dde"
-    };
+    // Get Firebase configuration from centralized config
+    const firebaseConfig = window.AppConfig.getFirebaseConfig();
 
     try {
         // Initialize Firebase
@@ -54,19 +54,24 @@ function initializeFirebaseServices() {
                 }
             });
 
-        // Initialize anonymous authentication (commented out until enabled in Firebase Console)
-        // Uncomment after enabling Anonymous auth in Firebase Console
-        /*
-        auth.signInAnonymously()
-            .then(() => {
-                console.log('Anonymous authentication successful');
-            })
-            .catch((error) => {
-                console.error('Authentication error:', error);
-                // Continue without auth for now
-            });
-        */
-        console.log('Skipping authentication for now - enable Anonymous auth in Firebase Console');
+        // Initialize anonymous authentication if enabled
+        if (window.AppConfig.isFeatureEnabled('enableAnonymousAuth')) {
+            auth.signInAnonymously()
+                .then(() => {
+                    console.log('Anonymous authentication successful');
+                })
+                .catch((error) => {
+                    if (error.code === 'auth/operation-not-allowed') {
+                        console.warn('Anonymous auth not enabled in Firebase Console. Please enable it at:');
+                        console.warn('https://console.firebase.google.com/project/xbrush-moviemaker-mvp/authentication/providers');
+                    } else {
+                        console.error('Authentication error:', error);
+                    }
+                    // Continue without auth for now
+                });
+        } else {
+            console.log('Anonymous authentication is disabled in configuration');
+        }
 
         // Monitor auth state
         auth.onAuthStateChanged((user) => {
