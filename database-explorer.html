@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Explorer - xBrush</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #2d3748;
+        }
+        
+        .header {
+            background: #2d3748;
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+        
+        .sidebar h3 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .table-list {
+            list-style: none;
+        }
+        
+        .table-item {
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-item:hover {
+            background: #e6f3ff;
+        }
+        
+        .table-item.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .table-count {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+        
+        .main-content {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .table-title {
+            font-size: 1.5rem;
+            color: #2d3748;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        .data-grid {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .data-table th {
+            background: #f7fafc;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+        }
+        
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+        
+        .data-table tr:hover {
+            background: #f7fafc;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #718096;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+        
+        .field-value {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .field-object {
+            background: #f7fafc;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #4a5568;
+        }
+        
+        .field-array {
+            background: #e6f3ff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #2b6cb0;
+        }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #718096;
+        }
+        
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .record-detail {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 200;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .record-detail.open {
+            right: 0;
+        }
+        
+        .detail-header {
+            padding: 20px;
+            background: #f7fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .detail-content {
+            padding: 20px;
+        }
+        
+        .detail-field {
+            margin-bottom: 20px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .detail-value {
+            color: #2d3748;
+            word-break: break-word;
+        }
+        
+        pre {
+            background: #f7fafc;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>🔍 Database Explorer</h1>
+            <div style="display: flex; gap: 15px;">
+                <button class="btn btn-secondary" onclick="refreshData()">🔄 Refresh</button>
+                <button class="btn btn-primary" onclick="exportData()">📥 Export</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h3>Collections</h3>
+            <ul class="table-list" id="tableList">
+                <li class="table-item active" onclick="loadTable('models')">
+                    <span>📋 models</span>
+                    <span class="table-count" id="count-models">0</span>
+                </li>
+                <li class="table-item" onclick="loadTable('modelProfiles')">
+                    <span>👤 modelProfiles</span>
+                    <span class="table-count" id="count-modelProfiles">0</span>
+                </li>
+                <li class="table-item" onclick="loadTable('licensingPlans')">
+                    <span>📑 licensingPlans</span>
+                    <span class="table-count" id="count-licensingPlans">0</span>
+                </li>
+                <li class="table-item" onclick="loadTable('licenses')">
+                    <span>📜 licenses</span>
+                    <span class="table-count" id="count-licenses">0</span>
+                </li>
+                <li class="table-item" onclick="loadTable('projects')">
+                    <span>🎬 projects</span>
+                    <span class="table-count" id="count-projects">0</span>
+                </li>
+                <li class="table-item" onclick="loadTable('reviews')">
+                    <span>⭐ reviews</span>
+                    <span class="table-count" id="count-reviews">0</span>
+                </li>
+                <li class="table-item" onclick="loadTable('payments')">
+                    <span>💳 payments</span>
+                    <span class="table-count" id="count-payments">0</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="table-header">
+                <h2 class="table-title" id="currentTableTitle">models</h2>
+                <div class="table-actions">
+                    <button class="btn btn-secondary" onclick="addSampleRecord()">➕ Add Sample</button>
+                    <button class="btn btn-secondary" onclick="clearTable()">🗑️ Clear Table</button>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <input type="text" 
+                       class="filter-input" 
+                       id="searchInput" 
+                       placeholder="Search records..."
+                       onkeyup="filterRecords()">
+                <select class="filter-input" style="width: 200px;" onchange="sortRecords(this.value)">
+                    <option value="">Sort by...</option>
+                    <option value="createdAt">Created Date</option>
+                    <option value="updatedAt">Updated Date</option>
+                    <option value="name">Name</option>
+                </select>
+            </div>
+
+            <div id="dataContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading data...
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Record Detail Panel -->
+    <div class="record-detail" id="recordDetail">
+        <div class="detail-header">
+            <h3>Record Details</h3>
+            <button class="btn btn-secondary" onclick="closeDetail()">✕</button>
+        </div>
+        <div class="detail-content" id="detailContent">
+            <!-- Details will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+    
+    <script>
+        let currentTable = 'models';
+        let currentData = [];
+        let db = null;
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (window.firebase && window.firebase.firestore) {
+                    db = firebase.firestore();
+                    updateTableCounts();
+                    loadTable('models');
+                } else {
+                    alert('Firebase not initialized. Please refresh the page.');
+                }
+            }, 1000);
+        });
+
+        async function updateTableCounts() {
+            const tables = ['models', 'modelProfiles', 'licensingPlans', 'licenses', 'projects', 'reviews', 'payments'];
+            
+            for (const table of tables) {
+                try {
+                    const snapshot = await db.collection(table).get();
+                    document.getElementById(`count-${table}`).textContent = snapshot.size;
+                } catch (error) {
+                    console.error(`Error counting ${table}:`, error);
+                }
+            }
+        }
+
+        async function loadTable(tableName) {
+            currentTable = tableName;
+            
+            // Update UI
+            document.querySelectorAll('.table-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.table-item').classList.add('active');
+            
+            document.getElementById('currentTableTitle').textContent = tableName;
+            document.getElementById('dataContainer').innerHTML = '<div class="loading"><div class="spinner"></div>Loading data...</div>';
+            
+            try {
+                const snapshot = await db.collection(tableName).limit(100).get();
+                currentData = [];
+                
+                snapshot.forEach(doc => {
+                    currentData.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                renderTable(currentData);
+            } catch (error) {
+                console.error('Error loading table:', error);
+                document.getElementById('dataContainer').innerHTML = `
+                    <div class="empty-state">
+                        <h3>Error loading data</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderTable(data) {
+            if (data.length === 0) {
+                document.getElementById('dataContainer').innerHTML = `
+                    <div class="empty-state">
+                        <h3>No data found</h3>
+                        <p>This table is empty. Add some records to see them here.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Get all unique keys from all records
+            const allKeys = new Set(['id']);
+            data.forEach(record => {
+                Object.keys(record).forEach(key => allKeys.add(key));
+            });
+            
+            const keys = Array.from(allKeys);
+            
+            let html = `
+                <div class="data-grid">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                ${keys.map(key => `<th>${key}</th>`).join('')}
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            data.forEach(record => {
+                html += '<tr>';
+                keys.forEach(key => {
+                    const value = record[key];
+                    html += `<td>${formatValue(value)}</td>`;
+                });
+                html += `
+                    <td>
+                        <button class="btn btn-secondary" onclick='viewRecord(${JSON.stringify(record)})'>View</button>
+                    </td>
+                `;
+                html += '</tr>';
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            document.getElementById('dataContainer').innerHTML = html;
+        }
+
+        function formatValue(value) {
+            if (value === null || value === undefined) {
+                return '<span style="color: #cbd5e0;">null</span>';
+            }
+            
+            if (typeof value === 'object') {
+                if (value.toDate && typeof value.toDate === 'function') {
+                    // Firestore timestamp
+                    return new Date(value.toDate()).toLocaleString();
+                } else if (Array.isArray(value)) {
+                    return `<span class="field-array">[${value.length} items]</span>`;
+                } else {
+                    return `<span class="field-object">{object}</span>`;
+                }
+            }
+            
+            if (typeof value === 'string' && value.length > 50) {
+                return `<div class="field-value" title="${value}">${value}</div>`;
+            }
+            
+            return value;
+        }
+
+        function viewRecord(record) {
+            const detailPanel = document.getElementById('recordDetail');
+            const detailContent = document.getElementById('detailContent');
+            
+            let html = '';
+            
+            Object.entries(record).forEach(([key, value]) => {
+                html += `
+                    <div class="detail-field">
+                        <div class="detail-label">${key}</div>
+                        <div class="detail-value">
+                            ${typeof value === 'object' ? 
+                                `<pre>${JSON.stringify(value, null, 2)}</pre>` : 
+                                value}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            detailContent.innerHTML = html;
+            detailPanel.classList.add('open');
+        }
+
+        function closeDetail() {
+            document.getElementById('recordDetail').classList.remove('open');
+        }
+
+        function filterRecords() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!searchTerm) {
+                renderTable(currentData);
+                return;
+            }
+            
+            const filtered = currentData.filter(record => {
+                const recordString = JSON.stringify(record).toLowerCase();
+                return recordString.includes(searchTerm);
+            });
+            
+            renderTable(filtered);
+        }
+
+        function sortRecords(field) {
+            if (!field) {
+                renderTable(currentData);
+                return;
+            }
+            
+            const sorted = [...currentData].sort((a, b) => {
+                const aVal = a[field];
+                const bVal = b[field];
+                
+                if (aVal < bVal) return -1;
+                if (aVal > bVal) return 1;
+                return 0;
+            });
+            
+            renderTable(sorted);
+        }
+
+        async function refreshData() {
+            await updateTableCounts();
+            await loadTable(currentTable);
+        }
+
+        async function exportData() {
+            const dataStr = JSON.stringify(currentData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${currentTable}_export_${new Date().toISOString()}.json`;
+            link.click();
+        }
+
+        async function clearTable() {
+            if (!confirm(`Are you sure you want to clear all data from ${currentTable}?`)) {
+                return;
+            }
+            
+            try {
+                const batch = db.batch();
+                const snapshot = await db.collection(currentTable).get();
+                snapshot.docs.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+                
+                alert('Table cleared successfully');
+                refreshData();
+            } catch (error) {
+                alert('Error clearing table: ' + error.message);
+            }
+        }
+
+        async function addSampleRecord() {
+            alert('This feature would add a sample record to the current table.');
+            // Implementation would depend on the table structure
+        }
+    </script>
+</body>
+</html>

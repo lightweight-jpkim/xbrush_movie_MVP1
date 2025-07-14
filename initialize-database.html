@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Database Initialization - xBrush</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: #1a202c;
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        
+        .card h3 {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .status {
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 0.95rem;
+        }
+        
+        .status.info {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status.success {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .status.warning {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .table-list {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        
+        .table-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .table-item:last-child {
+            border-bottom: none;
+        }
+        
+        .table-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .table-description {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+        
+        .table-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e2e8f0;
+        }
+        
+        .status-indicator.ready {
+            background: #48bb78;
+        }
+        
+        .status-indicator.pending {
+            background: #f6ad55;
+        }
+        
+        .status-indicator.error {
+            background: #fc8181;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c53030;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .progress-log {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 2px 0;
+        }
+        
+        .log-success {
+            color: #68d391;
+        }
+        
+        .log-error {
+            color: #fc8181;
+        }
+        
+        .log-info {
+            color: #90cdf4;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .table-structure {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .table-card {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .table-card h4 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        
+        .field-list {
+            font-size: 0.85rem;
+            color: #718096;
+        }
+        
+        .field-list li {
+            margin: 3px 0;
+            list-style: none;
+            padding-left: 15px;
+            position: relative;
+        }
+        
+        .field-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #cbd5e0;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>🗄️ Complete Database Initialization Tool</h1>
+            <p style="margin-top: 10px; opacity: 0.9;">Initialize all 7 tables for the xBrush Face Licensing Platform</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Status Dashboard -->
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2>📊 Database Status</h2>
+                <h3 id="dbStatus">Not Connected</h3>
+                <p style="color: #718096;">Firebase Connection</p>
+            </div>
+            <div class="card">
+                <h2>📈 Tables Created</h2>
+                <h3 id="tablesCount">0 / 7</h3>
+                <p style="color: #718096;">Total Progress</p>
+            </div>
+            <div class="card">
+                <h2>📝 Records Added</h2>
+                <h3 id="recordsCount">0</h3>
+                <p style="color: #718096;">Total Records</p>
+            </div>
+        </div>
+
+        <!-- Table Structure Overview -->
+        <div class="table-list">
+            <h2>📋 Database Tables Structure</h2>
+            <div class="table-structure">
+                <div class="table-card">
+                    <h4>1. models</h4>
+                    <ul class="field-list">
+                        <li>personalInfo</li>
+                        <li>professionalInfo</li>
+                        <li>portfolio</li>
+                        <li>pricing</li>
+                        <li>stats</li>
+                    </ul>
+                </div>
+                <div class="table-card">
+                    <h4>2. modelProfiles</h4>
+                    <ul class="field-list">
+                        <li>bio</li>
+                        <li>socialMedia</li>
+                        <li>achievements</li>
+                        <li>preferences</li>
+                        <li>bankInfo</li>
+                    </ul>
+                </div>
+                <div class="table-card">
+                    <h4>3. licensingPlans</h4>
+                    <ul class="field-list">
+                        <li>planType</li>
+                        <li>pricing</li>
+                        <li>options</li>
+                        <li>dynamicPricing</li>
+                        <li>approval</li>
+                    </ul>
+                </div>
+                <div class="table-card">
+                    <h4>4. licenses</h4>
+                    <ul class="field-list">
+                        <li>details</li>
+                        <li>pricing</li>
+                        <li>contract</li>
+                        <li>status</li>
+                        <li>timeline</li>
+                    </ul>
+                </div>
+                <div class="table-card">
+                    <h4>5. projects</h4>
+                    <ul class="field-list">
+                        <li>projectInfo</li>
+                        <li>licenses</li>
+                        <li>timeline</li>
+                        <li>deliverables</li>
+                        <li>budget</li>
+                    </ul>
+                </div>
+                <div class="table-card">
+                    <h4>6. reviews</h4>
+                    <ul class="field-list">
+                        <li>rating</li>
+                        <li>content</li>
+                        <li>detailedRatings</li>
+                        <li>modelResponse</li>
+                        <li>verified</li>
+                    </ul>
+                </div>
+                <div class="table-card">
+                    <h4>7. payments</h4>
+                    <ul class="field-list">
+                        <li>amount</li>
+                        <li>transaction</li>
+                        <li>breakdown</li>
+                        <li>payout</li>
+                        <li>status</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Status List -->
+        <div class="table-list">
+            <h2>📊 Table Initialization Status</h2>
+            <div id="tableStatusList">
+                <div class="table-item">
+                    <div>
+                        <div class="table-name">1. models</div>
+                        <div class="table-description">Basic model information and portfolio</div>
+                    </div>
+                    <div class="table-status">
+                        <span id="models-count">0 records</span>
+                        <div class="status-indicator" id="models-status"></div>
+                    </div>
+                </div>
+                <div class="table-item">
+                    <div>
+                        <div class="table-name">2. modelProfiles</div>
+                        <div class="table-description">Extended profile and preferences</div>
+                    </div>
+                    <div class="table-status">
+                        <span id="modelProfiles-count">0 records</span>
+                        <div class="status-indicator" id="modelProfiles-status"></div>
+                    </div>
+                </div>
+                <div class="table-item">
+                    <div>
+                        <div class="table-name">3. licensingPlans</div>
+                        <div class="table-description">Available licensing options and pricing</div>
+                    </div>
+                    <div class="table-status">
+                        <span id="licensingPlans-count">0 records</span>
+                        <div class="status-indicator" id="licensingPlans-status"></div>
+                    </div>
+                </div>
+                <div class="table-item">
+                    <div>
+                        <div class="table-name">4. licenses</div>
+                        <div class="table-description">Purchased licenses and contracts</div>
+                    </div>
+                    <div class="table-status">
+                        <span id="licenses-count">0 records</span>
+                        <div class="status-indicator" id="licenses-status"></div>
+                    </div>
+                </div>
+                <div class="table-item">
+                    <div>
+                        <div class="table-name">5. projects</div>
+                        <div class="table-description">Customer projects and deliverables</div>
+                    </div>
+                    <div class="table-status">
+                        <span id="projects-count">0 records</span>
+                        <div class="status-indicator" id="projects-status"></div>
+                    </div>
+                </div>
+                <div class="table-item">
+                    <div>
+                        <div class="table-name">6. reviews</div>
+                        <div class="table-description">Customer reviews and ratings</div>
+                    </div>
+                    <div class="table-status">
+                        <span id="reviews-count">0 records</span>
+                        <div class="status-indicator" id="reviews-status"></div>
+                    </div>
+                </div>
+                <div class="table-item">
+                    <div>
+                        <div class="table-name">7. payments</div>
+                        <div class="table-description">Payment transactions and payouts</div>
+                    </div>
+                    <div class="table-status">
+                        <span id="payments-count">0 records</span>
+                        <div class="status-indicator" id="payments-status"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button id="initBtn" class="btn btn-primary" onclick="initializeDatabase()">
+                🚀 Initialize Complete Database
+            </button>
+            <button id="checkBtn" class="btn btn-secondary" onclick="checkDatabase()">
+                🔍 Check Current Status
+            </button>
+            <button id="clearBtn" class="btn btn-danger" onclick="clearDatabase()" style="display: none;">
+                🗑️ Clear All Data
+            </button>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="statusMessage"></div>
+
+        <!-- Progress Log -->
+        <div class="progress-log" id="progressLog" style="display: none;">
+            <div class="log-entry log-info">📊 Database initialization log started...</div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+    
+    <!-- Database Initialization Script -->
+    <script src="initialize-complete-database.js"></script>
+    
+    <script>
+        let initializer = null;
+        
+        // Check Firebase connection on load
+        window.addEventListener('load', () => {
+            setTimeout(checkFirebaseConnection, 1000);
+        });
+        
+        function checkFirebaseConnection() {
+            const dbStatus = document.getElementById('dbStatus');
+            if (window.firebase && window.firebase.firestore) {
+                dbStatus.textContent = 'Connected';
+                dbStatus.style.color = '#48bb78';
+                checkDatabase();
+            } else {
+                dbStatus.textContent = 'Not Connected';
+                dbStatus.style.color = '#e53e3e';
+            }
+        }
+        
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('progressLog');
+            logDiv.style.display = 'block';
+            const time = new Date().toLocaleTimeString();
+            const className = `log-entry log-${type}`;
+            logDiv.innerHTML += `<div class="${className}">[${time}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        async function checkDatabase() {
+            log('🔍 Checking current database status...', 'info');
+            
+            const tables = ['models', 'modelProfiles', 'licensingPlans', 'licenses', 'projects', 'reviews', 'payments'];
+            let totalRecords = 0;
+            let tablesWithData = 0;
+            
+            for (const table of tables) {
+                try {
+                    const snapshot = await firebase.firestore().collection(table).limit(100).get();
+                    const count = snapshot.size;
+                    totalRecords += count;
+                    
+                    document.getElementById(`${table}-count`).textContent = `${count} records`;
+                    const statusIndicator = document.getElementById(`${table}-status`);
+                    
+                    if (count > 0) {
+                        tablesWithData++;
+                        statusIndicator.className = 'status-indicator ready';
+                    } else {
+                        statusIndicator.className = 'status-indicator pending';
+                    }
+                    
+                    log(`✅ ${table}: ${count} records found`, 'success');
+                } catch (error) {
+                    log(`❌ Error checking ${table}: ${error.message}`, 'error');
+                    document.getElementById(`${table}-status`).className = 'status-indicator error';
+                }
+            }
+            
+            // Update summary
+            document.getElementById('tablesCount').textContent = `${tablesWithData} / 7`;
+            document.getElementById('recordsCount').textContent = totalRecords;
+            
+            if (totalRecords > 0) {
+                document.getElementById('clearBtn').style.display = 'inline-block';
+                showStatus('info', `Database contains ${totalRecords} records across ${tablesWithData} tables.`);
+            } else {
+                showStatus('warning', 'Database is empty. Click "Initialize Complete Database" to set up all tables.');
+            }
+        }
+        
+        async function initializeDatabase() {
+            const btn = document.getElementById('initBtn');
+            btn.disabled = true;
+            btn.innerHTML = '🔄 Initializing... <span class="spinner"></span>';
+            
+            log('🚀 Starting complete database initialization...', 'info');
+            
+            try {
+                initializer = new DatabaseInitializer();
+                
+                // Override console.log to capture initialization logs
+                const originalLog = console.log;
+                console.log = function(message) {
+                    originalLog.apply(console, arguments);
+                    if (typeof message === 'string') {
+                        if (message.includes('✅')) {
+                            log(message, 'success');
+                        } else if (message.includes('❌')) {
+                            log(message, 'error');
+                        } else {
+                            log(message, 'info');
+                        }
+                    }
+                };
+                
+                const result = await initializer.initialize();
+                
+                // Restore console.log
+                console.log = originalLog;
+                
+                if (result.success) {
+                    showStatus('success', '🎉 Database initialization complete! All 7 tables have been created with sample data.');
+                    log('✅ Initialization completed successfully!', 'success');
+                    
+                    // Refresh status
+                    setTimeout(checkDatabase, 1000);
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                showStatus('error', `Initialization failed: ${error.message}`);
+                log(`❌ Initialization failed: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Initialize Complete Database';
+            }
+        }
+        
+        async function clearDatabase() {
+            if (!confirm('⚠️ This will delete ALL data from all 7 tables. Are you sure?')) {
+                return;
+            }
+            
+            if (!confirm('⚠️ This action cannot be undone. Are you REALLY sure?')) {
+                return;
+            }
+            
+            const btn = document.getElementById('clearBtn');
+            btn.disabled = true;
+            btn.innerHTML = '🔄 Clearing...';
+            
+            log('🗑️ Starting database cleanup...', 'info');
+            
+            try {
+                const tables = ['models', 'modelProfiles', 'licensingPlans', 'licenses', 'projects', 'reviews', 'payments'];
+                
+                for (const table of tables) {
+                    log(`Clearing ${table}...`, 'info');
+                    const snapshot = await firebase.firestore().collection(table).limit(100).get();
+                    const batch = firebase.firestore().batch();
+                    snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                    await batch.commit();
+                    log(`✅ Cleared ${table}`, 'success');
+                }
+                
+                showStatus('success', 'All data has been cleared successfully.');
+                setTimeout(checkDatabase, 1000);
+                
+            } catch (error) {
+                showStatus('error', `Clear failed: ${error.message}`);
+                log(`❌ Clear failed: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🗑️ Clear All Data';
+            }
+        }
+        
+        function showStatus(type, message) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+    </script>
+</body>
+</html>
