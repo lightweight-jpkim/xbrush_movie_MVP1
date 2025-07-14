@@ -43,25 +43,13 @@
 .premium-model-card {
     position: relative;
     background: white;
-    border: 2px solid #667eea;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     overflow: hidden;
     cursor: pointer;
 }
 
-.premium-model-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
-    background-size: 200% 100%;
-    animation: shimmer 3s linear infinite;
-}
 
 /* Simplified Premium Carousel */
 .premium-models-carousel {
@@ -127,11 +115,13 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     user-select: none;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .premium-model-card.simplified:hover {
     transform: scale(1.05) translateY(-5px);
-    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     z-index: 10;
 }
 
@@ -166,23 +156,22 @@
 .premium-model-card.simplified .premium-indicator {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 4px;
-    min-height: 20px;
-    flex-shrink: 0;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    width: 100%;
 }
 
 .premium-model-card.simplified h4 {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     margin: 0;
     color: #2d3748;
     transition: color 0.3s ease;
-    line-height: 1.2;
+    line-height: 1;
     font-weight: 600;
+    max-width: 140px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    flex-shrink: 0;
 }
 
 .premium-model-card.simplified:hover h4 {
@@ -310,34 +299,28 @@
     box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
 }
 
-@keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-}
 
 .premium-model-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 48px rgba(102, 126, 234, 0.25);
-    border-color: #764ba2;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 /* Premium Badge */
 .premium-badge {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #667eea;
     color: white;
-    padding: 2px 6px;
-    border-radius: 10px;
-    font-size: 0.65em;
-    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 500;
     display: inline-flex;
     align-items: center;
-    gap: 2px;
     flex-shrink: 0;
     white-space: nowrap;
 }
 
 .premium-badge.vip-badge {
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    background: #f59e0b;
 }
 
 /* Premium Image Container */
