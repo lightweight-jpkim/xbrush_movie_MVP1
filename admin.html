@@ -553,6 +553,69 @@
             grid-column: 1 / -1;
         }
         
+        /* Thumbnail upload styles */
+        .thumbnail-section {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        
+        .thumbnail-upload-area {
+            flex: 1;
+        }
+        
+        .thumbnail-preview {
+            width: 150px;
+            height: 150px;
+            border: 2px dashed #e5e7eb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #f9fafb;
+            position: relative;
+        }
+        
+        .thumbnail-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .thumbnail-preview-placeholder {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .file-input-label {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-block;
+            font-size: 0.875rem;
+            transition: background 0.3s ease;
+        }
+        
+        .file-input-label:hover {
+            background: #5a67d8;
+        }
+        
         .form-group label {
             display: block;
             margin-bottom: 8px;
@@ -896,8 +959,22 @@
                                 <input type="url" class="form-control" id="editProfileImage">
                             </div>
                             <div class="form-group full-width">
-                                <label for="editThumbnailUrl">썸네일 URL</label>
-                                <input type="url" class="form-control" id="editThumbnailUrl">
+                                <label>썸네일</label>
+                                <div class="thumbnail-section">
+                                    <div class="thumbnail-upload-area">
+                                        <input type="url" class="form-control" id="editThumbnailUrl" placeholder="썸네일 URL 입력">
+                                        <div class="file-input-wrapper">
+                                            <input type="file" id="thumbnailFile" accept="image/*" onchange="handleThumbnailUpload(event)">
+                                            <label for="thumbnailFile" class="file-input-label">이미지 업로드</label>
+                                        </div>
+                                    </div>
+                                    <div class="thumbnail-preview" id="thumbnailPreview">
+                                        <div class="thumbnail-preview-placeholder">
+                                            <div>썸네일 미리보기</div>
+                                            <div style="font-size: 2rem; margin-top: 8px;">📷</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -937,9 +1014,11 @@
     
     <!-- Application Scripts -->
     <script src="js/config.js"></script>
+    <script src="js/app-namespace.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/firebase-model-storage.js"></script>
     <script src="js/model-storage-adapter.js"></script>
+    <script src="js/image-storage.js"></script>
     <script src="utils.js"></script>
 
     <script>
@@ -998,11 +1077,20 @@
 
         // Load models for management
         async function loadModels() {
+            const tbody = document.getElementById('modelsTableBody');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">로딩 중...</td></tr>';
+            
             try {
+                // Ensure adapter is initialized
+                if (window.modelStorageAdapter?.ensureInitialized) {
+                    await window.modelStorageAdapter.ensureInitialized();
+                }
+                
                 const models = await window.modelStorageAdapter.getAllModels();
                 displayModels(models);
             } catch (error) {
                 console.error('Error loading models:', error);
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">데이터 로딩 실패. 페이지를 새로고침해주세요.</td></tr>';
                 showToast('모델 로딩 중 오류가 발생했습니다.', 'error');
             }
         }
@@ -1016,41 +1104,53 @@
                 return;
             }
             
-            tbody.innerHTML = models.map(model => `
-                <tr>
-                    <td>
-                        <div class="model-info">
-                            <img src="${model.thumbnailUrl || model.profileImage || '/images/default-avatar.png'}" 
-                                 alt="${model.name}" class="model-thumbnail">
-                            <div class="model-details">
-                                <h4>${model.name || model.personalInfo?.name || '이름 없음'}</h4>
-                                <p>${model.email || model.personalInfo?.email || '이메일 없음'}</p>
+            tbody.innerHTML = models.map(model => {
+                // Extract data from various possible locations
+                const name = model.personalInfo?.name || model.profile?.displayName || model.displayName || model.name || '이름 없음';
+                const email = model.personalInfo?.email || model.email || '이메일 없음';
+                const thumbnailUrl = model.thumbnailUrl || model.personalInfo?.thumbnailUrl || model.portfolio?.thumbnailUrl || model.profileImage || '/images/default-avatar.png';
+                const status = model.status || 'pending';
+                const categories = model.personalInfo?.categories || model.categories || [];
+                const registrationDate = model.registrationDate || model.createdAt || new Date().toISOString();
+                const tier = model.tier || 'basic';
+                
+                return `
+                    <tr>
+                        <td>
+                            <div class="model-info">
+                                <img src="${thumbnailUrl}" 
+                                     alt="${name}" class="model-thumbnail"
+                                     onerror="this.src='/images/default-avatar.png'">
+                                <div class="model-details">
+                                    <h4>${name}</h4>
+                                    <p>${email}</p>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="status-badge status-${model.status}">
-                            ${model.status === 'active' ? '활성' : model.status === 'pending' ? '대기' : '비활성'}
-                        </span>
-                    </td>
-                    <td>${(model.categories || model.personalInfo?.categories || []).join(', ') || '-'}</td>
-                    <td>${formatDate(model.createdAt || model.registrationDate)}</td>
-                    <td>
-                        <span class="tier-badge tier-${model.tier || 'basic'}">
-                            ${getTierName(model.tier)}
-                        </span>
-                    </td>
-                    <td>
-                        <button class="action-btn view" onclick="editModel('${model.id}')">편집</button>
-                        ${model.status === 'pending' ? 
-                            `<button class="action-btn approve" onclick="approveModel('${model.id}')">승인</button>
-                             <button class="action-btn reject" onclick="rejectModel('${model.id}')">거절</button>` :
-                            `<button class="action-btn premium" onclick="togglePremium('${model.id}')">프리미엄</button>
-                             <button class="action-btn" onclick="deleteModel('${model.id}')" style="background: #ef4444;">삭제</button>`
-                        }
-                    </td>
-                </tr>
-            `).join('');
+                        </td>
+                        <td>
+                            <span class="status-badge status-${status}">
+                                ${status === 'active' ? '활성' : status === 'pending' ? '대기' : '비활성'}
+                            </span>
+                        </td>
+                        <td>${categories.join(', ') || '-'}</td>
+                        <td>${formatDate(registrationDate)}</td>
+                        <td>
+                            <span class="tier-badge tier-${tier}">
+                                ${getTierName(tier)}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="action-btn view" onclick="editModel('${model.id}')">편집</button>
+                            ${status === 'pending' ? 
+                                `<button class="action-btn approve" onclick="approveModel('${model.id}')">승인</button>
+                                 <button class="action-btn reject" onclick="rejectModel('${model.id}')">거절</button>` :
+                                `<button class="action-btn premium" onclick="togglePremium('${model.id}')">프리미엄</button>
+                                 <button class="action-btn" onclick="deleteModel('${model.id}')" style="background: #ef4444;">삭제</button>`
+                            }
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         // Load plan reviews
@@ -1133,6 +1233,26 @@
         }
 
         // Model management functions
+        async function togglePremium(modelId) {
+            try {
+                const model = await window.modelStorageAdapter.getModel(modelId);
+                const currentTier = model.tier || 'basic';
+                const newTier = currentTier === 'premium' || currentTier === 'vip' ? 'basic' : 'premium';
+                
+                if (confirm(`${model.personalInfo?.name || model.displayName}의 티어를 ${getTierName(newTier)}로 변경하시겠습니까?`)) {
+                    await window.modelStorageAdapter.updateModel(modelId, { 
+                        tier: newTier,
+                        updatedAt: new Date().toISOString()
+                    });
+                    showToast('티어가 변경되었습니다.', 'success');
+                    loadModels();
+                }
+            } catch (error) {
+                console.error('Error toggling premium:', error);
+                showToast('티어 변경 중 오류가 발생했습니다.', 'error');
+            }
+        }
+        
         async function approveModel(modelId) {
             try {
                 await window.modelStorageAdapter.updateModel(modelId, { status: 'active' });
@@ -1216,6 +1336,20 @@
             };
             return tierNames[tier] || '베이직';
         }
+        
+        function getStatusLabel(status) {
+            const labels = {
+                pending: '승인 대기',
+                active: '활성',
+                inactive: '비활성',
+                rejected: '거절됨'
+            };
+            return labels[status] || status;
+        }
+        
+        function getTierLabel(tier) {
+            return getTierName(tier);
+        }
 
         // Edit model functions
         let currentEditingModel = null;
@@ -1267,7 +1401,12 @@
             document.getElementById('editDisplayName').value = model.displayName || model.personalInfo?.name || '';
             document.getElementById('editTagline').value = model.tagline || '';
             document.getElementById('editProfileImage').value = model.profileImage || model.personalInfo?.thumbnailUrl || '';
-            document.getElementById('editThumbnailUrl').value = model.thumbnailUrl || model.personalInfo?.thumbnailUrl || '';
+            
+            // Thumbnail
+            const thumbnailUrl = model.thumbnailUrl || model.personalInfo?.thumbnailUrl || model.portfolio?.thumbnailUrl || '';
+            document.getElementById('editThumbnailUrl').value = thumbnailUrl;
+            updateThumbnailPreview(thumbnailUrl);
+            currentThumbnailFile = null; // Reset file upload
             
             // Statistics
             document.getElementById('editRating').value = model.rating || 0;
@@ -1284,6 +1423,30 @@
             if (!currentEditingModel) return;
             
             try {
+                showToast('저장 중...', 'info');
+                
+                // Handle thumbnail upload if file is selected
+                let thumbnailUrl = document.getElementById('editThumbnailUrl').value;
+                
+                if (currentThumbnailFile) {
+                    try {
+                        // Upload to Firebase Storage
+                        const storage = window.firebaseStorage;
+                        const storageRef = storage.ref();
+                        const fileName = `models/thumbnails/${currentEditingModel.id}_${Date.now()}.jpg`;
+                        const fileRef = storageRef.child(fileName);
+                        
+                        const snapshot = await fileRef.put(currentThumbnailFile);
+                        thumbnailUrl = await snapshot.ref.getDownloadURL();
+                        
+                        console.log('Thumbnail uploaded:', thumbnailUrl);
+                    } catch (uploadError) {
+                        console.error('Thumbnail upload failed:', uploadError);
+                        showToast('썸네일 업로드 실패. URL을 직접 입력해주세요.', 'error');
+                        return;
+                    }
+                }
+                
                 // Gather all form data
                 const categories = [];
                 document.querySelectorAll('input[name="categories"]:checked').forEach(checkbox => {
@@ -1297,7 +1460,7 @@
                         phone: document.getElementById('editPhone').value,
                         intro: document.getElementById('editIntro').value,
                         categories: categories,
-                        thumbnailUrl: document.getElementById('editThumbnailUrl').value || document.getElementById('editProfileImage').value
+                        thumbnailUrl: thumbnailUrl || document.getElementById('editProfileImage').value
                     },
                     status: document.getElementById('editStatus').value,
                     tier: document.getElementById('editTier').value,
@@ -1312,7 +1475,7 @@
                     displayName: document.getElementById('editDisplayName').value,
                     tagline: document.getElementById('editTagline').value,
                     profileImage: document.getElementById('editProfileImage').value,
-                    thumbnailUrl: document.getElementById('editThumbnailUrl').value,
+                    thumbnailUrl: thumbnailUrl,
                     rating: parseFloat(document.getElementById('editRating').value) || 0,
                     totalLicenses: parseInt(document.getElementById('editTotalLicenses').value) || 0,
                     responseTime: document.getElementById('editResponseTime').value,
@@ -1416,6 +1579,98 @@
                 closeEditModal();
             }
         }
+        
+        // Thumbnail handling functions
+        let currentThumbnailFile = null;
+        
+        async function handleThumbnailUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showToast('이미지 파일만 업로드 가능합니다.', 'error');
+                return;
+            }
+            
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('파일 크기는 5MB 이하여야 합니다.', 'error');
+                return;
+            }
+            
+            currentThumbnailFile = file;
+            
+            // Preview the image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('thumbnailPreview');
+                preview.innerHTML = `<img src="${e.target.result}" alt="썸네일 미리보기">`;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function updateThumbnailPreview(url) {
+            const preview = document.getElementById('thumbnailPreview');
+            if (url) {
+                preview.innerHTML = `<img src="${url}" alt="썸네일 미리보기" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'thumbnail-preview-placeholder\\'><div>이미지 로드 실패</div><div style=\\'font-size: 2rem; margin-top: 8px;\\'>❌</div></div>';">`;
+            } else {
+                preview.innerHTML = `
+                    <div class="thumbnail-preview-placeholder">
+                        <div>썸네일 미리보기</div>
+                        <div style="font-size: 2rem; margin-top: 8px;">📷</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Improved initialization
+        async function initializeAdmin() {
+            const maxRetries = 20;
+            let retries = 0;
+            
+            const checkServices = () => {
+                return window.firebaseDB && 
+                       window.modelStorageAdapter && 
+                       window.firebaseStorage;
+            };
+            
+            while (retries < maxRetries) {
+                if (checkServices()) {
+                    console.log('All services ready');
+                    
+                    // Ensure adapter is initialized
+                    if (window.modelStorageAdapter.ensureInitialized) {
+                        try {
+                            await window.modelStorageAdapter.ensureInitialized();
+                        } catch (error) {
+                            console.error('Error initializing adapter:', error);
+                        }
+                    }
+                    
+                    // Setup URL input listener
+                    const urlInput = document.getElementById('editThumbnailUrl');
+                    if (urlInput) {
+                        urlInput.addEventListener('input', function(e) {
+                            if (e.target.value) {
+                                updateThumbnailPreview(e.target.value);
+                                currentThumbnailFile = null; // Clear file if URL is entered
+                            }
+                        });
+                    }
+                    
+                    loadDashboardStats();
+                    return;
+                }
+                await new Promise(resolve => setTimeout(resolve, 500));
+                retries++;
+            }
+            
+            showToast('Firebase 서비스 초기화 실패. 페이지를 새로고침해주세요.', 'error');
+        }
+        
+        // Call initialization on page load
+        window.addEventListener('DOMContentLoaded', initializeAdmin);
     </script>
 </body>
 </html>
