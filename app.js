@@ -2955,10 +2955,16 @@ async function loadFeaturedModels() {
         
         // Get active models from Firebase
         console.log('[Featured Models] Fetching models from Firebase...');
-        const models = await window.modelStorageAdapter.getActiveModels();
-        console.log('[Featured Models] Got models:', models.length);
+        const allModels = await window.modelStorageAdapter.getActiveModels();
+        console.log('[Featured Models] Got all models:', allModels.length);
         
-        // Update count
+        // Filter out premium models (only show basic models)
+        const models = allModels.filter(model => 
+            !model.tier || model.tier === 'basic'
+        );
+        console.log('[Featured Models] After filtering premium, basic models:', models.length);
+        
+        // Update count (show only basic models count)
         modelCount.textContent = `총 ${models.length}개`;
         
         if (models.length === 0) {
