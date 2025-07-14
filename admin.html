@@ -416,6 +416,9 @@
                 <input type="text" id="searchInput" placeholder="모델 이름으로 검색..." onkeyup="searchModels()">
             </div>
             <div class="admin-actions">
+                <button class="btn btn-outline" onclick="refreshData()">
+                    🔄 새로고침
+                </button>
                 <button class="btn btn-outline" onclick="window.location.href='models.html'">
                     👁️ 쇼케이스 보기
                 </button>
@@ -603,35 +606,106 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
-    <!-- Scripts -->
+    <!-- Application Configuration - Load First -->
+    <script src="js/config.js"></script>
+    <script src="js/app-namespace.js"></script>
+    
+    <!-- Firebase Configuration - After Config -->
+    <script src="js/firebase-config.js"></script>
+    
+    <!-- Utilities -->
     <script src="js/image-utils.js"></script>
     <script src="js/image-cache.js"></script>
-    <script src="js/firebase-config.js"></script>
+    
+    <!-- Storage Services - After Firebase Config -->
     <script src="js/firebase-model-storage.js"></script>
-    <script src="js/model-storage.js"></script>
     <script src="js/model-storage-adapter.js"></script>
-    <script src="js/model-migration.js"></script>
     <script>
         let allModels = [];
         let filteredModels = [];
 
         // Initialize
-        function init() {
-            loadModels();
+        async function init() {
+            console.log('[Admin] Starting initialization...');
+            
+            // Wait for Firebase to be ready
+            await waitForFirebase();
+            
+            console.log('[Admin] Firebase ready, loading models...');
+            await loadModels();
             updateStats();
+        }
+
+        // Wait for Firebase to be ready
+        async function waitForFirebase() {
+            let retries = 30; // 15 seconds timeout
+            
+            // First check if config is loaded
+            if (!window.AppConfig) {
+                console.error('[Admin] AppConfig not loaded! Check if js/config.js exists');
+            }
+            
+            while (retries > 0) {
+                // Check all required components
+                const status = {
+                    AppConfig: !!window.AppConfig,
+                    firebase: !!window.firebase,
+                    firebaseApp: !!(window.firebase && window.firebase.app),
+                    firebaseDB: !!window.firebaseDB,
+                    modelStorageAdapter: !!window.modelStorageAdapter
+                };
+                
+                console.log('[Admin] Firebase status check:', status);
+                
+                if (status.firebaseDB && status.modelStorageAdapter) {
+                    console.log('[Admin] Firebase is ready!');
+                    return true;
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+                retries--;
+            }
+            
+            // Provide detailed error information
+            const finalStatus = {
+                AppConfig: !!window.AppConfig,
+                firebase: !!window.firebase,
+                firebaseDB: !!window.firebaseDB,
+                modelStorageAdapter: !!window.modelStorageAdapter,
+                firebaseModelStorage: !!window.firebaseModelStorage
+            };
+            
+            console.error('[Admin] Firebase initialization failed. Final status:', finalStatus);
+            throw new Error('Firebase initialization timeout - Check console for details');
         }
 
         // Load all models
         async function loadModels() {
             try {
+                console.log('[Admin] Loading models from Firebase...');
+                
+                // Ensure adapter is initialized
+                if (!window.modelStorageAdapter) {
+                    console.error('[Admin] Model storage adapter not found');
+                    throw new Error('Model storage adapter not initialized');
+                }
+                
+                // Ensure adapter is ready
+                if (window.modelStorageAdapter.ensureInitialized) {
+                    await window.modelStorageAdapter.ensureInitialized();
+                }
+                
                 // Use Firebase adapter exclusively
                 allModels = await window.modelStorageAdapter.getAllModels();
+                console.log('[Admin] Loaded models:', allModels.length);
                 filteredModels = [...allModels];
                 displayModels(filteredModels);
+                updateStats();
             } catch (error) {
-                console.error('Error loading models:', error);
-                document.getElementById('modelsTableBody').innerHTML = '<tr><td colspan="6" class="text-center">모델을 불러오는 중 오류가 발생했습니다.</td></tr>';
+                console.error('[Admin] Error loading models:', error);
+                document.getElementById('modelsTableBody').innerHTML = `<tr><td colspan="6" class="text-center">모델을 불러오는 중 오류가 발생했습니다.<br><small>${error.message}</small></td></tr>`;
             }
         }
 
@@ -683,8 +757,9 @@
                     <tr>
                         <td>
                             <div class="model-info">
-                                <img src="${model.portfolio?.thumbnailUrl || 'images/default-avatar.png'}" 
-                                     alt="${personalInfo.name}" class="model-thumbnail">
+                                <img src="${model.portfolio?.thumbnailUrl || model.personalInfo?.thumbnailUrl || 'https://via.placeholder.com/60x80/e2e8f0/718096?text=' + encodeURIComponent(personalInfo.name?.charAt(0) || '?')}" 
+                                     alt="${personalInfo.name}" class="model-thumbnail"
+                                     onerror="this.src='https://via.placeholder.com/60x80/e2e8f0/718096?text=' + encodeURIComponent('${personalInfo.name?.charAt(0) || '?'}')"">
                                 <div class="model-details">
                                     <h4>${personalInfo.name || '이름 없음'} ${tierBadge}</h4>
                                     <p>${personalInfo.intro || '소개 없음'}</p>
@@ -724,15 +799,18 @@
 
         // Update statistics
         function updateStats() {
+            console.log('[Admin] Updating statistics...');
             const total = allModels.length;
             const active = allModels.filter(m => m.status === 'active').length;
-            const pending = allModels.filter(m => m.status === 'pending').length;
+            const pending = allModels.filter(m => m.status === 'pending' || !m.status).length;
             const premium = allModels.filter(m => m.tier === 'premium' || m.tier === 'vip').length;
             
             document.getElementById('totalModels').textContent = total;
             document.getElementById('activeModels').textContent = active;
             document.getElementById('pendingModels').textContent = pending;
             document.getElementById('premiumModels').textContent = premium;
+            
+            console.log('[Admin] Stats updated:', { total, active, pending, premium });
         }
 
         // Search models
@@ -930,6 +1008,13 @@
             }
         });
 
+        // Refresh data
+        async function refreshData() {
+            showLoadingState();
+            await loadModels();
+            showToast('데이터를 새로고침했습니다.', 'success');
+        }
+
         // Export data
         async function exportData() {
             try {
@@ -966,16 +1051,44 @@
 
         // Toggle premium status
         async function togglePremiumStatus(modelId) {
-            if (window.togglePremiumStatus && typeof window.togglePremiumStatus === 'function') {
-                await window.togglePremiumStatus(modelId);
-                // Reload models after status change
-                setTimeout(() => {
-                    loadModels();
-                    updateStats();
-                }, 1000);
-            } else {
-                console.error('Premium management not loaded');
-                showToast('프리미엄 관리 기능을 불러올 수 없습니다.', 'error');
+            try {
+                const model = allModels.find(m => m.id === modelId);
+                if (!model) return;
+                
+                // Determine new tier
+                let newTier = 'basic';
+                let badgeText = '';
+                
+                if (!model.tier || model.tier === 'basic') {
+                    newTier = 'premium';
+                    badgeText = '⭐ 프리미엄 모델';
+                } else if (model.tier === 'premium') {
+                    newTier = 'vip';
+                    badgeText = '💎 VIP 모델';
+                } else {
+                    newTier = 'basic';
+                    badgeText = '';
+                }
+                
+                // Update model tier
+                const updates = {
+                    tier: newTier,
+                    premiumBadge: badgeText,
+                    premiumStartDate: newTier !== 'basic' ? new Date().toISOString() : null,
+                    sortPriority: newTier === 'vip' ? 1 : newTier === 'premium' ? 100 : 1000
+                };
+                
+                await window.modelStorageAdapter.updateModel(modelId, updates);
+                
+                const tierName = newTier === 'vip' ? 'VIP' : newTier === 'premium' ? '프리미엄' : '일반';
+                showToast(`모델이 ${tierName} 등급으로 변경되었습니다.`, 'success');
+                
+                // Reload models
+                await loadModels();
+                
+            } catch (error) {
+                console.error('Error toggling premium status:', error);
+                showToast('프리미엄 상태 변경 중 오류가 발생했습니다.', 'error');
             }
         }
         
@@ -1020,8 +1133,23 @@
         `;
         document.head.appendChild(style);
 
+        // Show initial loading state
+        function showLoadingState() {
+            document.getElementById('modelsTableBody').innerHTML = '<tr><td colspan="6" class="text-center">Firebase를 초기화하는 중...</td></tr>';
+            document.getElementById('totalModels').textContent = '...';
+            document.getElementById('activeModels').textContent = '...';
+            document.getElementById('pendingModels').textContent = '...';
+            document.getElementById('premiumModels').textContent = '...';
+        }
+
         // Initialize on load
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', () => {
+            showLoadingState();
+            init().catch(error => {
+                console.error('[Admin] Initialization error:', error);
+                document.getElementById('modelsTableBody').innerHTML = '<tr><td colspan="6" class="text-center">초기화 중 오류가 발생했습니다. 페이지를 새로고침해주세요.</td></tr>';
+            });
+        });
     </script>
 </body>
 </html>

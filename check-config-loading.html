@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Loading Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .log {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Configuration Loading Test</h1>
+    
+    <div id="logs"></div>
+    
+    <!-- Test loading order -->
+    <script>
+        const logs = document.getElementById('logs');
+        const log = (message, type = 'info') => {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            logs.appendChild(div);
+            console.log(message);
+        };
+        
+        log('Starting configuration loading test...');
+    </script>
+    
+    <!-- Load Firebase first -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script>
+        log('Firebase App SDK loaded: ' + (typeof firebase !== 'undefined'), typeof firebase !== 'undefined' ? 'success' : 'error');
+    </script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script>
+        log('Firebase Firestore SDK loaded: ' + (typeof firebase.firestore !== 'undefined'), typeof firebase.firestore !== 'undefined' ? 'success' : 'error');
+    </script>
+    
+    <!-- Load configuration -->
+    <script src="js/config.js"></script>
+    <script>
+        if (window.AppConfig) {
+            log('AppConfig loaded successfully', 'success');
+            log('AppConfig contents: <pre>' + JSON.stringify(window.AppConfig.getFirebaseConfig(), null, 2) + '</pre>');
+        } else {
+            log('AppConfig NOT loaded!', 'error');
+        }
+    </script>
+    
+    <script src="js/app-namespace.js"></script>
+    <script>
+        if (window.xBrush) {
+            log('xBrush namespace loaded successfully', 'success');
+        } else {
+            log('xBrush namespace NOT loaded!', 'error');
+        }
+    </script>
+    
+    <!-- Load Firebase config -->
+    <script src="js/firebase-config.js"></script>
+    <script>
+        setTimeout(() => {
+            log('Checking Firebase initialization after 2 seconds...');
+            
+            const checks = {
+                'window.firebase': !!window.firebase,
+                'window.firebaseDB': !!window.firebaseDB,
+                'window.firebaseStorage': !!window.firebaseStorage,
+                'window.AppConfig': !!window.AppConfig,
+                'window.xBrush': !!window.xBrush
+            };
+            
+            log('Final status: <pre>' + JSON.stringify(checks, null, 2) + '</pre>');
+            
+            // Try direct initialization
+            if (!window.firebaseDB && window.firebase && window.AppConfig) {
+                log('Attempting direct Firebase initialization...', 'warning');
+                try {
+                    const config = window.AppConfig.getFirebaseConfig();
+                    firebase.initializeApp(config);
+                    window.firebaseDB = firebase.firestore();
+                    log('Direct initialization successful!', 'success');
+                } catch (error) {
+                    log('Direct initialization failed: ' + error.message, 'error');
+                }
+            }
+        }, 2000);
+    </script>
+    
+    <!-- Load storage adapters -->
+    <script src="js/firebase-model-storage.js"></script>
+    <script src="js/model-storage-adapter.js"></script>
+    
+    <script>
+        setTimeout(() => {
+            log('Checking storage adapters after 3 seconds...');
+            
+            const adapterChecks = {
+                'window.firebaseModelStorage': !!window.firebaseModelStorage,
+                'window.modelStorageAdapter': !!window.modelStorageAdapter,
+                'window.ModelStorageAdapter': !!window.ModelStorageAdapter
+            };
+            
+            log('Storage adapter status: <pre>' + JSON.stringify(adapterChecks, null, 2) + '</pre>');
+            
+            // Test loading models
+            if (window.modelStorageAdapter && window.modelStorageAdapter.getAllModels) {
+                log('Testing model loading...', 'warning');
+                window.modelStorageAdapter.getAllModels()
+                    .then(models => {
+                        log(`Successfully loaded ${models.length} models!`, 'success');
+                    })
+                    .catch(error => {
+                        log(`Model loading failed: ${error.message}`, 'error');
+                    });
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
