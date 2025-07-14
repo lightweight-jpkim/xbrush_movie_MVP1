@@ -50,12 +50,7 @@ class ModelDisplay {
             }
             
             // Get active models using the adapter
-            const allModels = await window.modelStorageAdapter.getActiveModels();
-            
-            // Filter out premium models (only show regular models)
-            const models = allModels.filter(model => 
-                !model.tier || model.tier === 'basic'
-            );
+            const models = await window.modelStorageAdapter.getActiveModels();
             
             if (models.length === 0) {
                 this.displayEmptyState();
@@ -271,6 +266,7 @@ class ModelDisplay {
         const isVerified = profile?.verificationStatus?.identity || false;
         const isPremium = profile?.verificationStatus?.premium || false;
         const isNew = flags?.newModel || false;
+        const tier = model.tier || 'basic';
 
         // Format categories/specialties
         const specialtyTags = specialties.slice(0, 3).map(spec => {
@@ -287,8 +283,9 @@ class ModelDisplay {
         // Trust badges
         const trustBadges = [];
         if (isVerified) trustBadges.push('<span class="trust-badge verified">✓ 인증</span>');
-        if (isPremium) trustBadges.push('<span class="trust-badge pro">PRO</span>');
-        if (rating >= 4.8 && reviewCount >= 10) trustBadges.push('<span class="trust-badge top-rated">⭐ 우수</span>');
+        if (tier === 'premium') trustBadges.push('<span class="trust-badge premium">⭐ 프리미엄</span>');
+        if (tier === 'vip') trustBadges.push('<span class="trust-badge vip">💎 VIP</span>');
+        if (rating >= 4.8 && reviewCount >= 10) trustBadges.push('<span class="trust-badge top-rated">🏆 우수</span>');
         
         const trustBadgesHTML = trustBadges.length > 0 ? 
             `<div class="model-trust-badges">${trustBadges.join('')}</div>` : '';
@@ -509,18 +506,13 @@ class ModelDisplay {
             // Filter only active models
             const activeModels = models.filter(model => model.status === 'active');
             
-            // Filter out premium models (only show regular models)
-            const regularModels = activeModels.filter(model => 
-                !model.tier || model.tier === 'basic'
-            );
-            
-            if (regularModels.length === 0) {
+            if (activeModels.length === 0) {
                 this.displayEmptyState();
                 return;
             }
 
             // Sort and display models
-            const sortedModels = this.sortModels(regularModels, this.currentSort);
+            const sortedModels = this.sortModels(activeModels, this.currentSort);
             this.displayModels(sortedModels);
         });
 

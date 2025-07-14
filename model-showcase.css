@@ -566,6 +566,16 @@
     color: white;
 }
 
+.trust-badge.premium {
+    background: #667eea;
+    color: white;
+}
+
+.trust-badge.vip {
+    background: #f59e0b;
+    color: white;
+}
+
 .trust-badge.top-rated {
     background: rgba(237, 137, 54, 0.9);
     color: white;
