@@ -60,7 +60,7 @@ class PremiumModelManager {
         if (!container) return;
 
         try {
-            const models = await this.getPremiumModels(6); // Show only 6 models
+            const models = await this.getPremiumModels(20); // Show up to 20 models
             
             if (models.length === 0) {
                 // Hide the entire premium section if no premium models
@@ -71,25 +71,52 @@ class PremiumModelManager {
                 return;
             }
 
-            container.innerHTML = models.map(model => 
-                this.createSimplifiedPremiumCard(model)
-            ).join('');
+            // Create wrapper for horizontal scrolling
+            container.innerHTML = `
+                <div class="premium-models-wrapper">
+                    ${models.map(model => this.createSimplifiedPremiumCard(model)).join('')}
+                </div>
+            `;
 
-            // Add view all button
+            // Add navigation buttons to premium section
             const premiumSection = document.getElementById('premiumModelsSection');
-            if (premiumSection && !premiumSection.querySelector('.view-all-premium')) {
-                const viewAllDiv = document.createElement('div');
-                viewAllDiv.className = 'view-all-premium';
-                viewAllDiv.innerHTML = `
-                    <a href="models.html?filter=premium" class="btn">
-                        모든 프리미엄 모델 보기
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-                        </svg>
-                    </a>
-                `;
-                premiumSection.appendChild(viewAllDiv);
+            if (premiumSection) {
+                // Add navigation buttons if not already present
+                if (!premiumSection.querySelector('.premium-carousel-nav')) {
+                    const navButtonsHTML = `
+                        <button class="premium-carousel-nav prev" onclick="premiumManager.scrollCarousel('prev')">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                            </svg>
+                        </button>
+                        <button class="premium-carousel-nav next" onclick="premiumManager.scrollCarousel('next')">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                            </svg>
+                        </button>
+                    `;
+                    premiumSection.insertAdjacentHTML('beforeend', navButtonsHTML);
+                }
+                
+                // Add view all button if not present
+                if (!premiumSection.querySelector('.view-all-premium')) {
+                    const viewAllDiv = document.createElement('div');
+                    viewAllDiv.className = 'view-all-premium';
+                    viewAllDiv.innerHTML = `
+                        <a href="models.html?filter=premium" class="btn">
+                            모든 프리미엄 모델 보기
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                            </svg>
+                        </a>
+                    `;
+                    premiumSection.appendChild(viewAllDiv);
+                }
             }
+
+            // Initialize scroll position and auto-scroll
+            this.carouselContainer = container;
+            this.initializeAutoScroll();
 
         } catch (error) {
             console.error('Error loading premium carousel:', error);
@@ -276,15 +303,101 @@ class PremiumModelManager {
     /**
      * Scroll carousel
      */
-    scrollCarousel(containerId, direction) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
+    scrollCarousel(direction) {
+        if (!this.carouselContainer) return;
         
-        const scrollAmount = 340; // Width of one card + gap
-        container.scrollBy({
-            left: scrollAmount * direction,
-            behavior: 'smooth'
+        // Stop auto-scroll when manually scrolling
+        this.stopAutoScroll();
+        
+        const scrollAmount = 220; // Width of card + gap
+        const currentScroll = this.carouselContainer.scrollLeft;
+        
+        if (direction === 'prev') {
+            this.carouselContainer.scrollTo({
+                left: currentScroll - scrollAmount,
+                behavior: 'smooth'
+            });
+        } else {
+            this.carouselContainer.scrollTo({
+                left: currentScroll + scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Resume auto-scroll after manual scroll
+        setTimeout(() => this.startAutoScroll(), 5000);
+    }
+
+    /**
+     * Initialize auto-scroll functionality
+     */
+    initializeAutoScroll() {
+        if (!this.carouselContainer) return;
+        
+        // Start auto-scroll
+        this.startAutoScroll();
+        
+        // Stop on hover
+        this.carouselContainer.addEventListener('mouseenter', () => {
+            this.stopAutoScroll();
         });
+        
+        // Resume on mouse leave
+        this.carouselContainer.addEventListener('mouseleave', () => {
+            this.startAutoScroll();
+        });
+        
+        // Stop on manual scroll
+        let isScrolling;
+        this.carouselContainer.addEventListener('scroll', () => {
+            this.stopAutoScroll();
+            window.clearTimeout(isScrolling);
+            isScrolling = setTimeout(() => {
+                this.startAutoScroll();
+            }, 3000);
+        });
+    }
+
+    /**
+     * Start auto-scrolling
+     */
+    startAutoScroll() {
+        if (this.autoScrollInterval) return;
+        
+        this.autoScrollInterval = setInterval(() => {
+            if (!this.carouselContainer) {
+                this.stopAutoScroll();
+                return;
+            }
+            
+            const maxScroll = this.carouselContainer.scrollWidth - this.carouselContainer.clientWidth;
+            const currentScroll = this.carouselContainer.scrollLeft;
+            
+            // Check if we've reached the end
+            if (currentScroll >= maxScroll - 10) {
+                // Scroll back to beginning
+                this.carouselContainer.scrollTo({
+                    left: 0,
+                    behavior: 'smooth'
+                });
+            } else {
+                // Scroll one card width
+                this.carouselContainer.scrollBy({
+                    left: 220,
+                    behavior: 'smooth'
+                });
+            }
+        }, 3000); // Auto-scroll every 3 seconds
+    }
+
+    /**
+     * Stop auto-scrolling
+     */
+    stopAutoScroll() {
+        if (this.autoScrollInterval) {
+            clearInterval(this.autoScrollInterval);
+            this.autoScrollInterval = null;
+        }
     }
 
     /**
