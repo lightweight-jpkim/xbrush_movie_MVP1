@@ -175,7 +175,7 @@ class PremiumModelManager {
                     <h3>${model.displayName}</h3>
                     <p class="tagline">${model.tagline || ''}</p>
                     <div class="model-stats">
-                        ${model.rating > 0 ? `<span class="rating">⭐ ${model.rating.toFixed(1)}</span>` : ''}
+                        ${model.rating > 0 ? `<span class="rating">⭐ ${Number(model.rating).toFixed(1)}</span>` : ''}
                         <span class="licenses">${model.totalLicenses || 0}건</span>
                         ${model.responseTime ? `<span class="response">⚡ ${model.responseTime}</span>` : ''}
                     </div>
