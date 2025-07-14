@@ -262,7 +262,9 @@ class PremiumModelManager {
         const badge = model.tier === 'vip' ? 'VIP' : '프리미엄';
 
         return `
-            <div class="premium-model-card simplified" onclick="selectModel('${model.id}')">
+            <div class="premium-model-card simplified card" onclick="selectModel(this, '${model.id}', '${model.tier}')" role="button" tabindex="0"
+                 onkeydown="if(event.key==='Enter') selectModel(this, '${model.id}', '${model.tier}')"
+                 aria-label="${model.displayName} 선택">
                 <div class="model-visual">
                     <img src="${model.profileImage}" alt="${model.displayName}" loading="lazy">
                 </div>

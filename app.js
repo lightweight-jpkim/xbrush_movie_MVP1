@@ -2992,16 +2992,21 @@ async function loadFeaturedModels() {
                                 model.profileImage ||
                                 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg==';
             
+            const tier = model.tier || 'basic';
+            const name = model.personalInfo?.name || '이름 없음';
+            
             return `
-            <div class="featured-model-card" onclick="selectFeaturedModel('${model.id}', '${model.personalInfo?.name || ''}')">
+            <div class="featured-model-card card" onclick="selectModel(this, '${model.id}', '${tier}')" role="button" tabindex="0"
+                 onkeydown="if(event.key==='Enter') selectModel(this, '${model.id}', '${tier}')"
+                 aria-label="${name} 선택">
                 <img src="${thumbnailUrl}" 
-                     alt="${model.personalInfo?.name || '모델'}" 
+                     alt="${name}" 
                      class="featured-model-image"
                      loading="lazy"
                      onload="this.classList.add('loaded');"
                      onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0E0QUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg=='">
                 <div class="featured-model-info">
-                    <div class="featured-model-name">${model.personalInfo?.name || '이름 없음'}</div>
+                    <div class="featured-model-name">${name}</div>
                     <div class="featured-model-intro">${model.personalInfo?.intro || '소개 없음'}</div>
                     ${model.personalInfo?.categories?.length > 0 ? `
                         <div class="featured-model-categories">
