@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xBrush Database Schema - Revised for Face Licensing</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #718096;
+            margin-bottom: 30px;
+        }
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .table-header {
+            background: #4a5568;
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #e2e8f0;
+            color: #2d3748;
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 2px solid #cbd5e0;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.85em;
+        }
+        tr:hover {
+            background: #f7fafc;
+        }
+        .key {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .fkey {
+            background: #ed8936;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .status-active {
+            background: #48bb78;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+        .status-pending {
+            background: #ed8936;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+        .info-box {
+            background: #e6f3ff;
+            border: 1px solid #3182ce;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+        .pricing-box {
+            background: #fef5e7;
+            border: 1px solid #f6d55c;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+        h3 {
+            margin: 0 0 10px 0;
+            color: #2d3748;
+        }
+        .overflow-scroll {
+            overflow-x: auto;
+        }
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>xBrush Face Licensing Platform - Revised Database Schema</h1>
+        <p class="description">Database structure for AI-generated commercial videos using licensed faces</p>
+        
+        <div class="info-box">
+            <h3>💡 Business Model</h3>
+            <p><strong>Platform Purpose:</strong> License model faces/likeness for AI-generated commercial videos</p>
+            <p><strong>Not Traditional Hiring:</strong> Customers don't hire models - they license their face/likeness for specific commercial use</p>
+            <p><strong>Revenue Model:</strong> Platform takes commission from each licensing transaction</p>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <span class="key">PK</span>
+                <span>Primary Key</span>
+            </div>
+            <div class="legend-item">
+                <span class="fkey">FK</span>
+                <span>Foreign Key</span>
+            </div>
+            <div class="legend-item">
+                <span class="status-active">Active</span>
+                <span>Active/Approved</span>
+            </div>
+            <div class="legend-item">
+                <span class="status-pending">Pending</span>
+                <span>Pending/Draft</span>
+            </div>
+        </div>
+
+        <!-- MODELS TABLE -->
+        <div class="table-container">
+            <div class="table-header">1. models (모델 기본 정보 - Private)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>modelId <span class="key">PK</span></th>
+                            <th>name</th>
+                            <th>email</th>
+                            <th>phone</th>
+                            <th>birthDate</th>
+                            <th>gender</th>
+                            <th>kyc_status</th>
+                            <th>kyc_documents</th>
+                            <th>bankAccount</th>
+                            <th>status</th>
+                            <th>joinedAt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>model_001</td>
+                            <td>이영희</td>
+                            <td>model1@email.com</td>
+                            <td>010-9876-5432</td>
+                            <td>1995-03-15</td>
+                            <td>female</td>
+                            <td><span class="status-active">verified</span></td>
+                            <td>{id, face, video}</td>
+                            <td>국민은행 ****</td>
+                            <td><span class="status-active">active</span></td>
+                            <td>2024-01-20</td>
+                        </tr>
+                        <tr>
+                            <td>model_002</td>
+                            <td>박민수</td>
+                            <td>model2@email.com</td>
+                            <td>010-8765-4321</td>
+                            <td>1992-07-22</td>
+                            <td>male</td>
+                            <td><span class="status-pending">pending</span></td>
+                            <td>{id, face}</td>
+                            <td>-</td>
+                            <td><span class="status-pending">pending</span></td>
+                            <td>2024-02-01</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MODEL PROFILES TABLE -->
+        <div class="table-container">
+            <div class="table-header">2. modelProfiles (모델 공개 프로필 - Showcase)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>profileId <span class="key">PK</span></th>
+                            <th>modelId <span class="fkey">FK</span></th>
+                            <th>displayName</th>
+                            <th>tagline</th>
+                            <th>introduction</th>
+                            <th>categories</th>
+                            <th>attributes</th>
+                            <th>profileImage</th>
+                            <th>sampleVideos</th>
+                            <th>totalLicenses</th>
+                            <th>rating</th>
+                            <th>isActive</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>profile_001</td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td>모델 영희</td>
+                            <td>밝고 친근한 이미지</td>
+                            <td>20-30대 화장품, 패션 광고에 적합</td>
+                            <td>["beauty", "fashion"]</td>
+                            <td>["친근함", "신뢰감", "젊음"]</td>
+                            <td>storage/profile_001.jpg</td>
+                            <td>3 samples</td>
+                            <td>156</td>
+                            <td>4.8</td>
+                            <td><span class="status-active">true</span></td>
+                        </tr>
+                        <tr>
+                            <td>profile_002</td>
+                            <td><span class="fkey">model_002</span></td>
+                            <td>모델 민수</td>
+                            <td>전문적이고 신뢰감 있는</td>
+                            <td>금융, IT 제품 광고에 적합</td>
+                            <td>["corporate", "tech"]</td>
+                            <td>["전문성", "신뢰", "지적"]</td>
+                            <td>storage/profile_002.jpg</td>
+                            <td>2 samples</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td><span class="status-pending">false</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- LICENSING PLANS TABLE -->
+        <div class="table-container">
+            <div class="table-header">3. licensingPlans (라이선스 플랜 - 모델별 가격 정책)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>planId <span class="key">PK</span></th>
+                            <th>modelId <span class="fkey">FK</span></th>
+                            <th>planName</th>
+                            <th>usageScope</th>
+                            <th>duration</th>
+                            <th>territory</th>
+                            <th>basePrice</th>
+                            <th>platformFee%</th>
+                            <th>restrictions</th>
+                            <th>isActive</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>plan_001</td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td>온라인 베이직</td>
+                            <td>온라인 광고</td>
+                            <td>6개월</td>
+                            <td>국내</td>
+                            <td>₩300,000</td>
+                            <td>20%</td>
+                            <td>SNS, 웹사이트</td>
+                            <td><span class="status-active">true</span></td>
+                        </tr>
+                        <tr>
+                            <td>plan_002</td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td>온라인 프리미엄</td>
+                            <td>온라인 광고</td>
+                            <td>12개월</td>
+                            <td>전세계</td>
+                            <td>₩800,000</td>
+                            <td>20%</td>
+                            <td>모든 온라인 채널</td>
+                            <td><span class="status-active">true</span></td>
+                        </tr>
+                        <tr>
+                            <td>plan_003</td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td>방송 광고</td>
+                            <td>TV/방송</td>
+                            <td>3개월</td>
+                            <td>국내</td>
+                            <td>₩2,000,000</td>
+                            <td>15%</td>
+                            <td>지상파, 케이블</td>
+                            <td><span class="status-active">true</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="pricing-box">
+            <h3>💰 Suggested Licensing Plan Types</h3>
+            <ul>
+                <li><strong>Basic Online (온라인 베이직):</strong> SNS, Website only / 6 months / Domestic</li>
+                <li><strong>Premium Online (온라인 프리미엄):</strong> All online channels / 12 months / Global</li>
+                <li><strong>Broadcast (방송용):</strong> TV, Cable / 3-6 months / Domestic</li>
+                <li><strong>Print Media (인쇄물):</strong> Magazines, Billboards / 6-12 months</li>
+                <li><strong>Full Commercial (전체 상업용):</strong> All channels / 12 months / Customizable</li>
+                <li><strong>Trial (체험판):</strong> Limited use / 1 month / Watermarked</li>
+            </ul>
+        </div>
+
+        <!-- LICENSES TABLE -->
+        <div class="table-container">
+            <div class="table-header">4. licenses (발급된 라이선스 - 실제 거래)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>licenseId <span class="key">PK</span></th>
+                            <th>projectId <span class="fkey">FK</span></th>
+                            <th>modelId <span class="fkey">FK</span></th>
+                            <th>planId <span class="fkey">FK</span></th>
+                            <th>licenseNumber</th>
+                            <th>customerCompany</th>
+                            <th>usageDetails</th>
+                            <th>startDate</th>
+                            <th>endDate</th>
+                            <th>totalAmount</th>
+                            <th>status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>lic_001</td>
+                            <td><span class="fkey">proj_001</span></td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td><span class="fkey">plan_001</span></td>
+                            <td>XB-2024-0215-001</td>
+                            <td>ABC화장품</td>
+                            <td>신제품 런칭 캠페인</td>
+                            <td>2024-02-15</td>
+                            <td>2024-08-15</td>
+                            <td>₩300,000</td>
+                            <td><span class="status-active">active</span></td>
+                        </tr>
+                        <tr>
+                            <td>lic_002</td>
+                            <td><span class="fkey">proj_002</span></td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td><span class="fkey">plan_003</span></td>
+                            <td>XB-2024-0301-002</td>
+                            <td>XYZ전자</td>
+                            <td>TV 광고 캠페인</td>
+                            <td>2024-03-01</td>
+                            <td>2024-06-01</td>
+                            <td>₩2,000,000</td>
+                            <td><span class="status-pending">pending</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PROJECTS TABLE -->
+        <div class="table-container">
+            <div class="table-header">5. projects (비디오 제작 프로젝트)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>projectId <span class="key">PK</span></th>
+                            <th>customerEmail</th>
+                            <th>modelId <span class="fkey">FK</span></th>
+                            <th>projectName</th>
+                            <th>videoSpecs</th>
+                            <th>scenario</th>
+                            <th>status</th>
+                            <th>videoUrl</th>
+                            <th>createdAt</th>
+                            <th>completedAt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>proj_001</td>
+                            <td>customer@abc.com</td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td>봄 신제품 화장품</td>
+                            <td>{16:9, 30s, modern}</td>
+                            <td>제품소개→사용장면→마무리</td>
+                            <td><span class="status-active">completed</span></td>
+                            <td>storage/videos/proj_001.mp4</td>
+                            <td>2024-02-15</td>
+                            <td>2024-02-15</td>
+                        </tr>
+                        <tr>
+                            <td>proj_002</td>
+                            <td>marketing@xyz.com</td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td>스마트폰 광고</td>
+                            <td>{16:9, 15s, tech}</td>
+                            <td>제품특징→사용편의→구매유도</td>
+                            <td><span class="status-pending">processing</span></td>
+                            <td>-</td>
+                            <td>2024-03-01</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- REVIEWS TABLE -->
+        <div class="table-container">
+            <div class="table-header">6. reviews (고객 리뷰)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>reviewId <span class="key">PK</span></th>
+                            <th>licenseId <span class="fkey">FK</span></th>
+                            <th>modelId <span class="fkey">FK</span></th>
+                            <th>customerEmail</th>
+                            <th>rating</th>
+                            <th>title</th>
+                            <th>content</th>
+                            <th>videoQuality</th>
+                            <th>likeness</th>
+                            <th>satisfaction</th>
+                            <th>createdAt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>review_001</td>
+                            <td><span class="fkey">lic_001</span></td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td>customer@abc.com</td>
+                            <td>5</td>
+                            <td>완벽한 광고 영상</td>
+                            <td>브랜드 이미지와 잘 맞았습니다</td>
+                            <td>5</td>
+                            <td>5</td>
+                            <td>5</td>
+                            <td>2024-02-20</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PAYMENTS TABLE -->
+        <div class="table-container">
+            <div class="table-header">7. payments (결제 및 정산)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>paymentId <span class="key">PK</span></th>
+                            <th>licenseId <span class="fkey">FK</span></th>
+                            <th>type</th>
+                            <th>totalAmount</th>
+                            <th>modelShare</th>
+                            <th>platformFee</th>
+                            <th>paymentMethod</th>
+                            <th>status</th>
+                            <th>paidAt</th>
+                            <th>settledAt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>pay_001</td>
+                            <td><span class="fkey">lic_001</span></td>
+                            <td>license_purchase</td>
+                            <td>₩300,000</td>
+                            <td>₩240,000</td>
+                            <td>₩60,000</td>
+                            <td>card</td>
+                            <td><span class="status-active">settled</span></td>
+                            <td>2024-02-15</td>
+                            <td>2024-02-25</td>
+                        </tr>
+                        <tr>
+                            <td>pay_002</td>
+                            <td><span class="fkey">lic_002</span></td>
+                            <td>license_purchase</td>
+                            <td>₩2,000,000</td>
+                            <td>₩1,700,000</td>
+                            <td>₩300,000</td>
+                            <td>transfer</td>
+                            <td><span class="status-pending">pending</span></td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- KEY DIFFERENCES -->
+        <div class="info-box">
+            <h3>🔑 Key Differences from Traditional Model Hiring</h3>
+            <ul>
+                <li><strong>Licensing Model:</strong> Customers buy rights to use face/likeness, not hiring time</li>
+                <li><strong>Usage-Based Pricing:</strong> Price based on usage scope (online/broadcast/print) and duration</li>
+                <li><strong>Territory Restrictions:</strong> Can limit usage to specific regions</li>
+                <li><strong>Automated Delivery:</strong> AI generates video immediately after license purchase</li>
+                <li><strong>Scalable:</strong> One model can have unlimited licenses simultaneously</li>
+                <li><strong>Clear Terms:</strong> Each license has specific usage rights and expiration</li>
+            </ul>
+        </div>
+
+        <!-- WORKFLOW -->
+        <div class="info-box">
+            <h3>📋 Typical Customer Journey</h3>
+            <ol>
+                <li><strong>Browse Models:</strong> Customer views modelProfiles on showcase page</li>
+                <li><strong>Select Model & Plan:</strong> Choose model and appropriate licensing plan</li>
+                <li><strong>Create Project:</strong> Input video specifications and scenario</li>
+                <li><strong>Generate Video:</strong> AI creates video using model's likeness</li>
+                <li><strong>Purchase License:</strong> Pay for chosen licensing plan</li>
+                <li><strong>Receive License:</strong> Get license certificate with usage rights</li>
+                <li><strong>Download Video:</strong> Access final video without watermarks</li>
+                <li><strong>Leave Review:</strong> Rate experience after using in campaign</li>
+            </ol>
+        </div>
+
+        <!-- REVENUE FLOW -->
+        <div class="pricing-box">
+            <h3>💵 Revenue Flow Example</h3>
+            <p><strong>Customer pays:</strong> ₩300,000 for Basic Online License</p>
+            <p><strong>Platform fee (20%):</strong> ₩60,000</p>
+            <p><strong>Model receives (80%):</strong> ₩240,000</p>
+            <p><strong>Settlement:</strong> Monthly payout to models (10th of each month)</p>
+        </div>
+    </div>
+</body>
+</html>

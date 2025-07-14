@@ -46,7 +46,12 @@ class ModelDisplay {
             }
             
             // Get active models (now async)
-            const models = await window.modelStorage.getActiveModels();
+            const allModels = await window.modelStorage.getActiveModels();
+            
+            // Filter out premium models (only show regular models)
+            const models = allModels.filter(model => 
+                !model.tier || model.tier === 'basic'
+            );
             
             if (models.length === 0) {
                 this.displayEmptyState();

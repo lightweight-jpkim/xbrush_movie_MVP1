@@ -8,6 +8,7 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="model-showcase.css">
+    <link rel="stylesheet" href="premium-models.css">
     <style>
         body {
             background: #f7fafc;
@@ -321,6 +322,8 @@
     </style>
 </head>
 <body>
+    <!-- Load Premium Models Script -->
+    <script src="premium-models.js"></script>
     <!-- Site Header -->
     <header class="site-header">
         <div class="header-container">
@@ -361,8 +364,8 @@
                 <div class="stat-label">대기중</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="storageUsed">0MB</div>
-                <div class="stat-label">스토리지 사용량</div>
+                <div class="stat-value" id="premiumModels">0</div>
+                <div class="stat-label">프리미엄 모델</div>
             </div>
         </div>
 
@@ -530,6 +533,8 @@
                 const price = new Intl.NumberFormat('ko-KR').format(contract.basePrice || 0);
                 const registrationDate = new Date(model.registrationDate).toLocaleDateString('ko-KR');
                 
+                const tierBadge = model.tier === 'vip' ? '💎 VIP' : model.tier === 'premium' ? '⭐ 프리미엄' : '';
+                
                 return `
                     <tr>
                         <td>
@@ -537,7 +542,7 @@
                                 <img src="${model.portfolio?.thumbnailUrl || 'images/default-avatar.png'}" 
                                      alt="${personalInfo.name}" class="model-thumbnail">
                                 <div class="model-details">
-                                    <h4>${personalInfo.name || '이름 없음'}</h4>
+                                    <h4>${personalInfo.name || '이름 없음'} ${tierBadge}</h4>
                                     <p>${personalInfo.intro || '소개 없음'}</p>
                                 </div>
                             </div>
@@ -557,6 +562,9 @@
                                 <button class="btn-icon" onclick="editModel('${model.id}')" title="수정">
                                     ✏️
                                 </button>
+                                <button class="btn-icon" onclick="togglePremiumStatus('${model.id}')" title="프리미엄 상태">
+                                    ${model.tier === 'premium' || model.tier === 'vip' ? '⭐' : '☆'}
+                                </button>
                                 <button class="btn-icon" onclick="toggleStatus('${model.id}')" title="상태 변경">
                                     ${model.status === 'active' ? '🔒' : '🔓'}
                                 </button>
@@ -575,12 +583,12 @@
             const total = allModels.length;
             const active = allModels.filter(m => m.status === 'active').length;
             const pending = allModels.filter(m => m.status === 'pending').length;
-            const storageInfo = window.modelStorage.getStorageInfo();
+            const premium = allModels.filter(m => m.tier === 'premium' || m.tier === 'vip').length;
             
             document.getElementById('totalModels').textContent = total;
             document.getElementById('activeModels').textContent = active;
             document.getElementById('pendingModels').textContent = pending;
-            document.getElementById('storageUsed').textContent = `${storageInfo.sizeInMB}MB`;
+            document.getElementById('premiumModels').textContent = premium;
         }
 
         // Search models
@@ -699,6 +707,21 @@
             showToast('모델 데이터가 다운로드됩니다.', 'info');
         }
 
+        // Toggle premium status
+        async function togglePremiumStatus(modelId) {
+            if (window.togglePremiumStatus && typeof window.togglePremiumStatus === 'function') {
+                await window.togglePremiumStatus(modelId);
+                // Reload models after status change
+                setTimeout(() => {
+                    loadModels();
+                    updateStats();
+                }, 1000);
+            } else {
+                console.error('Premium management not loaded');
+                showToast('프리미엄 관리 기능을 불러올 수 없습니다.', 'error');
+            }
+        }
+        
         // Show toast message
         function showToast(message, type = 'info') {
             // Simple toast implementation

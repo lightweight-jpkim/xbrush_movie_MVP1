@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xBrush Database Schema - Visual Spreadsheet</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #718096;
+            margin-bottom: 30px;
+        }
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .table-header {
+            background: #4a5568;
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #e2e8f0;
+            color: #2d3748;
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 2px solid #cbd5e0;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.85em;
+        }
+        tr:hover {
+            background: #f7fafc;
+        }
+        .key {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .fkey {
+            background: #ed8936;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .status-active {
+            background: #48bb78;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+        .status-pending {
+            background: #ed8936;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+        .relationship {
+            background: #fef5e7;
+            border: 1px solid #f6d55c;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+        .relationship h3 {
+            margin: 0 0 10px 0;
+            color: #744210;
+        }
+        .overflow-scroll {
+            overflow-x: auto;
+        }
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        @media print {
+            .table-container {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>xBrush MovieMaker Database Schema</h1>
+        <p class="description">Visual representation of all database tables with sample data and relationships</p>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <span class="key">PK</span>
+                <span>Primary Key</span>
+            </div>
+            <div class="legend-item">
+                <span class="fkey">FK</span>
+                <span>Foreign Key</span>
+            </div>
+            <div class="legend-item">
+                <span class="status-active">Active</span>
+                <span>Active Status</span>
+            </div>
+            <div class="legend-item">
+                <span class="status-pending">Pending</span>
+                <span>Pending Status</span>
+            </div>
+        </div>
+
+        <!-- USERS TABLE -->
+        <div class="table-container">
+            <div class="table-header">1. users (사용자 - 고객/모델/관리자)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>userId <span class="key">PK</span></th>
+                            <th>email</th>
+                            <th>name</th>
+                            <th>phone</th>
+                            <th>company</th>
+                            <th>role</th>
+                            <th>status</th>
+                            <th>credits</th>
+                            <th>subscription</th>
+                            <th>createdAt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>user_001</td>
+                            <td>customer@abc.com</td>
+                            <td>김철수</td>
+                            <td>010-1234-5678</td>
+                            <td>ABC Company</td>
+                            <td>customer</td>
+                            <td><span class="status-active">active</span></td>
+                            <td>1500</td>
+                            <td>premium (2024-12-31)</td>
+                            <td>2024-01-15</td>
+                        </tr>
+                        <tr>
+                            <td>user_002</td>
+                            <td>model1@email.com</td>
+                            <td>이영희</td>
+                            <td>010-9876-5432</td>
+                            <td>-</td>
+                            <td>model</td>
+                            <td><span class="status-active">active</span></td>
+                            <td>0</td>
+                            <td>-</td>
+                            <td>2024-01-20</td>
+                        </tr>
+                        <tr>
+                            <td>user_003</td>
+                            <td>admin@xbrush.com</td>
+                            <td>관리자</td>
+                            <td>010-0000-0000</td>
+                            <td>xBrush</td>
+                            <td>admin</td>
+                            <td><span class="status-active">active</span></td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>2024-01-01</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MODELS TABLE -->
+        <div class="table-container">
+            <div class="table-header">2. models (모델 기본 정보 - Private)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>modelId <span class="key">PK</span></th>
+                            <th>userId <span class="fkey">FK</span></th>
+                            <th>name</th>
+                            <th>email</th>
+                            <th>birthDate</th>
+                            <th>gender</th>
+                            <th>kyc_status</th>
+                            <th>kyc_idImage</th>
+                            <th>status</th>
+                            <th>registrationStep</th>
+                            <th>createdAt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>model_001</td>
+                            <td><span class="fkey">user_002</span></td>
+                            <td>이영희</td>
+                            <td>model1@email.com</td>
+                            <td>1995-03-15</td>
+                            <td>female</td>
+                            <td><span class="status-active">verified</span></td>
+                            <td>storage/kyc/id_001.jpg</td>
+                            <td><span class="status-active">active</span></td>
+                            <td>6</td>
+                            <td>2024-01-20</td>
+                        </tr>
+                        <tr>
+                            <td>model_002</td>
+                            <td><span class="fkey">user_004</span></td>
+                            <td>박민수</td>
+                            <td>model2@email.com</td>
+                            <td>1992-07-22</td>
+                            <td>male</td>
+                            <td><span class="status-pending">pending</span></td>
+                            <td>storage/kyc/id_002.jpg</td>
+                            <td><span class="status-pending">pending</span></td>
+                            <td>4</td>
+                            <td>2024-02-01</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MODEL PROFILES TABLE -->
+        <div class="table-container">
+            <div class="table-header">3. modelProfiles (모델 공개 정보 - 쇼케이스용)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>profileId <span class="key">PK</span></th>
+                            <th>modelId <span class="fkey">FK</span></th>
+                            <th>displayName</th>
+                            <th>tagline</th>
+                            <th>introduction</th>
+                            <th>categories</th>
+                            <th>profileImage</th>
+                            <th>portfolioImages</th>
+                            <th>completedProjects</th>
+                            <th>avgRating</th>
+                            <th>isPublished</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>profile_001</td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td>모델 영희</td>
+                            <td>프로페셔널 광고 모델</td>
+                            <td>10년 경력의 전문 모델입니다...</td>
+                            <td>beauty, fashion</td>
+                            <td>storage/profiles/main_001.jpg</td>
+                            <td>3 images</td>
+                            <td>156</td>
+                            <td>4.8</td>
+                            <td><span class="status-active">true</span></td>
+                        </tr>
+                        <tr>
+                            <td>profile_002</td>
+                            <td><span class="fkey">model_002</span></td>
+                            <td>모델 민수</td>
+                            <td>스포츠 전문 모델</td>
+                            <td>활동적인 이미지의 전문 모델...</td>
+                            <td>sports, lifestyle</td>
+                            <td>storage/profiles/main_002.jpg</td>
+                            <td>5 images</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td><span class="status-pending">false</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MODEL PRICING TABLE -->
+        <div class="table-container">
+            <div class="table-header">4. modelPricing (모델 가격 정보)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>pricingId <span class="key">PK</span></th>
+                            <th>modelId <span class="fkey">FK</span></th>
+                            <th>pricingType</th>
+                            <th>basePrice</th>
+                            <th>hourlyRate</th>
+                            <th>halfDayRate</th>
+                            <th>fullDayRate</th>
+                            <th>online_usage</th>
+                            <th>broadcast_usage</th>
+                            <th>minimumBooking</th>
+                            <th>effectiveFrom</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>price_001</td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td>project</td>
+                            <td>₩500,000</td>
+                            <td>₩200,000</td>
+                            <td>₩800,000</td>
+                            <td>₩1,500,000</td>
+                            <td>포함</td>
+                            <td>+₩1,000,000</td>
+                            <td>4시간</td>
+                            <td>2024-01-20</td>
+                        </tr>
+                        <tr>
+                            <td>price_002</td>
+                            <td><span class="fkey">model_002</span></td>
+                            <td>hourly</td>
+                            <td>₩300,000</td>
+                            <td>₩150,000</td>
+                            <td>₩600,000</td>
+                            <td>₩1,000,000</td>
+                            <td>포함</td>
+                            <td>+₩800,000</td>
+                            <td>2시간</td>
+                            <td>2024-02-01</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PROJECTS TABLE -->
+        <div class="table-container">
+            <div class="table-header">5. projects (비디오 제작 프로젝트)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>projectId <span class="key">PK</span></th>
+                            <th>customerId <span class="fkey">FK</span></th>
+                            <th>modelId <span class="fkey">FK</span></th>
+                            <th>projectName</th>
+                            <th>format</th>
+                            <th>duration</th>
+                            <th>status</th>
+                            <th>modelFee</th>
+                            <th>totalCost</th>
+                            <th>videoUrl</th>
+                            <th>createdAt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>project_001</td>
+                            <td><span class="fkey">user_001</span></td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td>신제품 화장품 광고</td>
+                            <td>16:9</td>
+                            <td>30s</td>
+                            <td><span class="status-active">completed</span></td>
+                            <td>₩500,000</td>
+                            <td>₩550,000</td>
+                            <td>storage/videos/v_001.mp4</td>
+                            <td>2024-02-15</td>
+                        </tr>
+                        <tr>
+                            <td>project_002</td>
+                            <td><span class="fkey">user_001</span></td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td>봄 세일 프로모션</td>
+                            <td>9:16</td>
+                            <td>15s</td>
+                            <td><span class="status-pending">processing</span></td>
+                            <td>₩300,000</td>
+                            <td>₩330,000</td>
+                            <td>-</td>
+                            <td>2024-03-01</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- REVIEWS TABLE -->
+        <div class="table-container">
+            <div class="table-header">6. reviews (고객 리뷰)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>reviewId <span class="key">PK</span></th>
+                            <th>modelId <span class="fkey">FK</span></th>
+                            <th>customerId <span class="fkey">FK</span></th>
+                            <th>projectId <span class="fkey">FK</span></th>
+                            <th>rating</th>
+                            <th>title</th>
+                            <th>content</th>
+                            <th>professionalism</th>
+                            <th>quality</th>
+                            <th>isVerified</th>
+                            <th>createdAt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>review_001</td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td><span class="fkey">user_001</span></td>
+                            <td><span class="fkey">project_001</span></td>
+                            <td>5</td>
+                            <td>최고의 모델입니다</td>
+                            <td>매우 프로페셔널하고...</td>
+                            <td>5</td>
+                            <td>5</td>
+                            <td><span class="status-active">true</span></td>
+                            <td>2024-02-20</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MODEL APPLICATIONS TABLE -->
+        <div class="table-container">
+            <div class="table-header">7. modelApplications (모델 등록 신청)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>applicationId <span class="key">PK</span></th>
+                            <th>modelId <span class="fkey">FK</span></th>
+                            <th>status</th>
+                            <th>currentStep</th>
+                            <th>reviewedBy</th>
+                            <th>reviewComments</th>
+                            <th>decision</th>
+                            <th>submittedAt</th>
+                            <th>reviewedAt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>app_001</td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td><span class="status-active">approved</span></td>
+                            <td>6</td>
+                            <td><span class="fkey">user_003</span></td>
+                            <td>모든 서류 확인 완료</td>
+                            <td>approved</td>
+                            <td>2024-01-20</td>
+                            <td>2024-01-21</td>
+                        </tr>
+                        <tr>
+                            <td>app_002</td>
+                            <td><span class="fkey">model_002</span></td>
+                            <td><span class="status-pending">pending</span></td>
+                            <td>4</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>2024-02-01</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TRANSACTIONS TABLE -->
+        <div class="table-container">
+            <div class="table-header">8. transactions (거래 내역)</div>
+            <div class="overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>transactionId <span class="key">PK</span></th>
+                            <th>type</th>
+                            <th>projectId <span class="fkey">FK</span></th>
+                            <th>modelId <span class="fkey">FK</span></th>
+                            <th>customerId <span class="fkey">FK</span></th>
+                            <th>amount</th>
+                            <th>modelFee</th>
+                            <th>platformFee</th>
+                            <th>status</th>
+                            <th>createdAt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>txn_001</td>
+                            <td>project_payment</td>
+                            <td><span class="fkey">project_001</span></td>
+                            <td><span class="fkey">model_001</span></td>
+                            <td><span class="fkey">user_001</span></td>
+                            <td>₩550,000</td>
+                            <td>₩500,000</td>
+                            <td>₩50,000</td>
+                            <td><span class="status-active">completed</span></td>
+                            <td>2024-02-15</td>
+                        </tr>
+                        <tr>
+                            <td>txn_002</td>
+                            <td>credit_purchase</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><span class="fkey">user_001</span></td>
+                            <td>₩100,000</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><span class="status-active">completed</span></td>
+                            <td>2024-02-10</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- RELATIONSHIPS -->
+        <div class="relationship">
+            <h3>📊 Key Relationships</h3>
+            <ul>
+                <li><strong>users ↔ models</strong>: One user account can have one model profile (1:1)</li>
+                <li><strong>models ↔ modelProfiles</strong>: Each model has one public profile (1:1)</li>
+                <li><strong>models ↔ modelPricing</strong>: Each model has one pricing structure (1:1)</li>
+                <li><strong>models ↔ projects</strong>: One model can have many projects (1:Many)</li>
+                <li><strong>projects ↔ reviews</strong>: Each project can have one review (1:1)</li>
+                <li><strong>users ↔ projects</strong>: One customer can create many projects (1:Many)</li>
+            </ul>
+        </div>
+
+        <!-- QUERY EXAMPLES -->
+        <div class="relationship">
+            <h3>💡 Common Query Examples</h3>
+            <h4>1. Get Model for Showcase Page:</h4>
+            <pre>
+// Join modelProfiles + modelPricing + reviews
+SELECT * FROM modelProfiles 
+JOIN modelPricing ON modelProfiles.modelId = modelPricing.modelId
+LEFT JOIN reviews ON modelProfiles.modelId = reviews.modelId
+WHERE modelProfiles.isPublished = true
+            </pre>
+
+            <h4>2. Get Customer's Projects:</h4>
+            <pre>
+// Join projects + models + transactions
+SELECT * FROM projects
+JOIN models ON projects.modelId = models.modelId
+JOIN transactions ON projects.projectId = transactions.projectId
+WHERE projects.customerId = 'user_001'
+            </pre>
+
+            <h4>3. Admin Dashboard Stats:</h4>
+            <pre>
+// Count models by status
+SELECT status, COUNT(*) FROM models GROUP BY status
+
+// Recent applications
+SELECT * FROM modelApplications 
+WHERE status = 'pending' 
+ORDER BY submittedAt DESC
+            </pre>
+        </div>
+
+        <!-- BENEFITS -->
+        <div class="relationship">
+            <h3>✅ Benefits of This Structure</h3>
+            <ul>
+                <li><strong>Security</strong>: Private data (KYC, personal info) separated from public profiles</li>
+                <li><strong>Performance</strong>: Smaller documents, indexed queries, faster loading</li>
+                <li><strong>Flexibility</strong>: Easy to update pricing without affecting profiles</li>
+                <li><strong>Scalability</strong>: Can handle thousands of models and millions of projects</li>
+                <li><strong>Maintainability</strong>: Clear separation of concerns, easier to debug</li>
+                <li><strong>Analytics</strong>: Clean data structure for reporting and insights</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

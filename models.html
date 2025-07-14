@@ -8,6 +8,7 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="model-showcase.css">
+    <link rel="stylesheet" href="premium-models.css">
     
     <!-- SEO Meta Tags -->
     <meta name="description" content="xBrush AI 모델 쇼케이스 - 다양한 AI 모델을 만나보세요">
@@ -83,9 +84,14 @@
                 </div>
             </div>
 
-            <!-- Models Container -->
+            <!-- Premium Models Container -->
+            <div id="premiumModelsContainer">
+                <!-- Premium models will be loaded here -->
+            </div>
+            
+            <!-- Regular Models Container -->
             <div id="modelsContainer">
-                <!-- Model cards will be dynamically loaded here -->
+                <!-- Regular model cards will be dynamically loaded here -->
             </div>
             
             <!-- Info Box for Development -->
@@ -124,6 +130,7 @@
     <script src="js/model-storage.js"></script>
     <script src="js/model-storage-adapter.js"></script>
     <script src="js/model-display.js"></script>
+    <script src="premium-models.js"></script>
     <script>
         // Initialize model display when page loads
         document.addEventListener('DOMContentLoaded', async function() {
@@ -136,6 +143,11 @@
             }
             
             if (window.modelDisplay) {
+                // Load premium models first
+                if (window.premiumManager) {
+                    await premiumManager.loadPremiumShowcase('premiumModelsContainer');
+                }
+                // Then load regular models
                 window.modelDisplay.init('modelsContainer');
             } else {
                 console.error('Model display not initialized');

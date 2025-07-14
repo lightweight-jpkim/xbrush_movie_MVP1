@@ -2908,19 +2908,25 @@ async function loadFeaturedModels() {
         
         // Get active models from Firebase
         console.log('[Featured Models] Fetching models from Firebase...');
-        const models = await window.modelStorageAdapter.getActiveModels();
-        console.log('[Featured Models] Got models:', models.length);
+        const allModels = await window.modelStorageAdapter.getActiveModels();
+        console.log('[Featured Models] Got all models:', allModels.length);
         
-        // Update count
-        modelCount.textContent = `총 ${models.length}개`;
+        // Filter out premium models (only show regular models in featured section)
+        const regularModels = allModels.filter(model => 
+            !model.tier || model.tier === 'basic'
+        );
+        console.log('[Featured Models] Regular models:', regularModels.length);
         
-        if (models.length === 0) {
-            featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>등록된 모델이 없습니다.</p></div>';
+        // Update count (only regular models)
+        modelCount.textContent = `총 ${regularModels.length}개`;
+        
+        if (regularModels.length === 0) {
+            featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>등록된 일반 모델이 없습니다.</p></div>';
             return;
         }
         
-        // Take only first 4 models
-        const featuredModels = models.slice(0, 4);
+        // Take only first 4 regular models
+        const featuredModels = regularModels.slice(0, 4);
         
         // Create model cards HTML
         const modelsHTML = featuredModels.map(model => `

@@ -190,6 +190,42 @@ class ModelStorageAdapter {
     }
 
     /**
+     * Update model tier (premium status)
+     */
+    async updateModelTier(modelId, tierData) {
+        await this.ensureInitialized();
+        
+        try {
+            const updates = {
+                tier: tierData.tier,
+                premiumBadge: tierData.badgeText || this.getDefaultBadge(tierData.tier),
+                premiumStartDate: new Date().toISOString(),
+                premiumEndDate: tierData.duration > 0 
+                    ? new Date(Date.now() + tierData.duration * 30 * 24 * 60 * 60 * 1000).toISOString()
+                    : null,
+                sortPriority: parseInt(tierData.sortPriority) || 1000
+            };
+            
+            return await this.firebaseStorage.updateModel(modelId, updates);
+        } catch (error) {
+            console.error('Failed to update model tier:', error);
+            throw new Error('Failed to update model tier. Please check your internet connection.');
+        }
+    }
+    
+    /**
+     * Get default badge for tier
+     */
+    getDefaultBadge(tier) {
+        const badges = {
+            premium: '⭐ 프리미엄 모델',
+            vip: '💎 VIP 모델',
+            basic: ''
+        };
+        return badges[tier] || '';
+    }
+
+    /**
      * Check and migrate local data on first load
      */
     async checkAndMigrateLocalData() {
