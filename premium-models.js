@@ -127,7 +127,8 @@ class PremiumModelManager {
             this.carouselContainer = container;
             this.carouselWrapper = container.querySelector('.premium-models-wrapper');
             
-            // No need for JavaScript auto-scroll as CSS handles it
+            // Initialize drag scroll functionality
+            this.initializeDragScroll();
 
         } catch (error) {
             console.error('Error loading premium carousel:', error);
@@ -315,52 +316,93 @@ class PremiumModelManager {
      * Scroll carousel
      */
     scrollCarousel(direction) {
-        if (!this.carouselWrapper) return;
+        if (!this.carouselContainer) return;
         
-        // Get current transform value
-        const computedStyle = window.getComputedStyle(this.carouselWrapper);
-        const matrix = computedStyle.transform;
-        let currentX = 0;
-        
-        if (matrix && matrix !== 'none') {
-            const values = matrix.match(/matrix.*\((.+)\)/)[1].split(', ');
-            currentX = parseFloat(values[4]);
-        }
-        
-        // Pause animation
-        this.carouselWrapper.style.animation = 'none';
-        
-        // Calculate new position (3 cards at a time for smoother navigation)
         const scrollAmount = 220 * 3; // Width of 3 cards + gaps
-        let newX = direction === 'prev' ? currentX + scrollAmount : currentX - scrollAmount;
+        const currentScroll = this.carouselContainer.scrollLeft;
         
-        // Get boundaries
-        const maxScroll = -(this.carouselWrapper.scrollWidth / 2);
+        this.carouselContainer.scrollTo({
+            left: direction === 'prev' ? 
+                currentScroll - scrollAmount : 
+                currentScroll + scrollAmount,
+            behavior: 'smooth'
+        });
+    }
+
+    /**
+     * Initialize drag scroll functionality
+     */
+    initializeDragScroll() {
+        if (!this.carouselContainer) return;
         
-        // Handle wrapping
-        if (newX > 0) {
-            newX = maxScroll + newX;
-        } else if (newX < maxScroll) {
-            newX = newX - maxScroll;
-        }
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+        let velocity = 0;
+        let rafId;
         
-        // Apply smooth transition
-        this.carouselWrapper.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-        this.carouselWrapper.style.transform = `translateX(${newX}px)`;
+        const container = this.carouselContainer;
         
-        // Resume animation after transition
-        setTimeout(() => {
-            // Remove transition
-            this.carouselWrapper.style.transition = '';
-            
-            // Calculate position percentage
-            const percentage = Math.abs(newX) / Math.abs(maxScroll);
-            const remainingDuration = 60 * (1 - percentage);
-            
-            // Resume animation from current position
-            this.carouselWrapper.style.animation = `smoothScroll ${remainingDuration}s linear infinite`;
-            this.carouselWrapper.style.animationDelay = `-${60 * percentage}s`;
-        }, 800);
+        // Mouse events
+        container.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startX = e.pageX - container.offsetLeft;
+            scrollLeft = container.scrollLeft;
+            cancelAnimationFrame(rafId);
+        });
+        
+        container.addEventListener('mouseleave', () => {
+            isDown = false;
+        });
+        
+        container.addEventListener('mouseup', () => {
+            isDown = false;
+            // Apply momentum
+            const momentumScroll = () => {
+                if (Math.abs(velocity) > 0.5) {
+                    container.scrollLeft += velocity;
+                    velocity *= 0.95; // Friction
+                    rafId = requestAnimationFrame(momentumScroll);
+                }
+            };
+            momentumScroll();
+        });
+        
+        container.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - container.offsetLeft;
+            const walk = (x - startX) * 2; // Scroll speed multiplier
+            container.scrollLeft = scrollLeft - walk;
+            velocity = walk * 0.2; // Calculate velocity for momentum
+        });
+        
+        // Touch events for mobile
+        container.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].pageX - container.offsetLeft;
+            scrollLeft = container.scrollLeft;
+        }, { passive: true });
+        
+        container.addEventListener('touchmove', (e) => {
+            const x = e.touches[0].pageX - container.offsetLeft;
+            const walk = (x - startX) * 2;
+            container.scrollLeft = scrollLeft - walk;
+        }, { passive: true });
+        
+        // Prevent clicking on cards while dragging
+        let moved = false;
+        container.addEventListener('mousedown', () => moved = false);
+        container.addEventListener('mousemove', () => moved = true);
+        
+        const cards = container.querySelectorAll('.premium-model-card');
+        cards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (moved) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+        });
     }
 
 
