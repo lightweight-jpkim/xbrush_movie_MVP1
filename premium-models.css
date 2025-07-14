@@ -61,6 +61,7 @@
     cursor: grab;
     user-select: none;
     -webkit-overflow-scrolling: touch;
+    scroll-behavior: auto; /* Disable smooth scroll for auto-scroll to work properly */
 }
 
 /* Hide scrollbar completely */

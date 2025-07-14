@@ -129,6 +129,9 @@ class PremiumModelManager {
             
             // Initialize drag scroll functionality
             this.initializeDragScroll();
+            
+            // Initialize auto-scroll
+            this.initializeAutoScroll();
 
         } catch (error) {
             console.error('Error loading premium carousel:', error);
@@ -429,6 +432,63 @@ class PremiumModelManager {
         }, true);
     }
 
+
+    /**
+     * Initialize auto-scroll functionality
+     */
+    initializeAutoScroll() {
+        if (!this.carouselContainer) return;
+        
+        let scrollSpeed = 0.5; // pixels per frame
+        let isPaused = false;
+        let animationId = null;
+        
+        const scroll = () => {
+            if (!isPaused) {
+                const container = this.carouselContainer;
+                const maxScroll = container.scrollWidth - container.clientWidth;
+                
+                // Scroll forward
+                container.scrollLeft += scrollSpeed;
+                
+                // If we've reached the end, reset to beginning for infinite loop
+                if (container.scrollLeft >= maxScroll) {
+                    // Find the middle point to create seamless loop
+                    const halfWidth = container.scrollWidth / 2;
+                    container.scrollLeft = container.scrollLeft - halfWidth;
+                }
+            }
+            
+            animationId = requestAnimationFrame(scroll);
+        };
+        
+        // Start scrolling
+        animationId = requestAnimationFrame(scroll);
+        
+        // Pause on hover
+        this.carouselContainer.addEventListener('mouseenter', () => {
+            isPaused = true;
+        });
+        
+        this.carouselContainer.addEventListener('mouseleave', () => {
+            isPaused = false;
+        });
+        
+        // Also pause on touch for mobile
+        this.carouselContainer.addEventListener('touchstart', () => {
+            isPaused = true;
+        });
+        
+        this.carouselContainer.addEventListener('touchend', () => {
+            // Resume after a short delay to allow for scrolling
+            setTimeout(() => {
+                isPaused = false;
+            }, 1000);
+        });
+        
+        // Store animation ID for cleanup if needed
+        this.autoScrollAnimation = animationId;
+    }
 
     /**
      * Update carousel button visibility
