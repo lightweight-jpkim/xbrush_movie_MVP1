@@ -584,12 +584,8 @@
         // Load all models
         async function loadModels() {
             try {
-                // Use Firebase adapter if available
-                if (window.modelStorageAdapter) {
-                    allModels = await window.modelStorageAdapter.getAllModels();
-                } else {
-                    allModels = await window.modelStorage.getAllModels();
-                }
+                // Use Firebase adapter exclusively
+                allModels = await window.modelStorageAdapter.getAllModels();
                 filteredModels = [...allModels];
                 displayModels(filteredModels);
             } catch (error) {
@@ -722,8 +718,7 @@
             
             if (confirm(`정말로 "${modelName}"을(를) 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
                 try {
-                    const adapter = window.modelStorageAdapter || window.modelStorage;
-                    if (await adapter.deleteModel(modelId)) {
+                    if (await window.modelStorageAdapter.deleteModel(modelId)) {
                         showToast('모델이 삭제되었습니다.', 'success');
                         loadModels();
                         updateStats();
@@ -745,8 +740,7 @@
             const newStatus = model.status === 'active' ? 'inactive' : 'active';
             
             try {
-                const adapter = window.modelStorageAdapter || window.modelStorage;
-                await adapter.updateModel(modelId, { status: newStatus });
+                await window.modelStorageAdapter.updateModel(modelId, { status: newStatus });
                 showToast(`모델 상태가 ${newStatus === 'active' ? '활성' : '비활성'}으로 변경되었습니다.`, 'success');
                 loadModels();
                 updateStats();
@@ -896,9 +890,37 @@
         });
 
         // Export data
-        function exportData() {
-            window.modelStorage.exportModels();
-            showToast('모델 데이터가 다운로드됩니다.', 'info');
+        async function exportData() {
+            try {
+                // Get all models from Firebase
+                const models = await window.modelStorageAdapter.getAllModels();
+                
+                // Create JSON data
+                const exportData = {
+                    exportDate: new Date().toISOString(),
+                    modelCount: models.length,
+                    models: models
+                };
+                
+                // Create downloadable file
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                // Create download link
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `xbrush-models-export-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('모델 데이터가 다운로드됩니다.', 'success');
+            } catch (error) {
+                console.error('Export error:', error);
+                showToast('데이터 내보내기 중 오류가 발생했습니다.', 'error');
+            }
         }
 
         // Toggle premium status

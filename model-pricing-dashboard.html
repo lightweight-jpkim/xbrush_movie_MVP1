@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모델 가격 설정 대시보드 - xBrush</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+        
+        .dashboard-header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .model-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .model-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        /* Pricing Insights */
+        .insights-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .insight-card {
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .insight-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .insight-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .insight-trend {
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .trend-up {
+            color: #48bb78;
+        }
+        
+        .trend-down {
+            color: #e53e3e;
+        }
+        
+        /* License Types */
+        .license-types-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .license-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .license-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .license-card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .license-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .license-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #cbd5e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .toggle-switch.active {
+            background: #48bb78;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(26px);
+        }
+        
+        .price-input-group {
+            margin-bottom: 20px;
+        }
+        
+        .price-input-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+        
+        .price-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .currency-symbol {
+            position: absolute;
+            left: 15px;
+            color: #718096;
+            font-weight: 500;
+        }
+        
+        .price-input {
+            width: 100%;
+            padding: 12px 15px 12px 35px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .price-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .market-comparison {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: #e6f3ff;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+        
+        .comparison-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+        
+        .below-market {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .above-market {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .at-market {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        /* Options */
+        .license-options {
+            space-y: 15px;
+        }
+        
+        .option-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .option-row:last-child {
+            border-bottom: none;
+        }
+        
+        .option-label {
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+        
+        .option-value {
+            font-weight: 500;
+        }
+        
+        select {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: white;
+        }
+        
+        /* Dynamic Pricing Rules */
+        .pricing-rules-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .rule-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .rule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .rule-title {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .multiplier-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .multiplier-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f7fafc;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        /* Custom Package */
+        .custom-package-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .add-package-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .add-package-btn:hover {
+            background: #5a67d8;
+        }
+        
+        .custom-package-card {
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            color: #718096;
+        }
+        
+        /* Save Button */
+        .save-section {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+        
+        .save-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .save-info {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .save-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 0.95rem;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="header-content">
+            <h1 class="page-title">가격 설정 대시보드</h1>
+            <div class="model-info">
+                <span>채연님</span>
+                <div class="model-avatar">채</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Pricing Insights -->
+        <section class="insights-section">
+            <h2 class="section-title">가격 분석 인사이트</h2>
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <div class="insight-value">₩425,000</div>
+                    <div class="insight-label">평균 거래 금액</div>
+                    <div class="insight-trend trend-up">
+                        <span>▲</span> 15% 지난달 대비
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-value">₩380,000</div>
+                    <div class="insight-label">시장 평균가</div>
+                    <div class="insight-trend">
+                        당신의 가격은 12% 높습니다
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-value">85%</div>
+                    <div class="insight-label">가격 경쟁력</div>
+                    <div class="insight-trend trend-up">
+                        <span>▲</span> 상위 15% 수준
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-value">온라인 베이직</div>
+                    <div class="insight-label">인기 패키지</div>
+                    <div class="insight-trend">
+                        전체 매출의 45%
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- License Types -->
+        <section class="license-types-section">
+            <div class="section-header">
+                <h2 class="section-title">라이선스 유형별 가격 설정</h2>
+                <span style="color: #718096; font-size: 0.9rem;">활성화된 라이선스만 고객에게 표시됩니다</span>
+            </div>
+            
+            <div class="license-grid">
+                <!-- Online Basic -->
+                <div class="license-card">
+                    <div class="license-header">
+                        <h3 class="license-title">온라인 베이직</h3>
+                        <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    
+                    <div class="price-input-group">
+                        <label>기본 가격</label>
+                        <div class="price-input-wrapper">
+                            <span class="currency-symbol">₩</span>
+                            <input type="number" class="price-input" value="300000" step="10000">
+                        </div>
+                        <div class="market-comparison">
+                            <span>시장 평균: ₩350,000</span>
+                            <span class="comparison-badge below-market">14% 낮음</span>
+                        </div>
+                    </div>
+                    
+                    <div class="license-options">
+                        <div class="option-row">
+                            <span class="option-label">최소 기간</span>
+                            <select>
+                                <option>1개월</option>
+                                <option selected>3개월</option>
+                                <option>6개월</option>
+                            </select>
+                        </div>
+                        <div class="option-row">
+                            <span class="option-label">최대 기간</span>
+                            <select>
+                                <option>6개월</option>
+                                <option selected>12개월</option>
+                                <option>24개월</option>
+                            </select>
+                        </div>
+                        <div class="option-row">
+                            <span class="option-label">사용 범위</span>
+                            <span class="option-value">SNS, 웹사이트</span>
+                        </div>
+                        <div class="option-row">
+                            <span class="option-label">납품 기간</span>
+                            <select>
+                                <option>1-2일</option>
+                                <option selected>3-5일</option>
+                                <option>7일</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Online Premium -->
+                <div class="license-card">
+                    <div class="license-header">
+                        <h3 class="license-title">온라인 프리미엄</h3>
+                        <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    
+                    <div class="price-input-group">
+                        <label>기본 가격</label>
+                        <div class="price-input-wrapper">
+                            <span class="currency-symbol">₩</span>
+                            <input type="number" class="price-input" value="800000" step="10000">
+                        </div>
+                        <div class="market-comparison">
+                            <span>시장 평균: ₩750,000</span>
+                            <span class="comparison-badge above-market">7% 높음</span>
+                        </div>
+                    </div>
+                    
+                    <div class="license-options">
+                        <div class="option-row">
+                            <span class="option-label">최소 기간</span>
+                            <select>
+                                <option>3개월</option>
+                                <option selected>6개월</option>
+                                <option>12개월</option>
+                            </select>
+                        </div>
+                        <div class="option-row">
+                            <span class="option-label">최대 기간</span>
+                            <select>
+                                <option>12개월</option>
+                                <option selected>24개월</option>
+                                <option>36개월</option>
+                            </select>
+                        </div>
+                        <div class="option-row">
+                            <span class="option-label">사용 범위</span>
+                            <span class="option-value">모든 온라인 채널</span>
+                        </div>
+                        <div class="option-row">
+                            <span class="option-label">납품 기간</span>
+                            <select>
+                                <option>3-5일</option>
+                                <option selected>5-7일</option>
+                                <option>10일</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Broadcast -->
+                <div class="license-card">
+                    <div class="license-header">
+                        <h3 class="license-title">방송 광고</h3>
+                        <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    
+                    <div class="price-input-group">
+                        <label>기본 가격</label>
+                        <div class="price-input-wrapper">
+                            <span class="currency-symbol">₩</span>
+                            <input type="number" class="price-input" value="2000000" step="50000" disabled>
+                        </div>
+                        <div class="market-comparison">
+                            <span style="color: #a0aec0;">이 라이선스를 활성화하면 가격을 설정할 수 있습니다</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Print -->
+                <div class="license-card">
+                    <div class="license-header">
+                        <h3 class="license-title">인쇄물</h3>
+                        <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    
+                    <div class="price-input-group">
+                        <label>기본 가격</label>
+                        <div class="price-input-wrapper">
+                            <span class="currency-symbol">₩</span>
+                            <input type="number" class="price-input" value="500000" step="10000">
+                        </div>
+                        <div class="market-comparison">
+                            <span>시장 평균: ₩500,000</span>
+                            <span class="comparison-badge at-market">적정 가격</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Pricing Rules -->
+        <section class="pricing-rules-section">
+            <h2 class="section-title">동적 가격 규칙</h2>
+            
+            <div class="rule-card">
+                <div class="rule-header">
+                    <h3 class="rule-title">🚀 급행 납품</h3>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                </div>
+                <div class="multiplier-grid">
+                    <div class="multiplier-item">
+                        <span>24시간 이내</span>
+                        <span style="color: #667eea; font-weight: 600;">2.0x</span>
+                    </div>
+                    <div class="multiplier-item">
+                        <span>48시간 이내</span>
+                        <span style="color: #667eea; font-weight: 600;">1.5x</span>
+                    </div>
+                    <div class="multiplier-item">
+                        <span>72시간 이내</span>
+                        <span style="color: #667eea; font-weight: 600;">1.2x</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="rule-card">
+                <div class="rule-header">
+                    <h3 class="rule-title">📦 대량 할인</h3>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                </div>
+                <div class="multiplier-grid">
+                    <div class="multiplier-item">
+                        <span>3개 이상</span>
+                        <span style="color: #48bb78; font-weight: 600;">-10%</span>
+                    </div>
+                    <div class="multiplier-item">
+                        <span>5개 이상</span>
+                        <span style="color: #48bb78; font-weight: 600;">-15%</span>
+                    </div>
+                    <div class="multiplier-item">
+                        <span>10개 이상</span>
+                        <span style="color: #48bb78; font-weight: 600;">-20%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="rule-card">
+                <div class="rule-header">
+                    <h3 class="rule-title">🎯 특별 조건</h3>
+                    <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+                </div>
+                <div style="color: #a0aec0; font-size: 0.9rem;">
+                    스타트업, 비영리 단체 등을 위한 특별 할인을 설정할 수 있습니다
+                </div>
+            </div>
+        </section>
+
+        <!-- Custom Packages -->
+        <section class="custom-package-section">
+            <div class="section-header">
+                <h2 class="section-title">맞춤 패키지</h2>
+                <button class="add-package-btn">
+                    <span>+</span>
+                    <span>새 패키지 만들기</span>
+                </button>
+            </div>
+            
+            <div class="custom-package-card">
+                <p>특별한 조건의 맞춤 패키지를 만들어보세요</p>
+                <p style="font-size: 0.85rem; margin-top: 8px;">예: 신규 크리에이터 할인, 장기 계약 특가</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Save Section -->
+    <div class="save-section">
+        <div class="save-content">
+            <div class="save-info">
+                마지막 저장: 2024년 2월 15일 오후 3:45
+            </div>
+            <div class="save-actions">
+                <button class="btn btn-secondary">미리보기</button>
+                <button class="btn btn-primary">변경사항 저장</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+            
+            // Find parent card and toggle disabled state
+            const card = element.closest('.license-card, .rule-card');
+            if (card) {
+                const inputs = card.querySelectorAll('input, select');
+                const isActive = element.classList.contains('active');
+                
+                inputs.forEach(input => {
+                    input.disabled = !isActive;
+                    if (!isActive) {
+                        input.style.opacity = '0.5';
+                    } else {
+                        input.style.opacity = '1';
+                    }
+                });
+            }
+        }
+        
+        // Price comparison updater
+        document.querySelectorAll('.price-input').forEach(input => {
+            input.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                const marketAvg = parseInt(this.closest('.license-card').querySelector('.market-comparison span').textContent.match(/[\d,]+/)[0].replace(/,/g, ''));
+                
+                const comparison = this.closest('.price-input-group').querySelector('.comparison-badge');
+                if (comparison) {
+                    const diff = ((value - marketAvg) / marketAvg * 100).toFixed(0);
+                    
+                    if (Math.abs(diff) < 5) {
+                        comparison.className = 'comparison-badge at-market';
+                        comparison.textContent = '적정 가격';
+                    } else if (diff > 0) {
+                        comparison.className = 'comparison-badge above-market';
+                        comparison.textContent = `${Math.abs(diff)}% 높음`;
+                    } else {
+                        comparison.className = 'comparison-badge below-market';
+                        comparison.textContent = `${Math.abs(diff)}% 낮음`;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

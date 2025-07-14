@@ -1,0 +1,3 @@
+GitHub Desktop Test
+Created at: 2025-07-14 14:50
+This file should appear immediately in GitHub Desktop's Changes tab.

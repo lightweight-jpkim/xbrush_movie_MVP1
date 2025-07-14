@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+// Convenience wrapper - just forwards to claude-git.js
+require('./claude-git.js');
+</invoke>

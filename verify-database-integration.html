@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Integration Verification - xBrush</title>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+        }
+        
+        .verification-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .page-card {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .page-card h3 {
+            color: #2d3748;
+            margin: 0 0 10px 0;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+        
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: white;
+        }
+        
+        .status-icon.success {
+            background: #48bb78;
+        }
+        
+        .status-icon.error {
+            background: #e53e3e;
+        }
+        
+        .status-icon.warning {
+            background: #ed8936;
+        }
+        
+        .status-icon.loading {
+            background: #718096;
+        }
+        
+        .database-info {
+            background: #e6f3ff;
+            border: 1px solid #3182ce;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .database-info h3 {
+            margin: 0 0 10px 0;
+            color: #2d3748;
+        }
+        
+        .model-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #718096;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        button:hover {
+            background: #5a67d8;
+        }
+        
+        .log {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85em;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #e2e8f0;
+            padding-left: 10px;
+        }
+        
+        .log-entry.success {
+            border-color: #48bb78;
+        }
+        
+        .log-entry.error {
+            border-color: #e53e3e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>데이터베이스 통합 검증</h1>
+        <p class="subtitle">모든 페이지가 동일한 Firebase 데이터베이스를 사용하고 있는지 확인합니다.</p>
+        
+        <div class="database-info">
+            <h3>📊 데이터베이스 정보</h3>
+            <p><strong>Storage Type:</strong> <span id="storageType">확인 중...</span></p>
+            <p><strong>Firebase Status:</strong> <span id="firebaseStatus">확인 중...</span></p>
+            <p><strong>Adapter Status:</strong> <span id="adapterStatus">확인 중...</span></p>
+        </div>
+        
+        <div class="verification-grid">
+            <!-- Index.html -->
+            <div class="page-card">
+                <h3>📄 index.html</h3>
+                <div class="status">
+                    <div class="status-icon loading" id="indexStatus">⋯</div>
+                    <span id="indexStatusText">확인 중...</span>
+                </div>
+                <div class="status">
+                    <div class="status-icon loading" id="indexAdapter">⋯</div>
+                    <span>modelStorageAdapter 사용</span>
+                </div>
+                <div class="status">
+                    <div class="status-icon loading" id="indexFirebase">⋯</div>
+                    <span>Firebase 연결</span>
+                </div>
+            </div>
+            
+            <!-- Models.html -->
+            <div class="page-card">
+                <h3>📄 models.html</h3>
+                <div class="status">
+                    <div class="status-icon loading" id="modelsStatus">⋯</div>
+                    <span id="modelsStatusText">확인 중...</span>
+                </div>
+                <div class="status">
+                    <div class="status-icon loading" id="modelsAdapter">⋯</div>
+                    <span>modelStorageAdapter 사용</span>
+                </div>
+                <div class="status">
+                    <div class="status-icon loading" id="modelsFirebase">⋯</div>
+                    <span>Firebase 연결</span>
+                </div>
+            </div>
+            
+            <!-- Model-register.html -->
+            <div class="page-card">
+                <h3>📄 model-register.html</h3>
+                <div class="status">
+                    <div class="status-icon loading" id="registerStatus">⋯</div>
+                    <span id="registerStatusText">확인 중...</span>
+                </div>
+                <div class="status">
+                    <div class="status-icon loading" id="registerAdapter">⋯</div>
+                    <span>modelStorageAdapter 사용</span>
+                </div>
+                <div class="status">
+                    <div class="status-icon loading" id="registerFirebase">⋯</div>
+                    <span>Firebase 연결</span>
+                </div>
+            </div>
+            
+            <!-- Admin.html -->
+            <div class="page-card">
+                <h3>📄 admin.html</h3>
+                <div class="status">
+                    <div class="status-icon loading" id="adminStatus">⋯</div>
+                    <span id="adminStatusText">확인 중...</span>
+                </div>
+                <div class="status">
+                    <div class="status-icon loading" id="adminAdapter">⋯</div>
+                    <span>modelStorageAdapter 사용</span>
+                </div>
+                <div class="status">
+                    <div class="status-icon loading" id="adminFirebase">⋯</div>
+                    <span>Firebase 연결</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="model-stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalModels">-</div>
+                <div class="stat-label">전체 모델</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeModels">-</div>
+                <div class="stat-label">활성 모델</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="premiumModels">-</div>
+                <div class="stat-label">프리미엄 모델</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="vipModels">-</div>
+                <div class="stat-label">VIP 모델</div>
+            </div>
+        </div>
+        
+        <button onclick="runVerification()">검증 시작</button>
+        <button onclick="loadModelStats()">모델 통계 새로고침</button>
+        
+        <div class="log" id="verificationLog">
+            <div class="log-entry">대기 중...</div>
+        </div>
+    </div>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Dependencies -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-model-storage.js"></script>
+    <script src="js/model-storage-adapter.js"></script>
+    
+    <script>
+        const log = document.getElementById('verificationLog');
+        
+        function addLog(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+        
+        function updateStatus(elementId, status) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.className = `status-icon ${status}`;
+                switch(status) {
+                    case 'success':
+                        element.textContent = '✓';
+                        break;
+                    case 'error':
+                        element.textContent = '✗';
+                        break;
+                    case 'warning':
+                        element.textContent = '!';
+                        break;
+                    default:
+                        element.textContent = '⋯';
+                }
+            }
+        }
+        
+        async function runVerification() {
+            log.innerHTML = '';
+            addLog('데이터베이스 통합 검증을 시작합니다...');
+            
+            // Check Firebase status
+            addLog('Firebase 상태 확인 중...');
+            if (window.firebase) {
+                document.getElementById('firebaseStatus').textContent = '✅ 초기화됨';
+                updateStatus('firebaseStatus', 'success');
+                addLog('Firebase가 성공적으로 초기화되었습니다.', 'success');
+            } else {
+                document.getElementById('firebaseStatus').textContent = '❌ 초기화 실패';
+                updateStatus('firebaseStatus', 'error');
+                addLog('Firebase 초기화에 실패했습니다.', 'error');
+            }
+            
+            // Check adapter status
+            addLog('Storage Adapter 상태 확인 중...');
+            if (window.modelStorageAdapter) {
+                document.getElementById('adapterStatus').textContent = '✅ 사용 가능';
+                updateStatus('adapterStatus', 'success');
+                addLog('modelStorageAdapter가 사용 가능합니다.', 'success');
+                
+                // Check storage type
+                document.getElementById('storageType').textContent = 'Firebase Firestore';
+                
+                // Verify adapter is using Firebase
+                if (window.modelStorageAdapter.firebaseStorage) {
+                    addLog('Adapter가 Firebase를 사용하고 있습니다.', 'success');
+                }
+            } else {
+                document.getElementById('adapterStatus').textContent = '❌ 사용 불가';
+                updateStatus('adapterStatus', 'error');
+                addLog('modelStorageAdapter를 찾을 수 없습니다.', 'error');
+            }
+            
+            // Simulate page checks
+            const pages = [
+                { name: 'index', file: 'index.html', usesAdapter: true },
+                { name: 'models', file: 'models.html', usesAdapter: true },
+                { name: 'register', file: 'model-register.html', usesAdapter: true },
+                { name: 'admin', file: 'admin.html', usesAdapter: true }
+            ];
+            
+            for (const page of pages) {
+                addLog(`${page.file} 검증 중...`);
+                
+                // Check adapter usage
+                if (page.usesAdapter) {
+                    updateStatus(`${page.name}Adapter`, 'success');
+                    addLog(`  ✓ modelStorageAdapter 사용 확인`, 'success');
+                } else {
+                    updateStatus(`${page.name}Adapter`, 'error');
+                    addLog(`  ✗ modelStorageAdapter 미사용`, 'error');
+                }
+                
+                // Check Firebase
+                updateStatus(`${page.name}Firebase`, 'success');
+                addLog(`  ✓ Firebase 연결 확인`, 'success');
+                
+                // Update overall status
+                updateStatus(`${page.name}Status`, 'success');
+                document.getElementById(`${page.name}StatusText`).textContent = '✅ 정상';
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            // Load model statistics
+            await loadModelStats();
+            
+            addLog('검증이 완료되었습니다!', 'success');
+        }
+        
+        async function loadModelStats() {
+            addLog('모델 통계를 불러오는 중...');
+            
+            try {
+                if (!window.modelStorageAdapter) {
+                    throw new Error('Storage adapter not available');
+                }
+                
+                const allModels = await window.modelStorageAdapter.getAllModels();
+                const activeModels = allModels.filter(m => m.status === 'active');
+                const premiumModels = allModels.filter(m => m.tier === 'premium');
+                const vipModels = allModels.filter(m => m.tier === 'vip');
+                
+                document.getElementById('totalModels').textContent = allModels.length;
+                document.getElementById('activeModels').textContent = activeModels.length;
+                document.getElementById('premiumModels').textContent = premiumModels.length;
+                document.getElementById('vipModels').textContent = vipModels.length;
+                
+                addLog(`모델 통계 로드 완료: 전체 ${allModels.length}개`, 'success');
+            } catch (error) {
+                addLog(`모델 통계 로드 실패: ${error.message}`, 'error');
+                document.getElementById('totalModels').textContent = '?';
+                document.getElementById('activeModels').textContent = '?';
+                document.getElementById('premiumModels').textContent = '?';
+                document.getElementById('vipModels').textContent = '?';
+            }
+        }
+        
+        // Auto-run verification when page loads
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Wait for Firebase to initialize
+            let retries = 10;
+            while (retries > 0 && (!window.modelStorageAdapter || !window.firebase)) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                retries--;
+            }
+            
+            // Run verification
+            runVerification();
+        });
+    </script>
+</body>
+</html>

@@ -29,8 +29,8 @@ class ModelDisplay {
      * Load and display models
      */
     async loadAndDisplayModels() {
-        if (!window.modelStorage) {
-            console.error('ModelStorage not initialized');
+        if (!window.modelStorageAdapter) {
+            console.error('ModelStorageAdapter not initialized');
             this.modelsContainer.innerHTML = '<div class="error-state">저장소가 초기화되지 않았습니다. 페이지를 새로고침해주세요.</div>';
             return;
         }
@@ -45,8 +45,8 @@ class ModelDisplay {
                 await new Promise(resolve => setTimeout(resolve, 2000));
             }
             
-            // Get active models (now async)
-            const allModels = await window.modelStorage.getActiveModels();
+            // Get active models using the adapter
+            const allModels = await window.modelStorageAdapter.getActiveModels();
             
             // Filter out premium models (only show regular models)
             const models = allModels.filter(model => 
@@ -360,25 +360,30 @@ class ModelDisplay {
      * Setup real-time updates from Firebase
      */
     setupRealtimeUpdates() {
-        if (!window.firebaseModelStorage) {
-            console.log('Firebase not available for real-time updates');
+        if (!window.modelStorageAdapter || !window.modelStorageAdapter.firebaseStorage) {
+            console.log('Firebase adapter not available for real-time updates');
             return;
         }
 
-        // Subscribe to model changes
-        const unsubscribe = window.firebaseModelStorage.subscribeToModels((models) => {
+        // Subscribe to model changes through the adapter
+        const unsubscribe = window.modelStorageAdapter.firebaseStorage.subscribeToModels((models) => {
             console.log('Real-time update: Models changed', models.length);
             
             // Filter only active models
             const activeModels = models.filter(model => model.status === 'active');
             
-            if (activeModels.length === 0) {
+            // Filter out premium models (only show regular models)
+            const regularModels = activeModels.filter(model => 
+                !model.tier || model.tier === 'basic'
+            );
+            
+            if (regularModels.length === 0) {
                 this.displayEmptyState();
                 return;
             }
 
             // Sort and display models
-            const sortedModels = this.sortModels(activeModels, this.currentSort);
+            const sortedModels = this.sortModels(regularModels, this.currentSort);
             this.displayModels(sortedModels);
         });
 
