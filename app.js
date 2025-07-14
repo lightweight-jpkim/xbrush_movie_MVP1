@@ -2893,9 +2893,13 @@ async function loadFeaturedModels() {
     const featuredModelsGrid = document.getElementById('featuredModelsGrid');
     const modelCount = document.getElementById('modelCount');
     
-    if (!featuredModelsGrid) return;
+    if (!featuredModelsGrid) {
+        console.error('[Featured Models] featuredModelsGrid element not found!');
+        return;
+    }
     
     console.log('[Featured Models] Starting to load...');
+    console.log('[Featured Models] Grid element:', featuredModelsGrid);
     
     try {
         // Show loading state
@@ -2910,15 +2914,19 @@ async function loadFeaturedModels() {
         console.log('[Featured Models] Fetching models from Firebase...');
         const allModels = await window.modelStorageAdapter.getActiveModels();
         console.log('[Featured Models] Got all models:', allModels.length);
+        console.log('[Featured Models] First model data:', allModels[0]);
         
         // Show ALL models temporarily (including premium) to debug image display
         const regularModels = allModels; // Temporarily show all models
         console.log('[Featured Models] Showing all models (debug):', regularModels.length);
         
         // Update count
-        modelCount.textContent = `총 ${regularModels.length}개`;
+        if (modelCount) {
+            modelCount.textContent = `총 ${regularModels.length}개`;
+        }
         
         if (regularModels.length === 0) {
+            console.log('[Featured Models] No models found, showing empty message');
             featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>등록된 모델이 없습니다.</p></div>';
             return;
         }
@@ -2956,14 +2964,48 @@ async function loadFeaturedModels() {
                     ` : ''}
                 </div>
             </div>
-        `).join('');
+        `}).join('');
         
+        console.log('[Featured Models] Generated HTML:', modelsHTML);
+        console.log('[Featured Models] Setting innerHTML...');
         featuredModelsGrid.innerHTML = modelsHTML;
+        console.log('[Featured Models] innerHTML set successfully');
+        
+        // Check if images are in DOM
+        const images = featuredModelsGrid.querySelectorAll('img');
+        console.log('[Featured Models] Found images in DOM:', images.length);
+        images.forEach((img, index) => {
+            console.log(`[Featured Models] Image ${index}:`, {
+                src: img.src.substring(0, 100) + '...',
+                className: img.className,
+                loading: img.getAttribute('loading'),
+                naturalWidth: img.naturalWidth,
+                naturalHeight: img.naturalHeight,
+                complete: img.complete
+            });
+            
+            // Force images to be visible
+            img.style.opacity = '1';
+            img.style.display = 'block';
+        });
         
     } catch (error) {
-        console.error('Error loading featured models:', error);
+        console.error('[Featured Models] Error loading models:', error);
+        console.error('[Featured Models] Error stack:', error.stack);
         featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>모델을 불러오는 중 오류가 발생했습니다.</p></div>';
     }
+    
+    // TEST: Add a manual test image to verify display works
+    console.log('[Featured Models] Adding test image...');
+    const testHTML = `
+        <div style="border: 2px solid red; padding: 10px; margin-top: 20px;">
+            <p>TEST IMAGE (should be visible):</p>
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg==" 
+                 style="width: 100px; height: 100px; display: block; opacity: 1; border: 1px solid blue;" 
+                 alt="Test Image">
+        </div>
+    `;
+    featuredModelsGrid.insertAdjacentHTML('beforeend', testHTML);
 }
 
 /**
