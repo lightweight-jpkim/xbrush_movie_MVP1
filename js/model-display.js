@@ -50,7 +50,12 @@ class ModelDisplay {
             }
             
             // Get active models using the adapter
-            const models = await window.modelStorageAdapter.getActiveModels();
+            const allModels = await window.modelStorageAdapter.getActiveModels();
+            
+            // Filter out premium models (only show basic models)
+            const models = allModels.filter(model => 
+                !model.tier || model.tier === 'basic'
+            );
             
             if (models.length === 0) {
                 this.displayEmptyState();
@@ -283,8 +288,7 @@ class ModelDisplay {
         // Trust badges
         const trustBadges = [];
         if (isVerified) trustBadges.push('<span class="trust-badge verified">✓ 인증</span>');
-        if (tier === 'premium') trustBadges.push('<span class="trust-badge premium">⭐ 프리미엄</span>');
-        if (tier === 'vip') trustBadges.push('<span class="trust-badge vip">💎 VIP</span>');
+        // Don't show tier badges in main page since we only show basic models
         if (rating >= 4.8 && reviewCount >= 10) trustBadges.push('<span class="trust-badge top-rated">🏆 우수</span>');
         
         const trustBadgesHTML = trustBadges.length > 0 ? 
@@ -503,8 +507,10 @@ class ModelDisplay {
         const unsubscribe = window.modelStorageAdapter.firebaseStorage.subscribeToModels((models) => {
             console.log('Real-time update: Models changed', models.length);
             
-            // Filter only active models
-            const activeModels = models.filter(model => model.status === 'active');
+            // Filter only active models and basic tier
+            const activeModels = models.filter(model => 
+                model.status === 'active' && (!model.tier || model.tier === 'basic')
+            );
             
             if (activeModels.length === 0) {
                 this.displayEmptyState();
