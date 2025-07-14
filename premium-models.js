@@ -60,7 +60,7 @@ class PremiumModelManager {
         if (!container) return;
 
         try {
-            const models = await this.getPremiumModels(6); // Show only 6 models
+            const models = await this.getPremiumModels(20); // Show up to 20 models
             
             if (models.length === 0) {
                 // Hide the entire premium section if no premium models
@@ -71,9 +71,22 @@ class PremiumModelManager {
                 return;
             }
 
-            container.innerHTML = models.map(model => 
-                this.createSimplifiedPremiumCard(model)
-            ).join('');
+            // Create wrapper for horizontal scrolling
+            container.innerHTML = `
+                <div class="premium-models-wrapper">
+                    ${models.map(model => this.createSimplifiedPremiumCard(model)).join('')}
+                </div>
+                <button class="premium-carousel-nav prev" onclick="premiumManager.scrollCarousel('prev')">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </button>
+                <button class="premium-carousel-nav next" onclick="premiumManager.scrollCarousel('next')">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                    </svg>
+                </button>
+            `;
 
             // Add view all button
             const premiumSection = document.getElementById('premiumModelsSection');
@@ -90,6 +103,9 @@ class PremiumModelManager {
                 `;
                 premiumSection.appendChild(viewAllDiv);
             }
+
+            // Initialize scroll position
+            this.carouselContainer = container;
 
         } catch (error) {
             console.error('Error loading premium carousel:', error);
@@ -276,15 +292,23 @@ class PremiumModelManager {
     /**
      * Scroll carousel
      */
-    scrollCarousel(containerId, direction) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
+    scrollCarousel(direction) {
+        if (!this.carouselContainer) return;
         
-        const scrollAmount = 340; // Width of one card + gap
-        container.scrollBy({
-            left: scrollAmount * direction,
-            behavior: 'smooth'
-        });
+        const scrollAmount = 220; // Width of card + gap
+        const currentScroll = this.carouselContainer.scrollLeft;
+        
+        if (direction === 'prev') {
+            this.carouselContainer.scrollTo({
+                left: currentScroll - scrollAmount,
+                behavior: 'smooth'
+            });
+        } else {
+            this.carouselContainer.scrollTo({
+                left: currentScroll + scrollAmount,
+                behavior: 'smooth'
+            });
+        }
     }
 
     /**
