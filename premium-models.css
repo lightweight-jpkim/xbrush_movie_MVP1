@@ -3,7 +3,20 @@
 /* Premium Section Container */
 .premium-models-section {
     margin: 40px 0;
+    padding: 0 80px;
     position: relative;
+}
+
+@media (max-width: 1200px) {
+    .premium-models-section {
+        padding: 0 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .premium-models-section {
+        padding: 0;
+    }
 }
 
 /* Premium Section Headers */
@@ -69,7 +82,7 @@
     overflow-y: hidden;
     scroll-behavior: smooth;
     padding: 20px 0;
-    margin: 20px -20px 0 -20px;
+    margin: 20px 0;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -89,6 +102,28 @@
 
 .premium-models-carousel::-webkit-scrollbar-thumb:hover {
     background: #5a67d8;
+}
+
+/* Fade Effects */
+.premium-models-carousel::before,
+.premium-models-carousel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 8px; /* Account for scrollbar */
+    width: 60px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.premium-models-carousel::before {
+    left: 0;
+    background: linear-gradient(to right, white 0%, transparent 100%);
+}
+
+.premium-models-carousel::after {
+    right: 0;
+    background: linear-gradient(to left, white 0%, transparent 100%);
 }
 
 .premium-models-wrapper {
@@ -177,40 +212,57 @@
 
 /* Carousel Navigation Buttons */
 .premium-carousel-nav {
-    position: absolute;
+    position: fixed;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #e2e8f0;
-    width: 40px;
-    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    z-index: 5;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .premium-carousel-nav:hover {
-    background: white;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
 .premium-carousel-nav.prev {
-    left: 10px;
+    left: 20px;
 }
 
 .premium-carousel-nav.next {
-    right: 10px;
+    right: 20px;
 }
 
 .premium-carousel-nav svg {
-    width: 20px;
-    height: 20px;
-    fill: #667eea;
+    width: 24px;
+    height: 24px;
+    fill: white;
+}
+
+/* Position navigation relative to section */
+.premium-models-section {
+    position: relative;
+}
+
+.premium-models-section .premium-carousel-nav {
+    position: absolute;
+}
+
+.premium-models-section .premium-carousel-nav.prev {
+    left: -60px;
+}
+
+.premium-models-section .premium-carousel-nav.next {
+    right: -60px;
 }
 
 /* Mobile Adjustments */
@@ -226,6 +278,23 @@
     
     .premium-carousel-nav {
         display: none;
+    }
+    
+    /* Adjust fade effects for mobile */
+    .premium-models-carousel::before,
+    .premium-models-carousel::after {
+        width: 30px;
+    }
+}
+
+/* Responsive adjustments for navigation position */
+@media (max-width: 1200px) {
+    .premium-models-section .premium-carousel-nav.prev {
+        left: 10px;
+    }
+    
+    .premium-models-section .premium-carousel-nav.next {
+        right: 10px;
     }
 }
 
