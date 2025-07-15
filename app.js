@@ -3192,29 +3192,42 @@ async function loadCelebrityModels() {
         // Wait for Firebase
         await waitForFirebase();
         
-        // Query for celebrity models
+        // Query for celebrity models - simplified to avoid index requirement
         const celebrityQuery = window.firebaseDB
             .collection('models')
-            .where('isCelebrity', '==', true)
-            .where('featured', '==', true)
-            .orderBy('personalInfo.name');
+            .where('isCelebrity', '==', true);
             
         const snapshot = await celebrityQuery.get();
         
-        if (snapshot.empty) {
-            console.log('[Celebrity Models] No celebrity models found');
+        // Filter for featured models in memory
+        const celebrityDocs = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.featured === true) {
+                celebrityDocs.push({ id: doc.id, ...data });
+            }
+        });
+        
+        // Sort by name in memory
+        celebrityDocs.sort((a, b) => {
+            const nameA = a.personalInfo?.name || '';
+            const nameB = b.personalInfo?.name || '';
+            return nameA.localeCompare(nameB);
+        });
+        
+        if (celebrityDocs.length === 0) {
+            console.log('[Celebrity Models] No featured celebrity models found');
             celebritySection.style.display = 'none';
             return;
         }
         
-        console.log(`[Celebrity Models] Found ${snapshot.size} celebrity models`);
+        console.log(`[Celebrity Models] Found ${celebrityDocs.length} featured celebrity models`);
         
         // Create celebrity model cards
         const celebrityHTML = [];
         
-        snapshot.forEach(doc => {
-            const model = doc.data();
-            const modelId = doc.id;
+        celebrityDocs.forEach(model => {
+            const modelId = model.id;
             
             // Get model details
             const name = model.personalInfo?.name || 'Unknown';

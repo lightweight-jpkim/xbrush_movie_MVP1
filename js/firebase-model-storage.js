@@ -240,7 +240,6 @@ class FirebaseModelStorage {
             
             const snapshot = await this.db.collection(this.collection)
                 .where('status', '==', 'active')
-                .orderBy('createdAt', 'desc')
                 .get();
             
             console.log('[FirebaseModelStorage] Query complete. Found:', snapshot.size, 'documents');
@@ -257,6 +256,13 @@ class FirebaseModelStorage {
                     id: doc.id,
                     ...data
                 });
+            });
+            
+            // Sort by createdAt in memory
+            models.sort((a, b) => {
+                const aTime = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0;
+                const bTime = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0;
+                return bTime - aTime; // desc order
             });
             
             console.log('[FirebaseModelStorage] Returning', models.length, 'active models');
@@ -276,7 +282,6 @@ class FirebaseModelStorage {
             
             const snapshot = await this.db.collection(this.collection)
                 .where('status', '==', 'pending')
-                .orderBy('createdAt', 'desc')
                 .get();
             
             const models = [];
@@ -285,6 +290,13 @@ class FirebaseModelStorage {
                     id: doc.id,
                     ...doc.data()
                 });
+            });
+            
+            // Sort by createdAt in memory
+            models.sort((a, b) => {
+                const aTime = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0;
+                const bTime = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0;
+                return bTime - aTime; // desc order
             });
             
             return models;
@@ -366,18 +378,28 @@ class FirebaseModelStorage {
         try {
             await this.ensureInitialized();
             
+            // First get all active models, then filter by category in memory
             const snapshot = await this.db.collection(this.collection)
-                .where('personalInfo.categories', 'array-contains', category)
                 .where('status', '==', 'active')
-                .orderBy('createdAt', 'desc')
                 .get();
             
             const models = [];
             snapshot.forEach(doc => {
-                models.push({
-                    id: doc.id,
-                    ...doc.data()
-                });
+                const data = doc.data();
+                // Filter by category in memory
+                if (data.personalInfo?.categories?.includes(category)) {
+                    models.push({
+                        id: doc.id,
+                        ...data
+                    });
+                }
+            });
+            
+            // Sort by createdAt in memory
+            models.sort((a, b) => {
+                const aTime = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0;
+                const bTime = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0;
+                return bTime - aTime; // desc order
             });
             
             return models;
@@ -394,7 +416,6 @@ class FirebaseModelStorage {
         try {
             return this.db.collection(this.collection)
                 .where('status', '==', 'active')
-                .orderBy('createdAt', 'desc')
                 .onSnapshot(snapshot => {
                     const models = [];
                     snapshot.forEach(doc => {
@@ -403,6 +424,14 @@ class FirebaseModelStorage {
                             ...doc.data()
                         });
                     });
+                    
+                    // Sort by createdAt in memory
+                    models.sort((a, b) => {
+                        const aTime = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0;
+                        const bTime = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0;
+                        return bTime - aTime; // desc order
+                    });
+                    
                     callback(models);
                 });
         } catch (error) {
