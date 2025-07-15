@@ -1550,25 +1550,32 @@ body {
     }
     
     .progress-nav {
-        padding: 16px;
+        padding: 12px;
         margin-bottom: 20px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
-    /* Hide full progress bar on mobile, show compact version */
+    /* Make progress steps horizontal scroll on mobile */
     .progress-steps {
+        display: flex;
+        min-width: 600px;
+        overflow-x: visible;
+    }
+    
+    /* Hide scrollbar for cleaner look */
+    .progress-nav::-webkit-scrollbar {
         display: none;
     }
     
-    /* Compact mobile progress indicator */
+    .progress-nav {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    
+    /* Compact mobile progress indicator - now hidden since we're using horizontal scroll */
     .mobile-progress-indicator {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f7fafc;
-        border-radius: 12px;
-        padding: 12px 20px;
-        font-weight: 600;
-        color: #4a5568;
+        display: none !important;
     }
     
     .mobile-progress-current {
@@ -1660,6 +1667,32 @@ body {
     }
     
     #celebrityModelsGrid .card {
+        flex: 0 0 280px;
+        scroll-snap-align: start;
+    }
+    
+    /* ALL card-grid sections - Horizontal scroll on mobile */
+    .card-grid {
+        display: flex !important;
+        overflow-x: auto;
+        overflow-y: hidden;
+        gap: 16px;
+        padding: 16px 0;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        grid-template-columns: none !important;
+    }
+    
+    .card-grid::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .card-grid {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    
+    .card-grid .card {
         flex: 0 0 280px;
         scroll-snap-align: start;
     }

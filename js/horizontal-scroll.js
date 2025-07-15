@@ -10,7 +10,8 @@
         
         const scrollContainers = [
             document.querySelector('.featured-models-grid'),
-            document.getElementById('celebrityModelsGrid')
+            document.getElementById('celebrityModelsGrid'),
+            ...document.querySelectorAll('.card-grid')
         ];
         
         scrollContainers.forEach(container => {
