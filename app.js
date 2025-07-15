@@ -30,7 +30,7 @@ class VideoCreationApp {
                 initializeCurrentImageComparison();
             }, 100);
             
-            showToast('애플리케이션이 시작되었습니다.', 'success');
+            // Removed startup toast notification for cleaner UX
         } catch (error) {
             handleError(error, 'Application initialization');
         }
