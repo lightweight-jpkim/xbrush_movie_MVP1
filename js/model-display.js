@@ -337,7 +337,7 @@ class ModelDisplay {
                         </div>
                         <div class="quick-stat" title="${instagramHandle}">
                             <a href="https://instagram.com/${instagramHandle.replace('@', '')}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="sns-link">
-                                <span class="stat-icon-large ig-icon">IG</span>
+                                <img src="images/ig.png" alt="Instagram" class="ig-icon-img" />
                             </a>
                         </div>
                         <div class="quick-stat" title="평점 ${Number(rating || 0).toFixed(1)}">

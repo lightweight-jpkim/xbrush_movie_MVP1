@@ -765,13 +765,12 @@
     display: block;
 }
 
-.stat-icon-large.ig-icon {
-    font-weight: 800;
-    font-size: 18px;
-    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.ig-icon-img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.2s ease;
 }
 
 .quick-stat .sns-link {
@@ -782,11 +781,8 @@
     text-decoration: none;
 }
 
-.quick-stat:hover .ig-icon {
-    background: linear-gradient(45deg, #fff, #fff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.quick-stat:hover .ig-icon-img {
+    transform: scale(1.1);
 }
 
 /* Enhanced Content Section */
