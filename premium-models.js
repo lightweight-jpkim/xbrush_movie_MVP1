@@ -490,6 +490,27 @@ class PremiumModelManager {
         
         // Store animation ID for cleanup if needed
         this.autoScrollAnimation = animationId;
+        this.isPaused = false;
+        
+        // Store pause function for external access
+        this.pauseAutoScroll = () => {
+            isPaused = true;
+        };
+        
+        this.resumeAutoScroll = () => {
+            isPaused = false;
+        };
+    }
+    
+    /**
+     * Stop auto-scroll permanently
+     */
+    stopAutoScroll() {
+        if (this.autoScrollAnimation) {
+            cancelAnimationFrame(this.autoScrollAnimation);
+            this.autoScrollAnimation = null;
+        }
+        this.isPaused = true;
     }
 
     /**
@@ -513,6 +534,7 @@ class PremiumModelManager {
 
 // Initialize premium manager
 const premiumManager = new PremiumModelManager();
+window.premiumManager = premiumManager;
 
 // Admin functions for premium management
 async function togglePremiumStatus(modelId) {

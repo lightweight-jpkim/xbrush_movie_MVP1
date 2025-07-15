@@ -1203,6 +1203,27 @@ function selectModel(element, modelId, tier) {
         app.dataService.updateField('model', modelId);
         app.dataService.updateField('modelTier', tier);
         
+        // If this is a premium model, stop auto-scroll and center it
+        if (element.closest('.premium-models-carousel')) {
+            // Stop auto-scroll
+            if (window.premiumManager && window.premiumManager.autoScrollAnimation) {
+                window.premiumManager.stopAutoScroll();
+            }
+            
+            // Center the selected model
+            const carousel = element.closest('.premium-models-carousel');
+            const cardRect = element.getBoundingClientRect();
+            const carouselRect = carousel.getBoundingClientRect();
+            const cardCenter = cardRect.left + cardRect.width / 2;
+            const carouselCenter = carouselRect.left + carouselRect.width / 2;
+            const scrollOffset = cardCenter - carouselCenter;
+            
+            carousel.scrollTo({
+                left: carousel.scrollLeft + scrollOffset,
+                behavior: 'smooth'
+            });
+        }
+        
         if (tier === 'premium') {
             showToast('🎬 프리미엄 배우가 선택되었습니다! 100 크레딧이 차감됩니다.', 'info');
         }
