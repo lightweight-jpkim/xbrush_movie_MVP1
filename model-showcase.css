@@ -649,13 +649,13 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(10px);
     color: white;
-    padding: 8px 15px;
+    padding: 12px 0;
     display: flex;
     justify-content: space-around;
-    font-size: 12px;
+    align-items: center;
     transform: translateY(100%);
     transition: transform 0.3s ease;
 }
@@ -667,28 +667,24 @@
 .quick-stat {
     display: flex;
     align-items: center;
-    gap: 6px;
-    flex: 1;
     justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }
 
-.quick-stat .stat-icon {
-    font-size: 14px;
+.quick-stat:hover {
+    transform: scale(1.2);
+}
+
+.stat-icon-large {
+    font-size: 24px;
     line-height: 1;
+    display: block;
 }
 
-.quick-stat .stat-text {
-    font-size: 11px;
-    line-height: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 80px;
-}
-
-.quick-stat .ig-icon {
-    font-weight: 700;
-    font-size: 12px;
+.stat-icon-large.ig-icon {
+    font-weight: 800;
+    font-size: 20px;
     background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -698,18 +694,13 @@
 .quick-stat .sns-link {
     display: flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
     color: white;
     text-decoration: none;
-    transition: all 0.2s ease;
 }
 
-.quick-stat .sns-link:hover {
-    transform: scale(1.05);
-}
-
-.quick-stat .sns-link:hover .ig-icon {
-    background: #e1306c;
+.quick-stat:hover .ig-icon {
+    background: linear-gradient(45deg, #fff, #fff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
