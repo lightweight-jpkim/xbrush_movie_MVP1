@@ -448,16 +448,20 @@ class PremiumModelManager {
         const scroll = () => {
             if (!this.autoScrollPaused && this.autoScrollAnimation !== null) {
                 const container = this.carouselContainer;
-                const maxScroll = container.scrollWidth - container.clientWidth;
+                const wrapper = this.carouselWrapper;
+                const cards = wrapper.querySelectorAll('.premium-model-card');
+                const totalCards = cards.length;
+                const originalSetSize = totalCards / 3; // Since we triplicate (or more)
+                const cardWidth = 240; // 220px width + 20px gap
+                const originalSetWidth = originalSetSize * cardWidth;
                 
                 // Scroll forward
                 container.scrollLeft += scrollSpeed;
                 
-                // If we've reached the end, reset to beginning for infinite loop
-                if (container.scrollLeft >= maxScroll) {
-                    // Find the middle point to create seamless loop
-                    const halfWidth = container.scrollWidth / 2;
-                    container.scrollLeft = container.scrollLeft - halfWidth;
+                // If we've scrolled past the first set of models, reset seamlessly
+                if (container.scrollLeft >= originalSetWidth) {
+                    // Jump back exactly one set of models
+                    container.scrollLeft = 0;
                 }
                 
                 this.autoScrollAnimation = requestAnimationFrame(scroll);
