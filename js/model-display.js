@@ -313,7 +313,7 @@ class ModelDisplay {
                          onload="this.classList.add('loaded');"
                          onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\\'image-error\\'><div class=\\'image-error-icon\\'>🖼️</div><div>이미지 로드 실패</div></div>';">
                     <div class="model-card-overlay">
-                        <button class="view-profile-btn">프로필 보기</button>
+                        <button class="view-profile-btn" onclick="event.stopPropagation(); window.simpleProfileModal ? window.simpleProfileModal.open('${id}') : window.modelDetailModal.open('${id}')">프로필 보기</button>
                     </div>
                     <div class="model-quick-stats">
                         <div class="quick-stat">
@@ -352,11 +352,11 @@ class ModelDisplay {
                         </div>
                     </div>
                     <div class="model-card-actions">
-                        <button class="action-btn" onclick="event.stopPropagation(); window.modelDetailModal.handleSave('${id}')">
+                        <button class="action-btn" onclick="event.stopPropagation(); if(window.showToast) window.showToast('저장 기능은 준비 중입니다.', 'info')">
                             <span>♡</span>
                             <span>저장</span>
                         </button>
-                        <button class="action-btn primary" onclick="event.stopPropagation(); window.modelDetailModal.open('${id}')">
+                        <button class="action-btn primary" onclick="event.stopPropagation(); window.simpleProfileModal ? window.simpleProfileModal.open('${id}') : window.modelDetailModal.open('${id}')">
                             <span>👁️</span>
                             <span>상세보기</span>
                         </button>
@@ -440,15 +440,15 @@ class ModelDisplay {
         
         cards.forEach(card => {
             card.addEventListener('click', (e) => {
-                // Don't trigger on button clicks
-                if (e.target.closest('.view-profile-btn')) {
+                // Don't trigger on button clicks or overlay
+                if (e.target.closest('.view-profile-btn') || e.target.closest('.model-card-overlay')) {
                     e.preventDefault();
-                    const modelId = card.getAttribute('data-model-id');
-                    this.viewModelProfile(modelId);
-                } else {
-                    const modelId = card.getAttribute('data-model-id');
-                    this.viewModelProfile(modelId);
+                    return;
                 }
+                
+                // Show selection confirmation modal
+                const modelId = card.getAttribute('data-model-id');
+                this.viewModelProfile(modelId);
             });
         });
     }
