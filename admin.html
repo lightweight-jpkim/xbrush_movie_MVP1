@@ -275,6 +275,52 @@
             color: white;
         }
         
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #f59e0b;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+        
         /* Plan Review Styles */
         .review-section {
             background: white;
@@ -786,6 +832,7 @@
                             <th>카테고리</th>
                             <th>등록일</th>
                             <th>티어</th>
+                            <th>사전 검토</th>
                             <th>작업</th>
                         </tr>
                     </thead>
@@ -1090,7 +1137,7 @@
                 displayModels(models);
             } catch (error) {
                 console.error('Error loading models:', error);
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">데이터 로딩 실패. 페이지를 새로고침해주세요.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">데이터 로딩 실패. 페이지를 새로고침해주세요.</td></tr>';
                 showToast('모델 로딩 중 오류가 발생했습니다.', 'error');
             }
         }
@@ -1100,7 +1147,7 @@
             const tbody = document.getElementById('modelsTableBody');
             
             if (models.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">등록된 모델이 없습니다.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">등록된 모델이 없습니다.</td></tr>';
                 return;
             }
             
@@ -1138,6 +1185,14 @@
                             <span class="tier-badge tier-${tier}">
                                 ${getTierName(tier)}
                             </span>
+                        </td>
+                        <td>
+                            <label class="toggle-switch">
+                                <input type="checkbox" 
+                                       ${model.contract?.secondConfirm ? 'checked' : ''} 
+                                       onchange="togglePreReview('${model.id}', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
                         </td>
                         <td>
                             <button class="action-btn view" onclick="editModel('${model.id}')">편집</button>
@@ -1505,6 +1560,43 @@
             } catch (error) {
                 console.error('Error deleting model:', error);
                 showToast('삭제 중 오류가 발생했습니다.', 'error');
+            }
+        }
+        
+        // Toggle pre-review rights
+        async function togglePreReview(modelId, enabled) {
+            try {
+                // Get the current model data
+                const models = await window.modelStorageAdapter.getAllModels();
+                const model = models.find(m => m.id === modelId);
+                
+                if (!model) {
+                    showToast('모델을 찾을 수 없습니다.', 'error');
+                    return;
+                }
+                
+                // Update contract object with new pre-review status
+                const updatedContract = {
+                    ...(model.contract || {}),
+                    secondConfirm: enabled
+                };
+                
+                await window.modelStorageAdapter.updateModel(modelId, { 
+                    contract: updatedContract 
+                });
+                
+                showToast(
+                    enabled ? '사전 검토 권리가 활성화되었습니다.' : '사전 검토 권리가 비활성화되었습니다.', 
+                    'success'
+                );
+                
+                // Refresh the table
+                loadModels();
+            } catch (error) {
+                console.error('Error toggling pre-review:', error);
+                showToast('사전 검토 상태 변경 중 오류가 발생했습니다.', 'error');
+                // Reload to reset the toggle
+                loadModels();
             }
         }
         
