@@ -18,7 +18,7 @@
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    background: #667eea;
     border-radius: 4px;
     width: 0%;
     transition: width 0.3s ease;
@@ -59,15 +59,11 @@
 }
 
 .progress-indicator {
-    text-align: right;
+    display: none;
 }
 
 .step-indicator {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 10px 20px;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 1.1rem;
+    display: none;
 }
 
 .current-step {
