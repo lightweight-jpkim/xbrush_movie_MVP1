@@ -27,9 +27,9 @@ body {
 .progress-nav {
     background: linear-gradient(135deg, #ffffff, #f8fafc);
     border-radius: 16px;
-    padding: 32px;
-    margin-bottom: 40px;
-    box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.06);
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.08);
     border: 2px solid #e2e8f0;
     position: relative;
     overflow: hidden;
@@ -1386,6 +1386,54 @@ body {
 .hidden { display: none; }
 .block { display: block; }
 
+/* Tablet view - horizontal scroll for progress */
+@media (max-width: 768px) and (min-width: 481px) {
+    .progress-nav {
+        padding: 16px;
+        margin-bottom: 24px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e0 transparent;
+    }
+    
+    .progress-nav::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .progress-nav::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .progress-nav::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 3px;
+    }
+    
+    .progress-steps {
+        min-width: 700px;
+        padding-bottom: 8px;
+    }
+    
+    /* Show scroll indicator on tablets */
+    .progress-nav::after {
+        content: '→';
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 20px;
+        color: #cbd5e0;
+        pointer-events: none;
+        animation: scrollHint 2s ease-in-out infinite;
+    }
+    
+    @keyframes scrollHint {
+        0%, 100% { opacity: 0.3; transform: translateY(-50%) translateX(0); }
+        50% { opacity: 1; transform: translateY(-50%) translateX(5px); }
+    }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
@@ -1497,22 +1545,42 @@ body {
     }
     
     .progress-nav {
-        padding: 20px;
+        padding: 16px;
+        margin-bottom: 20px;
     }
     
-    .step {
-        min-width: 100px;
-        padding: 8px 12px;
+    /* Hide full progress bar on mobile, show compact version */
+    .progress-steps {
+        display: none;
     }
     
-    .step-number {
-        width: 32px;
-        height: 32px;
+    /* Compact mobile progress indicator */
+    .mobile-progress-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f7fafc;
+        border-radius: 12px;
+        padding: 12px 20px;
+        font-weight: 600;
+        color: #4a5568;
+    }
+    
+    .mobile-progress-current {
+        font-size: 24px;
+        color: #667eea;
+        margin: 0 8px;
+    }
+    
+    .mobile-progress-total {
+        font-size: 16px;
+        color: #718096;
+    }
+    
+    .mobile-progress-label {
+        margin-left: 12px;
         font-size: 14px;
-    }
-    
-    .step-label {
-        font-size: 11px;
+        color: #2d3748;
     }
     
     .btn {
