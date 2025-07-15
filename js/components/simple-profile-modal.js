@@ -131,8 +131,10 @@ class SimpleProfileModal {
             this.renderModelData(model);
             
             // Show modal with animation
-            this.modal.classList.remove('loading');
             requestAnimationFrame(() => {
+                this.modal.classList.remove('loading');
+                // Force a reflow to ensure the loading class is removed
+                void this.modal.offsetHeight;
                 this.modal.classList.add('show');
             });
             

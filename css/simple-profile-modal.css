@@ -10,6 +10,11 @@
     z-index: 10000;
 }
 
+.simple-profile-modal.show,
+.simple-profile-modal.loading {
+    display: block;
+}
+
 .simple-profile-modal .modal-overlay {
     position: absolute;
     top: 0;
@@ -41,11 +46,23 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    pointer-events: none;
+    visibility: hidden;
 }
 
 .simple-profile-modal.show .modal-container {
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+}
+
+/* Ensure container is visible during loading */
+.simple-profile-modal.loading .modal-container {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+    visibility: visible;
 }
 
 .simple-profile-modal .modal-close {
@@ -326,10 +343,6 @@
 }
 
 /* Loading State */
-.simple-profile-modal.loading .modal-container {
-    opacity: 1;
-}
-
 .simple-profile-modal.loading .modal-content {
     display: flex;
     align-items: center;

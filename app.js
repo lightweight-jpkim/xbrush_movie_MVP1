@@ -1141,52 +1141,67 @@ function initializeApp() {
             sessionStorage.removeItem('skipToStep2');
             sessionStorage.removeItem('selectedModelForMovie');
             
-            // Wait for app to be fully initialized
-            setTimeout(() => {
-                // Find and select the model
-                const registeredModels = document.querySelectorAll('.featured-model-card');
+            // Wait for app to be fully initialized and models to load
+            setTimeout(async () => {
+                console.log('[App] Looking for model:', selectedModelId);
+                
+                // First, directly set the model in data service
+                app.dataService.updateField('model', selectedModelId);
+                
+                // Try to get model tier from any loaded model
+                let modelTier = 'basic';
+                
+                // Check all possible model containers
+                const allCards = document.querySelectorAll('.featured-model-card, .premium-model-card, .card[data-model-id]');
                 let modelFound = false;
                 
-                registeredModels.forEach(card => {
-                    if (card.getAttribute('onclick') && card.getAttribute('onclick').includes(selectedModelId)) {
-                        card.click();
+                allCards.forEach(card => {
+                    const onclick = card.getAttribute('onclick') || '';
+                    const dataId = card.getAttribute('data-model-id') || '';
+                    
+                    if (onclick.includes(selectedModelId) || dataId === selectedModelId) {
+                        // Extract tier from onclick if possible
+                        const tierMatch = onclick.match(/['"](\w+)['"]\s*\)$/);
+                        if (tierMatch) {
+                            modelTier = tierMatch[1];
+                        }
+                        
+                        // Mark the card as selected
+                        card.classList.add('selected');
                         modelFound = true;
                     }
                 });
                 
-                if (!modelFound) {
-                    // If not in featured models, check premium models
-                    const premiumModels = document.querySelectorAll('.premium-model-card');
-                    premiumModels.forEach(card => {
-                        if (card.getAttribute('onclick') && card.getAttribute('onclick').includes(selectedModelId)) {
-                            card.click();
-                            modelFound = true;
-                        }
-                    });
-                }
+                // Set the tier
+                app.dataService.updateField('modelTier', modelTier);
                 
-                if (!modelFound) {
-                    // If not in premium models, check virtual AI models
-                    const virtualModels = document.querySelectorAll('.card[data-model-id]');
-                    virtualModels.forEach(card => {
-                        if (card.getAttribute('data-model-id') === selectedModelId) {
-                            card.click();
-                            modelFound = true;
-                        }
-                    });
-                }
+                // Verify the model is actually set in dataService
+                const modelIsSet = app.dataService.selectedData.model !== null;
+                console.log('[App] Model selection status:', {
+                    modelFound,
+                    selectedModelId,
+                    modelIsSet,
+                    dataServiceModel: app.dataService.selectedData.model
+                });
                 
-                // Move to step 2
-                if (modelFound) {
-                    // Ensure we're on step 1 first
-                    app.stepManager.currentStep = 1;
-                    // Then move to step 2
-                    app.stepManager.goToStep(2);
-                    showToast('선택한 모델로 동영상 제작을 시작합니다.', 'info');
+                // Now we can safely go to step 2
+                if (modelIsSet) {
+                    console.log('[App] Model successfully set, moving to step 2');
+                    // Force update the UI to show model as selected
+                    app.stepManager.checkNextButton();
+                    
+                    // Small delay to ensure UI updates
+                    setTimeout(() => {
+                        app.stepManager.goToStep(2);
+                        showToast('선택한 모델로 동영상 제작을 시작합니다.', 'info');
+                    }, 100);
                 } else {
-                    showToast('모델을 찾을 수 없습니다. 직접 선택해주세요.', 'warning');
+                    console.log('[App] Model not properly set, staying on step 1');
+                    showToast('모델을 다시 선택해주세요.', 'warning');
+                    // Ensure we stay on step 1
+                    app.stepManager.goToStep(1);
                 }
-            }, 1000);
+            }, 1500);
         }
         
         // Featured models will be loaded when Firebase is ready
