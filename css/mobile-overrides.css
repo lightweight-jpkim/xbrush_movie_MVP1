@@ -3,7 +3,8 @@
 /* Mobile view - max-width: 480px */
 @media screen and (max-width: 480px) {
     /* Hide the full progress bar on mobile */
-    .progress-nav {
+    .progress-nav,
+    .model-progress-nav {
         display: none !important;
     }
     
@@ -20,6 +21,28 @@
         font-weight: 600 !important;
         margin: 0 auto 16px !important;
         width: fit-content !important;
+    }
+    
+    /* Style the existing step indicator on model registration page */
+    .step-indicator {
+        background: #667eea !important;
+        color: white !important;
+        border-radius: 20px !important;
+        padding: 6px 16px !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        display: inline-block !important;
+        margin: 0 !important;
+    }
+    
+    .step-indicator .current-step {
+        font-size: 18px !important;
+        color: white !important;
+    }
+    
+    .step-indicator .total-steps {
+        font-size: 14px !important;
+        color: rgba(255, 255, 255, 0.8) !important;
     }
     
     .mobile-progress-current {
