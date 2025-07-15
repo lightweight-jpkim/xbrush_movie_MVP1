@@ -1,0 +1,118 @@
+/* Mobile Override Styles - Load this LAST to ensure proper cascade */
+
+/* Mobile view - max-width: 480px */
+@media screen and (max-width: 480px) {
+    /* Progress bar - horizontal scroll */
+    .progress-nav {
+        padding: 12px !important;
+        margin-bottom: 20px !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    .progress-steps {
+        display: flex !important;
+        min-width: 600px !important;
+        overflow-x: visible !important;
+        flex-wrap: nowrap !important;
+    }
+    
+    .progress-nav::-webkit-scrollbar {
+        display: none !important;
+    }
+    
+    .progress-nav {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+    }
+    
+    /* Hide mobile progress indicator */
+    .mobile-progress-indicator {
+        display: none !important;
+    }
+    
+    /* Featured Models - Force horizontal scroll */
+    .featured-models-section .featured-models-grid {
+        display: flex !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        gap: 16px !important;
+        padding: 16px 0 !important;
+        scroll-snap-type: x mandatory !important;
+        -webkit-overflow-scrolling: touch !important;
+        grid-template-columns: unset !important;
+    }
+    
+    .featured-models-section .featured-models-grid::-webkit-scrollbar {
+        display: none !important;
+    }
+    
+    .featured-models-section .featured-models-grid {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+    }
+    
+    .featured-models-section .featured-model-card {
+        flex: 0 0 280px !important;
+        scroll-snap-align: start !important;
+    }
+    
+    /* ALL card-grid sections - Force horizontal scroll */
+    section .card-grid,
+    .card-grid {
+        display: flex !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        gap: 16px !important;
+        padding: 16px 0 !important;
+        scroll-snap-type: x mandatory !important;
+        -webkit-overflow-scrolling: touch !important;
+        grid-template-columns: unset !important;
+    }
+    
+    section .card-grid::-webkit-scrollbar,
+    .card-grid::-webkit-scrollbar {
+        display: none !important;
+    }
+    
+    section .card-grid,
+    .card-grid {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+    }
+    
+    section .card-grid .card,
+    .card-grid .card {
+        flex: 0 0 280px !important;
+        scroll-snap-align: start !important;
+        min-width: 280px !important;
+        max-width: 280px !important;
+    }
+    
+    /* Celebrity Models Grid */
+    #celebrityModelsGrid {
+        display: flex !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        gap: 16px !important;
+        padding: 16px 0 !important;
+        scroll-snap-type: x mandatory !important;
+        -webkit-overflow-scrolling: touch !important;
+        grid-template-columns: unset !important;
+    }
+    
+    #celebrityModelsGrid::-webkit-scrollbar {
+        display: none !important;
+    }
+    
+    #celebrityModelsGrid {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+    }
+    
+    #celebrityModelsGrid .card {
+        flex: 0 0 280px !important;
+        scroll-snap-align: start !important;
+    }
+}

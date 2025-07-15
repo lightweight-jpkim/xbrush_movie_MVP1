@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>xBrush 동영상 광고 제작</title>
-    <!-- Version: 8909dda - Mobile horizontal scroll update -->
+    <!-- Version: FIXED - Mobile overrides CSS + removed celebrity section -->
     
     <!-- External CSS -->
     <link rel="stylesheet" href="styles.css">
@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="css/thumbnail-optimization.css">
     <link rel="stylesheet" href="css/validation.css">
     <link rel="stylesheet" href="premium-models.css">
+    <link rel="stylesheet" href="css/simple-profile-modal.css">
+    <link rel="stylesheet" href="css/mobile-overrides.css"><!-- Load last for proper cascade -->
     
     <!-- SEO Meta Tags -->
     <meta name="description" content="AI 기반 동영상 광고 제작 플랫폼 - xBrush로 전문적인 광고 영상을 쉽고 빠르게 제작하세요">
@@ -211,18 +213,6 @@
                     </div>
                 </section>
 
-                <!-- Celebrity Models Section -->
-                <section id="celebrityModelsSection" style="display: none;">
-                    <header class="flex items-center mb-2">
-                        <h2 class="subheading mb-0 mr-3">⭐ 연예인 모델</h2>
-                        <span class="badge badge-info">프리미엄</span>
-                    </header>
-                    <p class="description mb-2">검증된 연예인 모델들과 함께 프리미엄 광고를 제작하세요.</p>
-                    
-                    <div class="card-grid" id="celebrityModelsGrid">
-                        <!-- Celebrity models will be loaded here dynamically -->
-                    </div>
-                </section>
                 
                 <div class="action-buttons">
                     <div></div>
