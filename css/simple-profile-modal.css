@@ -31,7 +31,7 @@
 }
 
 .simple-profile-modal .modal-container {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.9);
@@ -43,11 +43,12 @@
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     opacity: 0;
     transition: all 0.3s ease;
-    overflow: hidden;
+    overflow: auto;
     display: flex;
     flex-direction: column;
     pointer-events: none;
     visibility: hidden;
+    z-index: 10001;
 }
 
 .simple-profile-modal.show .modal-container {
