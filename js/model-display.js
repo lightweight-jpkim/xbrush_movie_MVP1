@@ -441,15 +441,107 @@ class ModelDisplay {
         // Store selected model ID
         sessionStorage.setItem('selectedModelId', modelId);
         
-        // Open model detail modal
-        if (window.modelDetailModal) {
-            window.modelDetailModal.open(modelId);
-        } else {
-            // Fallback if modal not loaded
-            if (window.showToast) {
-                window.showToast('프로필을 불러오는 중입니다...', 'info');
-            }
+        // Create custom confirmation modal
+        const modal = document.createElement('div');
+        modal.className = 'model-use-confirm-modal';
+        modal.innerHTML = `
+            <div class="modal-overlay" onclick="this.parentElement.remove()">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <h3>모델 사용 확인</h3>
+                    <p>이 모델을 사용하여 동영상을 제작하시겠습니까?</p>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" onclick="
+                            sessionStorage.setItem('selectedModelForMovie', '${modelId}');
+                            sessionStorage.setItem('skipToStep2', 'true');
+                            window.location.href = 'index.html#step2';
+                        ">동영상 제작하기</button>
+                        <button class="btn btn-outline" onclick="
+                            this.closest('.model-use-confirm-modal').remove();
+                            if (window.modelDetailModal) {
+                                window.modelDetailModal.open('${modelId}');
+                            }
+                        ">프로필 보기</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add styles if not already present
+        if (!document.querySelector('#model-use-confirm-styles')) {
+            const styles = document.createElement('style');
+            styles.id = 'model-use-confirm-styles';
+            styles.textContent = `
+                .model-use-confirm-modal {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    z-index: 10000;
+                }
+                .model-use-confirm-modal .modal-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                }
+                .model-use-confirm-modal .modal-content {
+                    background: white;
+                    border-radius: 12px;
+                    padding: 30px;
+                    max-width: 400px;
+                    width: 100%;
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+                }
+                .model-use-confirm-modal h3 {
+                    margin: 0 0 15px 0;
+                    font-size: 1.4rem;
+                    color: #2d3748;
+                }
+                .model-use-confirm-modal p {
+                    margin: 0 0 25px 0;
+                    color: #4a5568;
+                    line-height: 1.5;
+                }
+                .model-use-confirm-modal .modal-actions {
+                    display: flex;
+                    gap: 12px;
+                }
+                .model-use-confirm-modal .btn {
+                    flex: 1;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                .model-use-confirm-modal .btn-primary {
+                    background: #667eea;
+                    color: white;
+                    border: none;
+                }
+                .model-use-confirm-modal .btn-primary:hover {
+                    background: #5a67d8;
+                }
+                .model-use-confirm-modal .btn-outline {
+                    background: white;
+                    color: #667eea;
+                    border: 2px solid #667eea;
+                }
+                .model-use-confirm-modal .btn-outline:hover {
+                    background: #f7fafc;
+                }
+            `;
+            document.head.appendChild(styles);
         }
+        
+        document.body.appendChild(modal);
     }
 
     /**

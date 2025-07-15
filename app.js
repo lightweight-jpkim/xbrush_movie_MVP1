@@ -1131,6 +1131,61 @@ let app; // Global app instance
 function initializeApp() {
     try {
         app = new VideoCreationApp();
+        
+        // Check if we're coming from model showcase with a selected model
+        const skipToStep2 = sessionStorage.getItem('skipToStep2');
+        const selectedModelId = sessionStorage.getItem('selectedModelForMovie');
+        
+        if (skipToStep2 === 'true' && selectedModelId) {
+            // Clear the flags
+            sessionStorage.removeItem('skipToStep2');
+            sessionStorage.removeItem('selectedModelForMovie');
+            
+            // Wait for app to be fully initialized
+            setTimeout(() => {
+                // Find and select the model
+                const registeredModels = document.querySelectorAll('.featured-model-card');
+                let modelFound = false;
+                
+                registeredModels.forEach(card => {
+                    if (card.getAttribute('onclick') && card.getAttribute('onclick').includes(selectedModelId)) {
+                        card.click();
+                        modelFound = true;
+                    }
+                });
+                
+                if (!modelFound) {
+                    // If not in featured models, check premium models
+                    const premiumModels = document.querySelectorAll('.premium-model-card');
+                    premiumModels.forEach(card => {
+                        if (card.getAttribute('onclick') && card.getAttribute('onclick').includes(selectedModelId)) {
+                            card.click();
+                            modelFound = true;
+                        }
+                    });
+                }
+                
+                if (!modelFound) {
+                    // If not in premium models, check virtual AI models
+                    const virtualModels = document.querySelectorAll('.card[data-model-id]');
+                    virtualModels.forEach(card => {
+                        if (card.getAttribute('data-model-id') === selectedModelId) {
+                            card.click();
+                            modelFound = true;
+                        }
+                    });
+                }
+                
+                // Move to step 2
+                if (modelFound) {
+                    app.stepManager.nextStep();
+                    showToast('선택한 모델로 동영상 제작을 시작합니다.', 'info');
+                } else {
+                    showToast('모델을 찾을 수 없습니다. 직접 선택해주세요.', 'warning');
+                }
+            }, 1000);
+        }
+        
         // Featured models will be loaded when Firebase is ready
     } catch (error) {
         handleError(error, 'Application initialization');
