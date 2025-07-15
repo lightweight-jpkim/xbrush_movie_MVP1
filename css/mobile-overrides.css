@@ -2,9 +2,18 @@
 
 /* Mobile view - max-width: 768px */
 @media screen and (max-width: 768px) {
-    /* Hide the model registration progress bar on mobile only */
+    /* Keep model registration progress bar visible but compact on mobile */
     .model-progress-nav {
-        display: none !important;
+        padding: 10px 20px !important;
+    }
+    
+    .model-progress-nav .progress-steps {
+        height: 4px !important;
+    }
+    
+    .model-progress-nav .progress-line,
+    .model-progress-nav .progress-line-active {
+        height: 4px !important;
     }
     
     /* Main page progress nav is hidden on all screen sizes via inline style */

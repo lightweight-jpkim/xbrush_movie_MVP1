@@ -2,8 +2,15 @@
 
 /* Progress Navigation - Show only the progress bar, hide buttons */
 .model-progress-nav {
-    display: block;
-    padding: 20px 0;
+    display: block !important;
+    padding: 20px 40px;
+    background: white;
+    margin-bottom: 20px;
+}
+
+.model-progress-nav .progress-steps {
+    position: relative;
+    height: 8px;
 }
 
 .model-progress-nav .step {
@@ -11,21 +18,26 @@
 }
 
 .model-progress-nav .progress-line {
-    display: block;
-    height: 4px;
+    display: block !important;
+    height: 8px;
     background: #e2e8f0;
-    border-radius: 2px;
-    position: relative;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
 }
 
 .model-progress-nav .progress-line-active {
     position: absolute;
     top: 0;
     left: 0;
-    height: 100%;
-    background: #667eea;
-    border-radius: 2px;
+    height: 8px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 4px;
     transition: width 0.3s ease;
+    z-index: 1;
 }
 
 /* Header Styles */
