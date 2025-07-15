@@ -1,7 +1,7 @@
 /* Mobile Override Styles - Load this LAST to ensure proper cascade */
 
-/* Mobile view - max-width: 480px */
-@media screen and (max-width: 480px) {
+/* Mobile view - max-width: 768px */
+@media screen and (max-width: 768px) {
     /* Hide the full progress bar on mobile */
     .progress-nav,
     .model-progress-nav {

@@ -121,21 +121,3 @@
     }
 }
 
-/* Small mobile */
-@media (max-width: 480px) {
-    .pagination-controls {
-        gap: 8px;
-    }
-    
-    .pagination-btn {
-        min-width: 32px;
-        height: 32px;
-        font-size: 12px;
-        padding: 4px 8px;
-    }
-    
-    .pagination-prev,
-    .pagination-next {
-        padding: 4px 12px;
-    }
-}

@@ -395,7 +395,7 @@
 }
 
 /* Mobile Responsive */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .simple-profile-modal .modal-container {
         width: 100%;
         height: 100%;

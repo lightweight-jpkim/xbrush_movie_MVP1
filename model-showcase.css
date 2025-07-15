@@ -636,11 +636,6 @@
     }
 }
 
-@media (max-width: 480px) {
-    .models-grid {
-        grid-template-columns: 1fr;
-    }
-}
 
 /* Enhanced Commercial Model Cards */
 .model-card-commercial {

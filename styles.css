@@ -1,6 +1,12 @@
 /* ========================================
  * xBrush Video Creation App Styles
  * ========================================
+ * 
+ * Responsive Design Strategy:
+ * - Desktop: ≥ 768px (default styles)
+ * - Mobile: < 768px (responsive overrides)
+ * 
+ * No intermediate breakpoints for simplicity.
  */
 
 /* Reset and Base Styles */
@@ -1391,53 +1397,6 @@ body {
 .hidden { display: none; }
 .block { display: block; }
 
-/* Tablet view - horizontal scroll for progress */
-@media (max-width: 768px) and (min-width: 481px) {
-    .progress-nav {
-        padding: 16px;
-        margin-bottom: 24px;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
-        scrollbar-color: #cbd5e0 transparent;
-    }
-    
-    .progress-nav::-webkit-scrollbar {
-        height: 6px;
-    }
-    
-    .progress-nav::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    
-    .progress-nav::-webkit-scrollbar-thumb {
-        background: #cbd5e0;
-        border-radius: 3px;
-    }
-    
-    .progress-steps {
-        min-width: 700px;
-        padding-bottom: 8px;
-    }
-    
-    /* Show scroll indicator on tablets */
-    .progress-nav::after {
-        content: '→';
-        position: absolute;
-        right: 8px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 20px;
-        color: #cbd5e0;
-        pointer-events: none;
-        animation: scrollHint 2s ease-in-out infinite;
-    }
-    
-    @keyframes scrollHint {
-        0%, 100% { opacity: 0.3; transform: translateY(-50%) translateX(0); }
-        50% { opacity: 1; transform: translateY(-50%) translateX(5px); }
-    }
-}
 
 /* Responsive Design */
 @media (max-width: 768px) {
