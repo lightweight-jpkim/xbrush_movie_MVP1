@@ -3027,8 +3027,9 @@ async function loadFeaturedModels() {
             return;
         }
         
-        // Take only first 4 models
-        const featuredModels = models.slice(0, 4);
+        // Randomly select 4 models
+        const shuffled = [...models].sort(() => Math.random() - 0.5);
+        const featuredModels = shuffled.slice(0, 4);
         
         // Debug: log first model structure
         if (featuredModels.length > 0) {

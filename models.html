@@ -93,14 +93,9 @@
                 </div>
             </div>
 
-            <!-- Premium Models Container -->
-            <div id="premiumModelsContainer">
-                <!-- Premium models will be loaded here -->
-            </div>
-            
-            <!-- Regular Models Container -->
+            <!-- Models Container -->
             <div id="modelsContainer">
-                <!-- Regular model cards will be dynamically loaded here -->
+                <!-- All model cards will be dynamically loaded here -->
             </div>
             
             <!-- Info Box for Development -->
@@ -194,20 +189,17 @@
                 
                 // Apply filter
                 if (filter === 'all') {
-                    // For 'all', show only non-premium models (basic tier)
-                    filteredModels = allModels.filter(model => 
-                        !model.tier || model.tier === 'basic'
-                    );
+                    // For 'all', show all models
+                    filteredModels = allModels;
                 } else if (filter === 'premium') {
                     filteredModels = allModels.filter(model => 
                         model.tier === 'premium' || model.tier === 'vip'
                     );
                 } else {
-                    // Category filter - exclude premium models
+                    // Category filter - show all models in that category
                     filteredModels = allModels.filter(model => {
                         const categories = model.personalInfo?.categories || model.categories || [];
-                        const isBasicTier = !model.tier || model.tier === 'basic';
-                        return categories.includes(filter) && isBasicTier;
+                        return categories.includes(filter);
                     });
                 }
                 
@@ -235,11 +227,6 @@
                 return;
             }
             
-            // Always hide premium container when any filter is active (except 'all')
-            const premiumContainer = document.getElementById('premiumModelsContainer');
-            if (premiumContainer) {
-                premiumContainer.style.display = currentFilter === 'all' ? 'block' : 'none';
-            }
             
             // Update model display
             if (window.modelDisplay) {
@@ -281,16 +268,15 @@
                     // Filter based on current filter
                     let modelsToDisplay;
                     if (currentFilter === 'all') {
-                        // Show only basic tier models in regular section
-                        modelsToDisplay = allModels.filter(model => !model.tier || model.tier === 'basic');
+                        // Show all models
+                        modelsToDisplay = allModels;
                     } else if (currentFilter === 'premium') {
                         modelsToDisplay = allModels.filter(model => model.tier === 'premium' || model.tier === 'vip');
                     } else {
-                        // Category filter - only basic tier
+                        // Category filter - show all models in that category
                         modelsToDisplay = allModels.filter(model => {
                             const categories = model.personalInfo?.categories || model.categories || [];
-                            const isBasicTier = !model.tier || model.tier === 'basic';
-                            return categories.includes(currentFilter) && isBasicTier;
+                            return categories.includes(currentFilter);
                         });
                     }
                     
@@ -306,11 +292,6 @@
                 
                 // Initialize model display
                 window.modelDisplay.init('modelsContainer');
-                
-                // Load premium showcase only when showing all models
-                if (window.premiumManager && currentFilter === 'all') {
-                    await premiumManager.loadPremiumShowcase('premiumModelsContainer');
-                }
             } else {
                 console.error('Model display not initialized');
             }

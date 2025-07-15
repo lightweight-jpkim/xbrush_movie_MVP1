@@ -288,7 +288,8 @@ class ModelDisplay {
         // Trust badges
         const trustBadges = [];
         if (isVerified) trustBadges.push('<span class="trust-badge verified">✓ 인증</span>');
-        // Don't show tier badges in main page since we only show basic models
+        if (tier === 'premium') trustBadges.push('<span class="trust-badge premium">⭐ 프리미엄</span>');
+        if (tier === 'vip') trustBadges.push('<span class="trust-badge vip">💎 VIP</span>');
         if (rating >= 4.8 && reviewCount >= 10) trustBadges.push('<span class="trust-badge top-rated">🏆 우수</span>');
         
         const trustBadgesHTML = trustBadges.length > 0 ? 
@@ -371,15 +372,30 @@ class ModelDisplay {
     sortModels(models, sortBy) {
         const sortedModels = [...models];
         
+        // Helper function to get tier priority
+        const getTierPriority = (tier) => {
+            if (tier === 'vip') return 3;
+            if (tier === 'premium') return 2;
+            return 1; // basic or no tier
+        };
+        
         switch (sortBy) {
             case 'newest':
-                return sortedModels.sort((a, b) => 
-                    new Date(b.registrationDate) - new Date(a.registrationDate)
-                );
+                return sortedModels.sort((a, b) => {
+                    // First sort by tier
+                    const tierDiff = getTierPriority(b.tier) - getTierPriority(a.tier);
+                    if (tierDiff !== 0) return tierDiff;
+                    // Then by date
+                    return new Date(b.registrationDate) - new Date(a.registrationDate);
+                });
             case 'oldest':
-                return sortedModels.sort((a, b) => 
-                    new Date(a.registrationDate) - new Date(b.registrationDate)
-                );
+                return sortedModels.sort((a, b) => {
+                    // First sort by tier
+                    const tierDiff = getTierPriority(b.tier) - getTierPriority(a.tier);
+                    if (tierDiff !== 0) return tierDiff;
+                    // Then by date
+                    return new Date(a.registrationDate) - new Date(b.registrationDate);
+                });
             case 'priceHigh':
                 return sortedModels.sort((a, b) => {
                     const priceA = a.pricing?.packages?.find(p => p.id === 'standard')?.price || a.contract?.basePrice || 0;
@@ -393,7 +409,12 @@ class ModelDisplay {
                     return priceA - priceB;
                 });
             default:
-                return sortedModels;
+                // Default sort by tier then by newest
+                return sortedModels.sort((a, b) => {
+                    const tierDiff = getTierPriority(b.tier) - getTierPriority(a.tier);
+                    if (tierDiff !== 0) return tierDiff;
+                    return new Date(b.registrationDate) - new Date(a.registrationDate);
+                });
         }
     }
 
