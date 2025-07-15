@@ -81,6 +81,7 @@
                 <div class="filter-buttons">
                     <button class="filter-btn active" data-filter="all">전체</button>
                     <button class="filter-btn premium-filter" data-filter="premium">⭐ 프리미엄</button>
+                    <button class="filter-btn fast-filter" data-filter="fast">⚡ 빠른 진행</button>
                     <button class="filter-btn" data-filter="fashion">패션</button>
                     <button class="filter-btn" data-filter="beauty">뷰티</button>
                     <button class="filter-btn" data-filter="lifestyle">라이프스타일</button>
@@ -249,6 +250,11 @@
                     filteredModels = allModels.filter(model => 
                         model.tier === 'premium' || model.tier === 'vip'
                     );
+                } else if (filter === 'fast') {
+                    // Filter models without pre-review rights (fast processing)
+                    filteredModels = allModels.filter(model => 
+                        !model.contract?.secondConfirm
+                    );
                 } else {
                     // Category filter - show all models in that category
                     filteredModels = allModels.filter(model => {
@@ -274,7 +280,7 @@
                 container.innerHTML = `
                     <div class="empty-models-state">
                         <div class="empty-icon">🔍</div>
-                        <h3>${currentFilter === 'premium' ? '프리미엄 모델이 없습니다' : '해당 카테고리에 모델이 없습니다'}</h3>
+                        <h3>${currentFilter === 'premium' ? '프리미엄 모델이 없습니다' : currentFilter === 'fast' ? '빠른 진행 가능한 모델이 없습니다' : '해당 카테고리에 모델이 없습니다'}</h3>
                         <p>다른 카테고리를 선택해보세요</p>
                     </div>
                 `;
@@ -326,6 +332,9 @@
                         modelsToDisplay = allModels;
                     } else if (currentFilter === 'premium') {
                         modelsToDisplay = allModels.filter(model => model.tier === 'premium' || model.tier === 'vip');
+                    } else if (currentFilter === 'fast') {
+                        // Filter models without pre-review rights (fast processing)
+                        modelsToDisplay = allModels.filter(model => !model.contract?.secondConfirm);
                     } else {
                         // Category filter - show all models in that category
                         modelsToDisplay = allModels.filter(model => {

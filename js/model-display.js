@@ -300,15 +300,13 @@ class ModelDisplay {
         const trustBadgesHTML = trustBadges.length > 0 ? 
             `<div class="model-trust-badges">${trustBadges.join('')}</div>` : '';
 
-        // Status badge
-        const statusClass = isAvailable ? '' : 'busy';
-        const availabilityText = isAvailable ? '즉시 가능' : '예약 중';
-        
-        // Pre-review rights or response time
+        // Pre-review status
         const hasPreReviewRights = contract.secondConfirm === true;
-        const responseIndicator = hasPreReviewRights 
-            ? '<span class="pre-review-badge" title="사전 검토 권리 보유">🔍 검토 필요</span>'
-            : `<span class="response-time-badge" title="평균 응답 시간">⚡ ${responseTime}시간 내</span>`;
+        const statusClass = hasPreReviewRights ? 'pre-review' : 'fast-response';
+        const statusText = hasPreReviewRights ? '검토 필요' : '빠른 진행';
+        const statusTooltip = hasPreReviewRights 
+            ? '모든 결과물은 모델의 사전 승인이 필요합니다' 
+            : `평균 ${responseTime}시간 내 응답`;
 
         // Format price
         const formattedPrice = new Intl.NumberFormat('ko-KR').format(basePrice);
@@ -317,7 +315,7 @@ class ModelDisplay {
             <div class="model-card model-card-commercial" data-model-id="${id}">
                 <div class="model-card-image">
                     ${trustBadgesHTML}
-                    <div class="model-status-badge ${statusClass}"></div>
+                    <div class="model-status-badge ${statusClass}" title="${statusTooltip}"></div>
                     <img src="${thumbnail}" 
                          alt="${name}" 
                          loading="lazy"
@@ -350,10 +348,7 @@ class ModelDisplay {
                 <div class="model-card-content model-card-content-enhanced">
                     <div class="model-meta-row">
                         <h3 class="model-name">${name}</h3>
-                        <span class="model-availability ${statusClass}">${availabilityText}</span>
-                    </div>
-                    <div class="model-response-info">
-                        ${responseIndicator}
+                        <span class="model-pre-review-status ${statusClass}">${statusText}</span>
                     </div>
                     <p class="model-intro">${tagline}</p>
                     <div class="model-specialties">

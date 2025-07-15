@@ -348,6 +348,17 @@
     /* Remove fixed styles - let it behave like other buttons */
 }
 
+.filter-btn.fast-filter {
+    /* Style for fast processing filter */
+    border-color: #3B82F6;
+}
+
+.filter-btn.fast-filter.active {
+    background: #3B82F6;
+    color: white;
+    border-color: #3B82F6;
+}
+
 .sort-control {
     display: flex;
     align-items: center;
@@ -509,35 +520,6 @@
     color: white;
 }
 
-/* Model Response Info */
-.model-response-info {
-    margin: 8px 0;
-    display: flex;
-    gap: 8px;
-}
-
-.pre-review-badge,
-.response-time-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.pre-review-badge {
-    background: #FEF3C7;
-    color: #92400E;
-    border: 1px solid #F59E0B;
-}
-
-.response-time-badge {
-    background: #DBEAFE;
-    color: #1E40AF;
-    border: 1px solid #3B82F6;
-}
 
 .model-card-footer {
     display: flex;
@@ -682,20 +664,19 @@
     right: 12px;
     width: 12px;
     height: 12px;
-    background: #48bb78;
     border-radius: 50%;
     z-index: 10;
+    cursor: help;
+}
+
+.model-status-badge.fast-response {
+    background: #48bb78;
     box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.3);
 }
 
-.model-status-badge.busy {
-    background: #ed8936;
-    box-shadow: 0 0 0 3px rgba(237, 137, 54, 0.3);
-}
-
-.model-status-badge.offline {
-    background: #718096;
-    box-shadow: 0 0 0 3px rgba(113, 128, 150, 0.3);
+.model-status-badge.pre-review {
+    background: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
 }
 
 /* Trust Badges */
@@ -820,14 +801,21 @@
     margin-bottom: 8px;
 }
 
-.model-availability {
+.model-pre-review-status {
     font-size: 12px;
-    color: #48bb78;
     font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
 }
 
-.model-availability.busy {
-    color: #ed8936;
+.model-pre-review-status.fast-response {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.model-pre-review-status.pre-review {
+    background: #FEF3C7;
+    color: #92400E;
 }
 
 .model-specialties {
