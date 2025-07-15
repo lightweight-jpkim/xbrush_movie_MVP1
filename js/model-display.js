@@ -478,8 +478,15 @@ class ModelDisplay {
                         ">동영상 제작하기</button>
                         <button class="btn btn-outline" onclick="
                             this.closest('.model-use-confirm-modal').remove();
-                            if (window.modelDetailModal) {
+                            if (window.simpleProfileModal) {
+                                window.simpleProfileModal.open('${modelId}');
+                            } else if (window.modelDetailModal) {
                                 window.modelDetailModal.open('${modelId}');
+                            } else {
+                                console.error('Profile modal not initialized');
+                                if (window.showToast) {
+                                    window.showToast('프로필 로딩 중 오류가 발생했습니다.', 'error');
+                                }
                             }
                         ">프로필 보기</button>
                     </div>

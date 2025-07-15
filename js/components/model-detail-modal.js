@@ -351,8 +351,10 @@ class ModelDetailModal {
     }
     
     async fetchModelData(modelId) {
-        // Fetch from Firebase
-        if (window.modelStorage) {
+        // Fetch from Firebase using the adapter
+        if (window.modelStorageAdapter) {
+            return await window.modelStorageAdapter.getModel(modelId);
+        } else if (window.modelStorage) {
             return await window.modelStorage.getModel(modelId);
         }
         return null;
@@ -364,10 +366,14 @@ class ModelDetailModal {
         this.modal.querySelector('.model-name').textContent = model.personalInfo?.name || 'Unknown Model';
         this.modal.querySelector('.model-tagline').textContent = model.profile?.tagline || '프로페셔널 AI 모델';
         
-        // Stats
-        this.modal.querySelector('.model-rating').textContent = (model.ratings?.overall || 0).toFixed(1);
-        this.modal.querySelector('.model-projects').textContent = model.stats?.completedProjects || 0;
-        this.modal.querySelector('.model-response').textContent = `${model.stats?.responseTime || 2}시간`;
+        // Stats - Handle missing stats gracefully
+        const ratingEl = this.modal.querySelector('.model-rating');
+        const projectsEl = this.modal.querySelector('.model-projects');
+        const responseEl = this.modal.querySelector('.model-response');
+        
+        if (ratingEl) ratingEl.textContent = (model.ratings?.overall || 0).toFixed(1);
+        if (projectsEl) projectsEl.textContent = model.stats?.completedProjects || 0;
+        if (responseEl) responseEl.textContent = `${model.stats?.responseTime || 2}시간`;
         
         // Badges
         if (model.profile?.verificationStatus?.identity) {

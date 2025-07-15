@@ -1,0 +1,365 @@
+/* Simple Profile Modal Styles */
+
+.simple-profile-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+}
+
+.simple-profile-modal .modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.simple-profile-modal.show .modal-overlay {
+    opacity: 1;
+}
+
+.simple-profile-modal .modal-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.simple-profile-modal.show .modal-container {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+.simple-profile-modal .modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 10;
+}
+
+.simple-profile-modal .modal-close:hover {
+    background: rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+}
+
+.simple-profile-modal .modal-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Profile Header */
+.profile-header {
+    padding: 30px;
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.profile-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.profile-badges .badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge.verified {
+    background: #48bb78;
+    color: white;
+}
+
+.badge.premium {
+    background: #667eea;
+    color: white;
+}
+
+.badge.vip {
+    background: #f59e0b;
+    color: white;
+}
+
+.profile-name {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: #2d3748;
+}
+
+.profile-tagline {
+    font-size: 1.1rem;
+    color: #718096;
+    margin: 0 0 16px 0;
+}
+
+.profile-meta {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.availability-status {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.availability-status.available {
+    color: #48bb78;
+}
+
+.availability-status.busy {
+    color: #ed8936;
+}
+
+.price-range {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+/* Tabs */
+.profile-tabs {
+    display: flex;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f7fafc;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 16px;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #718096;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.tab-btn:hover {
+    color: #2d3748;
+}
+
+.tab-btn.active {
+    color: #667eea;
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #667eea;
+}
+
+/* Tab Contents */
+.tab-contents {
+    min-height: 300px;
+}
+
+.tab-content {
+    display: none;
+    padding: 30px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Portfolio Tab */
+.portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.portfolio-item {
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.portfolio-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.portfolio-item:hover img {
+    transform: scale(1.05);
+}
+
+.empty-portfolio {
+    text-align: center;
+}
+
+.single-portfolio-image {
+    max-width: 400px;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* About Tab */
+.about-section h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 24px 0 12px 0;
+}
+
+.about-section h3:first-child {
+    margin-top: 0;
+}
+
+.model-bio {
+    color: #4a5568;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.specialty-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.specialty-tags .tag {
+    padding: 6px 16px;
+    background: #f0f4ff;
+    color: #667eea;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.contact-section {
+    background: #f7fafc;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 30px;
+}
+
+.contact-email {
+    font-size: 1.1rem;
+    color: #667eea;
+    margin: 0;
+}
+
+/* Action Buttons */
+.modal-actions {
+    padding: 20px 30px;
+    background: #f7fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.modal-actions .btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-actions .btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.modal-actions .btn-primary:hover {
+    background: #5a67d8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Loading State */
+.simple-profile-modal.loading .modal-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.simple-profile-modal.loading .modal-content::after {
+    content: '로딩 중...';
+    font-size: 1.2rem;
+    color: #718096;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+    .simple-profile-modal .modal-container {
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        max-height: none;
+        border-radius: 0;
+    }
+    
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .profile-meta {
+        justify-content: center;
+    }
+    
+    .portfolio-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+}
