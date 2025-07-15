@@ -3,20 +3,8 @@
 /* Premium Section Container */
 .premium-models-section {
     margin: 40px 0;
-    padding: 0 80px;
+    padding: 0;
     position: relative;
-}
-
-@media (max-width: 1200px) {
-    .premium-models-section {
-        padding: 0 20px;
-    }
-}
-
-@media (max-width: 768px) {
-    .premium-models-section {
-        padding: 0;
-    }
 }
 
 /* Premium Section Headers */
@@ -25,7 +13,7 @@
 }
 
 .premium-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #667eea;
     color: white;
     padding: 20px 30px;
     border-radius: 12px;
@@ -33,7 +21,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .premium-header h2 {
@@ -55,103 +43,73 @@
 .premium-model-card {
     position: relative;
     background: white;
-    border: 2px solid #667eea;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     overflow: hidden;
     cursor: pointer;
 }
 
-.premium-model-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
-    background-size: 200% 100%;
-    animation: shimmer 3s linear infinite;
-}
 
 /* Simplified Premium Carousel */
 .premium-models-carousel {
     position: relative;
     overflow-x: auto;
     overflow-y: hidden;
-    scroll-behavior: smooth;
     padding: 20px 0;
     margin: 20px 0;
+    cursor: grab;
+    user-select: none;
     -webkit-overflow-scrolling: touch;
+    scroll-behavior: auto; /* Disable smooth scroll for auto-scroll to work properly */
 }
 
+/* Hide scrollbar completely */
 .premium-models-carousel::-webkit-scrollbar {
-    height: 8px;
+    display: none;
 }
 
-.premium-models-carousel::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
+.premium-models-carousel {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
 
-.premium-models-carousel::-webkit-scrollbar-thumb {
-    background: #667eea;
-    border-radius: 10px;
+.premium-models-carousel:active {
+    cursor: grabbing;
 }
 
-.premium-models-carousel::-webkit-scrollbar-thumb:hover {
-    background: #5a67d8;
-}
-
-/* Fade Effects */
-.premium-models-carousel::before,
-.premium-models-carousel::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 8px; /* Account for scrollbar */
-    width: 60px;
-    z-index: 2;
-    pointer-events: none;
-}
-
-.premium-models-carousel::before {
-    left: 0;
-    background: linear-gradient(to right, white 0%, transparent 100%);
-}
-
-.premium-models-carousel::after {
-    right: 0;
-    background: linear-gradient(to left, white 0%, transparent 100%);
-}
 
 .premium-models-wrapper {
-    display: inline-flex;
+    display: flex;
     gap: 20px;
     padding: 0 20px;
 }
 
 .premium-model-card.simplified {
-    width: 200px;
-    height: 280px;
+    width: 220px;
+    height: 300px;
     display: flex;
     flex-direction: column;
     padding: 0;
     flex-shrink: 0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    user-select: none;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .premium-model-card.simplified:hover {
-    transform: scale(1.08) translateY(-8px);
-    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     z-index: 10;
 }
 
 .premium-model-card.simplified .model-visual {
-    height: 180px;
+    height: 200px;
     overflow: hidden;
     position: relative;
+    flex-shrink: 0;
 }
 
 .premium-model-card.simplified .model-visual img {
@@ -165,31 +123,35 @@
     transform: scale(1.1);
 }
 
-.premium-model-card.simplified .premium-indicator {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    right: 10px;
-    display: flex;
-    justify-content: space-between;
-    z-index: 10;
-}
-
 .premium-model-card.simplified .model-details {
-    padding: 15px;
-    flex: 1;
+    padding: 12px;
+    height: 100px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     background: white;
     position: relative;
+    box-sizing: border-box;
+}
+
+.premium-model-card.simplified .model-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    width: 100%;
 }
 
 .premium-model-card.simplified h4 {
-    font-size: 1rem;
-    margin: 0 0 5px 0;
+    font-size: 0.9rem;
+    margin: 0;
     color: #2d3748;
     transition: color 0.3s ease;
+    line-height: 1;
+    font-weight: 600;
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .premium-model-card.simplified:hover h4 {
@@ -197,9 +159,10 @@
 }
 
 .premium-model-card.simplified .premium-tagline {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: #718096;
     margin: 0;
+    line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -212,57 +175,47 @@
 
 /* Carousel Navigation Buttons */
 .premium-carousel-nav {
-    position: fixed;
+    position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    width: 48px;
-    height: 48px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    z-index: 100;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    z-index: 10;
+    opacity: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.premium-models-section:hover .premium-carousel-nav {
+    opacity: 1;
 }
 
 .premium-carousel-nav:hover {
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-50%) scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .premium-carousel-nav.prev {
-    left: 20px;
+    left: 10px;
 }
 
 .premium-carousel-nav.next {
-    right: 20px;
+    right: 10px;
 }
 
 .premium-carousel-nav svg {
-    width: 24px;
-    height: 24px;
-    fill: white;
-}
-
-/* Position navigation relative to section */
-.premium-models-section {
-    position: relative;
-}
-
-.premium-models-section .premium-carousel-nav {
-    position: absolute;
-}
-
-.premium-models-section .premium-carousel-nav.prev {
-    left: -60px;
-}
-
-.premium-models-section .premium-carousel-nav.next {
-    right: -60px;
+    width: 18px;
+    height: 18px;
+    fill: #667eea;
 }
 
 /* Mobile Adjustments */
@@ -273,9 +226,23 @@
     }
     
     .premium-model-card.simplified .model-visual {
-        height: 140px;
+        height: 160px;
     }
     
+    .premium-model-card.simplified .model-details {
+        height: 80px;
+        padding: 10px;
+    }
+    
+    .premium-model-card.simplified h4 {
+        font-size: 0.8rem;
+    }
+    
+    .premium-model-card.simplified .premium-tagline {
+        font-size: 0.7rem;
+    }
+    
+    /* Keep arrows hidden on mobile since touch/swipe is available */
     .premium-carousel-nav {
         display: none;
     }
@@ -283,18 +250,7 @@
     /* Adjust fade effects for mobile */
     .premium-models-carousel::before,
     .premium-models-carousel::after {
-        width: 30px;
-    }
-}
-
-/* Responsive adjustments for navigation position */
-@media (max-width: 1200px) {
-    .premium-models-section .premium-carousel-nav.prev {
-        left: 10px;
-    }
-    
-    .premium-models-section .premium-carousel-nav.next {
-        right: 10px;
+        width: 20px;
     }
 }
 
@@ -308,7 +264,7 @@
     align-items: center;
     gap: 8px;
     padding: 12px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #667eea;
     color: white;
     border-radius: 8px;
     text-decoration: none;
@@ -321,33 +277,28 @@
     box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
 }
 
-@keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-}
 
 .premium-model-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 48px rgba(102, 126, 234, 0.25);
-    border-color: #764ba2;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 /* Premium Badge */
 .premium-badge {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #667eea;
     color: white;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.8em;
-    font-weight: 600;
-    z-index: 10;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-    display: flex;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    display: inline-flex;
     align-items: center;
-    gap: 4px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.premium-badge.vip-badge {
+    background: #f59e0b;
 }
 
 /* Premium Image Container */
@@ -562,7 +513,7 @@
     display: flex;
     justify-content: space-between;
     padding: 12px;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+    background: rgba(0,0,0,0.5);
     z-index: 10;
 }
 
@@ -656,20 +607,6 @@
     fill: white;
 }
 
-/* VIP Badge Styling */
-.vip-badge {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    animation: vip-glow 2s ease-in-out infinite alternate;
-}
-
-@keyframes vip-glow {
-    from {
-        box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-    }
-    to {
-        box-shadow: 0 2px 20px rgba(245, 87, 108, 0.4);
-    }
-}
 
 /* Responsive Design */
 @media (max-width: 768px) {

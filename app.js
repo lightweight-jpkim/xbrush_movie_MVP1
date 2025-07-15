@@ -1131,6 +1131,61 @@ let app; // Global app instance
 function initializeApp() {
     try {
         app = new VideoCreationApp();
+        
+        // Check if we're coming from model showcase with a selected model
+        const skipToStep2 = sessionStorage.getItem('skipToStep2');
+        const selectedModelId = sessionStorage.getItem('selectedModelForMovie');
+        
+        if (skipToStep2 === 'true' && selectedModelId) {
+            // Clear the flags
+            sessionStorage.removeItem('skipToStep2');
+            sessionStorage.removeItem('selectedModelForMovie');
+            
+            // Wait for app to be fully initialized
+            setTimeout(() => {
+                // Find and select the model
+                const registeredModels = document.querySelectorAll('.featured-model-card');
+                let modelFound = false;
+                
+                registeredModels.forEach(card => {
+                    if (card.getAttribute('onclick') && card.getAttribute('onclick').includes(selectedModelId)) {
+                        card.click();
+                        modelFound = true;
+                    }
+                });
+                
+                if (!modelFound) {
+                    // If not in featured models, check premium models
+                    const premiumModels = document.querySelectorAll('.premium-model-card');
+                    premiumModels.forEach(card => {
+                        if (card.getAttribute('onclick') && card.getAttribute('onclick').includes(selectedModelId)) {
+                            card.click();
+                            modelFound = true;
+                        }
+                    });
+                }
+                
+                if (!modelFound) {
+                    // If not in premium models, check virtual AI models
+                    const virtualModels = document.querySelectorAll('.card[data-model-id]');
+                    virtualModels.forEach(card => {
+                        if (card.getAttribute('data-model-id') === selectedModelId) {
+                            card.click();
+                            modelFound = true;
+                        }
+                    });
+                }
+                
+                // Move to step 2
+                if (modelFound) {
+                    app.stepManager.nextStep();
+                    showToast('선택한 모델로 동영상 제작을 시작합니다.', 'info');
+                } else {
+                    showToast('모델을 찾을 수 없습니다. 직접 선택해주세요.', 'warning');
+                }
+            }, 1000);
+        }
+        
         // Featured models will be loaded when Firebase is ready
     } catch (error) {
         handleError(error, 'Application initialization');
@@ -2955,10 +3010,16 @@ async function loadFeaturedModels() {
         
         // Get active models from Firebase
         console.log('[Featured Models] Fetching models from Firebase...');
-        const models = await window.modelStorageAdapter.getActiveModels();
-        console.log('[Featured Models] Got models:', models.length);
+        const allModels = await window.modelStorageAdapter.getActiveModels();
+        console.log('[Featured Models] Got all models:', allModels.length);
         
-        // Update count
+        // Filter out premium models (only show basic models)
+        const models = allModels.filter(model => 
+            !model.tier || model.tier === 'basic'
+        );
+        console.log('[Featured Models] After filtering premium, basic models:', models.length);
+        
+        // Update count (show only basic models count)
         modelCount.textContent = `총 ${models.length}개`;
         
         if (models.length === 0) {
@@ -2986,16 +3047,21 @@ async function loadFeaturedModels() {
                                 model.profileImage ||
                                 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg==';
             
+            const tier = model.tier || 'basic';
+            const name = model.personalInfo?.name || '이름 없음';
+            
             return `
-            <div class="featured-model-card" onclick="selectFeaturedModel('${model.id}', '${model.personalInfo?.name || ''}')">
+            <div class="featured-model-card card" onclick="selectModel(this, '${model.id}', '${tier}')" role="button" tabindex="0"
+                 onkeydown="if(event.key==='Enter') selectModel(this, '${model.id}', '${tier}')"
+                 aria-label="${name} 선택">
                 <img src="${thumbnailUrl}" 
-                     alt="${model.personalInfo?.name || '모델'}" 
+                     alt="${name}" 
                      class="featured-model-image"
                      loading="lazy"
                      onload="this.classList.add('loaded');"
                      onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0E0QUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg=='">
                 <div class="featured-model-info">
-                    <div class="featured-model-name">${model.personalInfo?.name || '이름 없음'}</div>
+                    <div class="featured-model-name">${name}</div>
                     <div class="featured-model-intro">${model.personalInfo?.intro || '소개 없음'}</div>
                     ${model.personalInfo?.categories?.length > 0 ? `
                         <div class="featured-model-categories">

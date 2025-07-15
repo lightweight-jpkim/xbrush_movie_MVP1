@@ -45,15 +45,15 @@
     <!-- Hero Section -->
     <section class="hero-section">
         <div class="hero-content">
-            <h1 class="hero-title">xBrush AI 모델 쇼케이스</h1>
-            <p class="hero-subtitle">당신의 프로젝트에 완벽한 AI 모델을 찾아보세요</p>
-            <div class="hero-actions">
-                <a href="model-register.html" class="btn btn-primary btn-large">
-                    모델로 등록하기
-                </a>
-                <a href="index.html" class="btn btn-outline btn-large">
-                    동영상 제작하기
-                </a>
+            <div class="hero-text-actions">
+                <div class="hero-text">
+                    <h1 class="hero-title">xBrush AI 모델 쇼케이스</h1>
+                    <p class="hero-subtitle">당신의 프로젝트에 완벽한 AI 모델을 찾아보세요</p>
+                </div>
+                <div class="hero-actions">
+                    <a href="model-register.html" class="btn btn-primary">모델로 등록하기</a>
+                    <a href="index.html" class="btn btn-outline">동영상 제작하기</a>
+                </div>
             </div>
         </div>
     </section>
@@ -62,8 +62,7 @@
     <section class="models-section">
         <div class="container">
             <div class="models-header">
-                <h2>등록된 모델</h2>
-                <p>다양한 분야의 전문 AI 모델들을 만나보세요</p>
+                <h2>등록된 모델 <span class="models-subtitle">- 다양한 분야의 전문 AI 모델들을 만나보세요</span></h2>
             </div>
 
             <!-- Filter and Sort Controls -->
@@ -195,16 +194,20 @@
                 
                 // Apply filter
                 if (filter === 'all') {
-                    filteredModels = allModels;
+                    // For 'all', show only non-premium models (basic tier)
+                    filteredModels = allModels.filter(model => 
+                        !model.tier || model.tier === 'basic'
+                    );
                 } else if (filter === 'premium') {
                     filteredModels = allModels.filter(model => 
                         model.tier === 'premium' || model.tier === 'vip'
                     );
                 } else {
-                    // Category filter
+                    // Category filter - exclude premium models
                     filteredModels = allModels.filter(model => {
                         const categories = model.personalInfo?.categories || model.categories || [];
-                        return categories.includes(filter);
+                        const isBasicTier = !model.tier || model.tier === 'basic';
+                        return categories.includes(filter) && isBasicTier;
                     });
                 }
                 
@@ -232,10 +235,10 @@
                 return;
             }
             
-            // If premium filter is active, hide premium container
+            // Always hide premium container when any filter is active (except 'all')
             const premiumContainer = document.getElementById('premiumModelsContainer');
             if (premiumContainer) {
-                premiumContainer.style.display = currentFilter === 'premium' ? 'none' : 'block';
+                premiumContainer.style.display = currentFilter === 'all' ? 'block' : 'none';
             }
             
             // Update model display
@@ -269,16 +272,44 @@
             });
             
             if (window.modelDisplay) {
-                // Load premium models first (only if not filtering by premium)
-                if (window.premiumManager && currentFilter !== 'premium') {
-                    await premiumManager.loadPremiumShowcase('premiumModelsContainer');
-                }
+                // For showcase page, we need to filter premium models out of regular display
+                const originalInit = window.modelDisplay.loadAndDisplayModels.bind(window.modelDisplay);
+                window.modelDisplay.loadAndDisplayModels = async function() {
+                    // Get all models
+                    const allModels = await window.modelStorageAdapter.getActiveModels();
+                    
+                    // Filter based on current filter
+                    let modelsToDisplay;
+                    if (currentFilter === 'all') {
+                        // Show only basic tier models in regular section
+                        modelsToDisplay = allModels.filter(model => !model.tier || model.tier === 'basic');
+                    } else if (currentFilter === 'premium') {
+                        modelsToDisplay = allModels.filter(model => model.tier === 'premium' || model.tier === 'vip');
+                    } else {
+                        // Category filter - only basic tier
+                        modelsToDisplay = allModels.filter(model => {
+                            const categories = model.personalInfo?.categories || model.categories || [];
+                            const isBasicTier = !model.tier || model.tier === 'basic';
+                            return categories.includes(currentFilter) && isBasicTier;
+                        });
+                    }
+                    
+                    // Display the filtered models
+                    this.allModels = modelsToDisplay;
+                    this.filteredModels = modelsToDisplay;
+                    if (modelsToDisplay.length === 0) {
+                        this.displayEmptyState();
+                    } else {
+                        await this.displayModelsWithPagination();
+                    }
+                };
                 
-                // Then load models based on filter
-                if (currentFilter === 'premium') {
-                    filterModels('premium');
-                } else {
-                    window.modelDisplay.init('modelsContainer');
+                // Initialize model display
+                window.modelDisplay.init('modelsContainer');
+                
+                // Load premium showcase only when showing all models
+                if (window.premiumManager && currentFilter === 'all') {
+                    await premiumManager.loadPremiumShowcase('premiumModelsContainer');
                 }
             } else {
                 console.error('Model display not initialized');

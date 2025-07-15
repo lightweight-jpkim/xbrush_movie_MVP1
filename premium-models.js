@@ -71,10 +71,19 @@ class PremiumModelManager {
                 return;
             }
 
+            // Ensure we have enough models for smooth scrolling
+            // Triple the models if we have less than 10
+            let duplicatedModels;
+            if (models.length < 10) {
+                duplicatedModels = [...models, ...models, ...models];
+            } else {
+                duplicatedModels = [...models, ...models];
+            }
+            
             // Create wrapper for horizontal scrolling
             container.innerHTML = `
                 <div class="premium-models-wrapper">
-                    ${models.map(model => this.createSimplifiedPremiumCard(model)).join('')}
+                    ${duplicatedModels.map(model => this.createSimplifiedPremiumCard(model)).join('')}
                 </div>
             `;
 
@@ -114,8 +123,14 @@ class PremiumModelManager {
                 }
             }
 
-            // Initialize scroll position and auto-scroll
+            // Store references
             this.carouselContainer = container;
+            this.carouselWrapper = container.querySelector('.premium-models-wrapper');
+            
+            // Initialize drag scroll functionality
+            this.initializeDragScroll();
+            
+            // Initialize auto-scroll
             this.initializeAutoScroll();
 
         } catch (error) {
@@ -244,18 +259,20 @@ class PremiumModelManager {
      * Create simplified premium card for index page
      */
     createSimplifiedPremiumCard(model) {
-        const badge = model.tier === 'vip' ? '💎 VIP' : '⭐ 프리미엄';
+        const badge = model.tier === 'vip' ? 'VIP' : '프리미엄';
 
         return `
-            <div class="premium-model-card simplified" onclick="selectModel('${model.id}')">
+            <div class="premium-model-card simplified card" onclick="selectModel(this, '${model.id}', '${model.tier}')" role="button" tabindex="0"
+                 onkeydown="if(event.key==='Enter') selectModel(this, '${model.id}', '${model.tier}')"
+                 aria-label="${model.displayName} 선택">
                 <div class="model-visual">
                     <img src="${model.profileImage}" alt="${model.displayName}" loading="lazy">
-                    <div class="premium-indicator">
-                        <span class="premium-badge ${model.tier === 'vip' ? 'vip-badge' : ''}">${badge}</span>
-                    </div>
                 </div>
                 <div class="model-details">
-                    <h4>${model.displayName}</h4>
+                    <div class="model-header">
+                        <h4>${model.displayName}</h4>
+                        <span class="premium-badge ${model.tier === 'vip' ? 'vip-badge' : ''}">${badge}</span>
+                    </div>
                     <p class="premium-tagline">${model.tagline || '프로페셔널 모델'}</p>
                 </div>
             </div>
@@ -306,27 +323,117 @@ class PremiumModelManager {
     scrollCarousel(direction) {
         if (!this.carouselContainer) return;
         
-        // Stop auto-scroll when manually scrolling
-        this.stopAutoScroll();
-        
-        const scrollAmount = 220; // Width of card + gap
+        const scrollAmount = 220 * 3; // Width of 3 cards + gaps
         const currentScroll = this.carouselContainer.scrollLeft;
         
-        if (direction === 'prev') {
-            this.carouselContainer.scrollTo({
-                left: currentScroll - scrollAmount,
-                behavior: 'smooth'
-            });
-        } else {
-            this.carouselContainer.scrollTo({
-                left: currentScroll + scrollAmount,
-                behavior: 'smooth'
-            });
-        }
-        
-        // Resume auto-scroll after manual scroll
-        setTimeout(() => this.startAutoScroll(), 5000);
+        this.carouselContainer.scrollTo({
+            left: direction === 'prev' ? 
+                currentScroll - scrollAmount : 
+                currentScroll + scrollAmount,
+            behavior: 'smooth'
+        });
     }
+
+    /**
+     * Initialize drag scroll functionality
+     */
+    initializeDragScroll() {
+        if (!this.carouselContainer) return;
+        
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+        let velocity = 0;
+        let rafId;
+        let hasMoved = false;
+        
+        const container = this.carouselContainer;
+        
+        // Prevent text selection while dragging
+        const preventDefault = (e) => {
+            e.preventDefault();
+        };
+        
+        // Mouse events
+        container.addEventListener('mousedown', (e) => {
+            // Only start drag if clicking on the container, not buttons
+            if (e.target.closest('.premium-carousel-nav')) return;
+            
+            isDown = true;
+            hasMoved = false;
+            container.style.cursor = 'grabbing';
+            startX = e.pageX - container.offsetLeft;
+            scrollLeft = container.scrollLeft;
+            cancelAnimationFrame(rafId);
+            velocity = 0;
+            
+            // Prevent text selection
+            document.addEventListener('selectstart', preventDefault);
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (!isDown) return;
+            
+            isDown = false;
+            container.style.cursor = 'grab';
+            
+            // Remove text selection prevention
+            document.removeEventListener('selectstart', preventDefault);
+            
+            // Apply momentum only if we moved
+            if (Math.abs(velocity) > 2) {
+                const momentumScroll = () => {
+                    if (Math.abs(velocity) > 0.5) {
+                        container.scrollLeft += velocity;
+                        velocity *= 0.92; // Friction
+                        rafId = requestAnimationFrame(momentumScroll);
+                    }
+                };
+                momentumScroll();
+            }
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            
+            const x = e.pageX - container.offsetLeft;
+            const walk = (x - startX) * 1.5; // Scroll speed multiplier
+            container.scrollLeft = scrollLeft - walk;
+            velocity = (x - startX) * 0.1; // Calculate velocity for momentum
+            
+            // Mark that we've moved
+            if (Math.abs(walk) > 5) {
+                hasMoved = true;
+            }
+        });
+        
+        // Touch events for mobile
+        container.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].pageX - container.offsetLeft;
+            scrollLeft = container.scrollLeft;
+            hasMoved = false;
+        }, { passive: true });
+        
+        container.addEventListener('touchmove', (e) => {
+            const x = e.touches[0].pageX - container.offsetLeft;
+            const walk = (x - startX) * 1.5;
+            container.scrollLeft = scrollLeft - walk;
+            
+            if (Math.abs(walk) > 5) {
+                hasMoved = true;
+            }
+        }, { passive: true });
+        
+        // Prevent clicking on cards while dragging
+        container.addEventListener('click', (e) => {
+            if (hasMoved) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
+    }
+
 
     /**
      * Initialize auto-scroll functionality
@@ -334,70 +441,55 @@ class PremiumModelManager {
     initializeAutoScroll() {
         if (!this.carouselContainer) return;
         
-        // Start auto-scroll
-        this.startAutoScroll();
+        let scrollSpeed = 0.5; // pixels per frame
+        let isPaused = false;
+        let animationId = null;
         
-        // Stop on hover
+        const scroll = () => {
+            if (!isPaused) {
+                const container = this.carouselContainer;
+                const maxScroll = container.scrollWidth - container.clientWidth;
+                
+                // Scroll forward
+                container.scrollLeft += scrollSpeed;
+                
+                // If we've reached the end, reset to beginning for infinite loop
+                if (container.scrollLeft >= maxScroll) {
+                    // Find the middle point to create seamless loop
+                    const halfWidth = container.scrollWidth / 2;
+                    container.scrollLeft = container.scrollLeft - halfWidth;
+                }
+            }
+            
+            animationId = requestAnimationFrame(scroll);
+        };
+        
+        // Start scrolling
+        animationId = requestAnimationFrame(scroll);
+        
+        // Pause on hover
         this.carouselContainer.addEventListener('mouseenter', () => {
-            this.stopAutoScroll();
+            isPaused = true;
         });
         
-        // Resume on mouse leave
         this.carouselContainer.addEventListener('mouseleave', () => {
-            this.startAutoScroll();
+            isPaused = false;
         });
         
-        // Stop on manual scroll
-        let isScrolling;
-        this.carouselContainer.addEventListener('scroll', () => {
-            this.stopAutoScroll();
-            window.clearTimeout(isScrolling);
-            isScrolling = setTimeout(() => {
-                this.startAutoScroll();
-            }, 3000);
+        // Also pause on touch for mobile
+        this.carouselContainer.addEventListener('touchstart', () => {
+            isPaused = true;
         });
-    }
-
-    /**
-     * Start auto-scrolling
-     */
-    startAutoScroll() {
-        if (this.autoScrollInterval) return;
         
-        this.autoScrollInterval = setInterval(() => {
-            if (!this.carouselContainer) {
-                this.stopAutoScroll();
-                return;
-            }
-            
-            const maxScroll = this.carouselContainer.scrollWidth - this.carouselContainer.clientWidth;
-            const currentScroll = this.carouselContainer.scrollLeft;
-            
-            // Check if we've reached the end
-            if (currentScroll >= maxScroll - 10) {
-                // Scroll back to beginning
-                this.carouselContainer.scrollTo({
-                    left: 0,
-                    behavior: 'smooth'
-                });
-            } else {
-                // Scroll one card width
-                this.carouselContainer.scrollBy({
-                    left: 220,
-                    behavior: 'smooth'
-                });
-            }
-        }, 3000); // Auto-scroll every 3 seconds
-    }
-
-    /**
-     * Stop auto-scrolling
-     */
-    stopAutoScroll() {
-        if (this.autoScrollInterval) {
-            clearInterval(this.autoScrollInterval);
-            this.autoScrollInterval = null;
-        }
+        this.carouselContainer.addEventListener('touchend', () => {
+            // Resume after a short delay to allow for scrolling
+            setTimeout(() => {
+                isPaused = false;
+            }, 1000);
+        });
+        
+        // Store animation ID for cleanup if needed
+        this.autoScrollAnimation = animationId;
     }
 
     /**
