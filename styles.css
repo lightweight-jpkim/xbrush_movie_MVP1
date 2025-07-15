@@ -47,6 +47,11 @@ body {
     padding: 8px 0;
 }
 
+/* Mobile progress indicator - hidden by default */
+.mobile-progress-indicator {
+    display: none;
+}
+
 .progress-line {
     position: absolute;
     top: 20px;
