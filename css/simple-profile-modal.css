@@ -36,14 +36,14 @@
     left: 50%;
     transform: translate(-50%, -50%) scale(0.9);
     width: 90%;
-    max-width: 700px;
+    max-width: 900px;
     max-height: 90vh;
     background: white;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.15);
     opacity: 0;
     transition: all 0.3s ease;
-    overflow: auto;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     pointer-events: none;
@@ -89,98 +89,129 @@
 .simple-profile-modal .modal-content {
     flex: 1;
     overflow-y: auto;
+    background: #f9fafb;
 }
 
 /* Profile Header */
 .profile-header {
-    padding: 30px;
-    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    padding: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
-    gap: 30px;
+    gap: 40px;
     align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    transform: rotate(45deg);
 }
 
 .profile-image {
-    width: 150px;
-    height: 150px;
-    border-radius: 12px;
+    width: 200px;
+    height: 200px;
+    border-radius: 16px;
     object-fit: cover;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+    z-index: 1;
 }
 
 .profile-info {
     flex: 1;
+    z-index: 1;
 }
 
 .profile-badges {
     display: flex;
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 10px;
+    margin-bottom: 12px;
 }
 
 .profile-badges .badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
+    padding: 6px 16px;
+    border-radius: 24px;
+    font-size: 13px;
     font-weight: 600;
+    backdrop-filter: blur(10px);
 }
 
 .badge.verified {
-    background: #48bb78;
+    background: rgba(72, 187, 120, 0.9);
     color: white;
+    box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
 }
 
 .badge.premium {
-    background: #667eea;
-    color: white;
+    background: rgba(255, 255, 255, 0.9);
+    color: #667eea;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
 }
 
 .badge.vip {
-    background: #f59e0b;
+    background: rgba(245, 158, 11, 0.9);
     color: white;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
 }
 
 .profile-name {
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 700;
-    margin: 0 0 8px 0;
-    color: #2d3748;
+    margin: 0 0 12px 0;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .profile-tagline {
-    font-size: 1.1rem;
-    color: #718096;
-    margin: 0 0 16px 0;
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 20px 0;
+    line-height: 1.5;
 }
 
 .profile-meta {
     display: flex;
-    gap: 20px;
+    gap: 24px;
     align-items: center;
 }
 
 .availability-status {
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
 }
 
 .availability-status.available {
-    color: #48bb78;
+    color: #86efac;
+    border: 1px solid rgba(134, 239, 172, 0.5);
 }
 
 .availability-status.busy {
-    color: #ed8936;
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.5);
 }
 
 /* Profile Response Info */
 .profile-response-info {
-    margin: 12px 0;
-    padding: 12px;
-    background: #F8FAFC;
-    border-radius: 8px;
+    margin: 16px 0 0 0;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .profile-response-info .pre-review-badge,
@@ -189,30 +220,37 @@
 }
 
 .profile-response-info .info-text {
-    font-size: 13px;
-    color: #64748B;
-    line-height: 1.4;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
 }
 
 .price-range {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 700;
-    color: #667eea;
+    color: white;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
 }
 
 /* Tabs */
 .profile-tabs {
     display: flex;
-    border-bottom: 1px solid #e2e8f0;
-    background: #f7fafc;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .tab-btn {
     flex: 1;
-    padding: 16px;
+    padding: 20px;
     background: none;
     border: none;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: #718096;
     cursor: pointer;
@@ -222,6 +260,7 @@
 
 .tab-btn:hover {
     color: #2d3748;
+    background: #f7fafc;
 }
 
 .tab-btn.active {
@@ -231,50 +270,64 @@
 .tab-btn.active::after {
     content: '';
     position: absolute;
-    bottom: -1px;
-    left: 0;
-    right: 0;
+    bottom: 0;
+    left: 20%;
+    right: 20%;
     height: 3px;
     background: #667eea;
+    border-radius: 3px 3px 0 0;
 }
 
 /* Tab Contents */
 .tab-contents {
-    min-height: 300px;
+    min-height: 350px;
+    background: white;
 }
 
 .tab-content {
     display: none;
-    padding: 30px;
+    padding: 40px;
 }
 
 .tab-content.active {
     display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Portfolio Tab */
 .portfolio-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
 }
 
 .portfolio-item {
     aspect-ratio: 3/4;
     overflow: hidden;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.portfolio-item:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
 }
 
 .portfolio-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s;
+    transition: transform 0.5s ease;
 }
 
 .portfolio-item:hover img {
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
 
 .empty-portfolio {
@@ -282,11 +335,13 @@
 }
 
 .single-portfolio-image {
-    max-width: 400px;
+    max-width: 500px;
     width: 100%;
     height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    display: block;
 }
 
 /* About Tab */
@@ -338,31 +393,48 @@
 
 /* Action Buttons */
 .modal-actions {
-    padding: 20px 30px;
-    background: #f7fafc;
-    border-top: 1px solid #e2e8f0;
+    padding: 30px 40px;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .modal-actions .btn {
     width: 100%;
-    padding: 16px;
-    font-size: 1.1rem;
+    padding: 18px;
+    font-size: 1.2rem;
     font-weight: 600;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
 }
 
 .modal-actions .btn-primary {
-    background: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-actions .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
 }
 
 .modal-actions .btn-primary:hover {
-    background: #5a67d8;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+}
+
+.modal-actions .btn-primary:hover::before {
+    left: 100%;
 }
 
 /* Loading State */
@@ -407,14 +479,54 @@
     .profile-header {
         flex-direction: column;
         text-align: center;
+        padding: 30px 20px;
+        gap: 24px;
+    }
+    
+    .profile-image {
+        width: 160px;
+        height: 160px;
+    }
+    
+    .profile-name {
+        font-size: 2rem;
+    }
+    
+    .profile-tagline {
+        font-size: 1.1rem;
     }
     
     .profile-meta {
         justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    
+    .availability-status,
+    .price-range {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+    
+    .profile-badges {
+        justify-content: center;
+    }
+    
+    .tab-content {
+        padding: 24px 20px;
     }
     
     .portfolio-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
+    }
+    
+    .modal-actions {
+        padding: 20px;
+    }
+    
+    .modal-actions .btn {
+        font-size: 1.1rem;
+        padding: 16px;
     }
 }
