@@ -1,8 +1,31 @@
 /* Model Register Specific Styles */
 
-/* Progress Navigation - Ensure visible on desktop */
+/* Progress Navigation - Show only the progress bar, hide buttons */
 .model-progress-nav {
     display: block;
+    padding: 20px 0;
+}
+
+.model-progress-nav .step {
+    display: none !important;
+}
+
+.model-progress-nav .progress-line {
+    display: block;
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    position: relative;
+}
+
+.model-progress-nav .progress-line-active {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #667eea;
+    border-radius: 2px;
+    transition: width 0.3s ease;
 }
 
 /* Header Styles */
