@@ -1,5 +1,10 @@
 /* Model Register Specific Styles */
 
+/* Progress Navigation - Ensure visible on desktop */
+.model-progress-nav {
+    display: block;
+}
+
 /* Header Styles */
 .model-register-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

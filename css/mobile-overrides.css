@@ -2,11 +2,12 @@
 
 /* Mobile view - max-width: 768px */
 @media screen and (max-width: 768px) {
-    /* Hide the full progress bar on mobile */
-    .progress-nav,
+    /* Hide the model registration progress bar on mobile only */
     .model-progress-nav {
         display: none !important;
     }
+    
+    /* Main page progress nav is hidden on all screen sizes via inline style */
     
     /* Show only the mobile progress indicator */
     .mobile-progress-indicator {
