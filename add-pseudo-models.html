@@ -278,7 +278,7 @@
                 let addedCount = 0;
                 for (const model of models) {
                     try {
-                        await window.modelStorageAdapter.addModel(model);
+                        await window.modelStorageAdapter.saveModel(model);
                         addedCount++;
                         status.textContent = `${addedCount}/10 모델 추가 완료...`;
                     } catch (error) {
