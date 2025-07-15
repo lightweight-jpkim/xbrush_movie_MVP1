@@ -326,6 +326,10 @@
 }
 
 /* Loading State */
+.simple-profile-modal.loading .modal-container {
+    opacity: 1;
+}
+
 .simple-profile-modal.loading .modal-content {
     display: flex;
     align-items: center;
@@ -337,6 +341,14 @@
     content: '로딩 중...';
     font-size: 1.2rem;
     color: #718096;
+}
+
+/* Hide all content while loading */
+.simple-profile-modal.loading .profile-header,
+.simple-profile-modal.loading .profile-tabs,
+.simple-profile-modal.loading .tab-contents,
+.simple-profile-modal.loading .modal-actions {
+    display: none;
 }
 
 /* Mobile Responsive */

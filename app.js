@@ -1178,7 +1178,10 @@ function initializeApp() {
                 
                 // Move to step 2
                 if (modelFound) {
-                    app.stepManager.nextStep();
+                    // Ensure we're on step 1 first
+                    app.stepManager.currentStep = 1;
+                    // Then move to step 2
+                    app.stepManager.goToStep(2);
                     showToast('선택한 모델로 동영상 제작을 시작합니다.', 'info');
                 } else {
                     showToast('모델을 찾을 수 없습니다. 직접 선택해주세요.', 'warning');

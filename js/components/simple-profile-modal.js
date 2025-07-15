@@ -162,58 +162,67 @@ class SimpleProfileModal {
     }
     
     renderModelData(model) {
-        // Profile image
-        this.modal.querySelector('.profile-image').src = 
-            model.portfolio?.thumbnailUrl || 'https://via.placeholder.com/400x400';
-        
-        // Name and tagline
-        this.modal.querySelector('.profile-name').textContent = 
-            model.personalInfo?.name || 'Unknown Model';
-        this.modal.querySelector('.profile-tagline').textContent = 
-            model.profile?.tagline || '프로페셔널 모델';
-        
-        // Badges
-        const badgesContainer = this.modal.querySelector('.profile-badges');
-        badgesContainer.innerHTML = '';
-        
-        if (model.profile?.verificationStatus?.identity) {
-            badgesContainer.innerHTML += '<span class="badge verified">✓ 인증됨</span>';
+        try {
+            console.log('[SimpleProfileModal] Rendering model data:', model);
+            
+            // Profile image
+            this.modal.querySelector('.profile-image').src = 
+                model.portfolio?.thumbnailUrl || 'https://via.placeholder.com/400x400';
+            
+            // Name and tagline
+            this.modal.querySelector('.profile-name').textContent = 
+                model.personalInfo?.name || 'Unknown Model';
+            this.modal.querySelector('.profile-tagline').textContent = 
+                model.profile?.tagline || '프로페셔널 모델';
+            
+            // Badges
+            const badgesContainer = this.modal.querySelector('.profile-badges');
+            badgesContainer.innerHTML = '';
+            
+            if (model.profile?.verificationStatus?.identity) {
+                badgesContainer.innerHTML += '<span class="badge verified">✓ 인증됨</span>';
+            }
+            
+            if (model.pricing?.tier === 'premium') {
+                badgesContainer.innerHTML += '<span class="badge premium">⭐ 프리미엄</span>';
+            } else if (model.pricing?.tier === 'vip') {
+                badgesContainer.innerHTML += '<span class="badge vip">💎 VIP</span>';
+            }
+            
+            // Availability status
+            const statusEl = this.modal.querySelector('.availability-status');
+            const isAvailable = model.availability?.status === 'available';
+            statusEl.textContent = isAvailable ? '✅ 예약 가능' : '⏸️ 예약 중';
+            statusEl.className = `availability-status ${isAvailable ? 'available' : 'busy'}`;
+            
+            // Price
+            const priceEl = this.modal.querySelector('.price-range');
+            const price = model.pricing?.basePrice || 100000;
+            priceEl.textContent = `₩${price.toLocaleString('ko-KR')}부터`;
+            
+            // Bio
+            this.modal.querySelector('.model-bio').textContent = 
+                model.profile?.bio || '안녕하세요! 프로페셔널 모델입니다.';
+            
+            // Specialties
+            const specialtiesContainer = this.modal.querySelector('.specialty-tags');
+            const specialties = model.profile?.specialties || ['fashion'];
+            specialtiesContainer.innerHTML = specialties
+                .map(spec => `<span class="tag">${this.getSpecialtyName(spec)}</span>`)
+                .join('');
+            
+            // Contact email
+            this.modal.querySelector('.contact-email').textContent = 
+                model.personalInfo?.email || 'contact@xbrush.com';
+            
+            // Portfolio
+            this.renderPortfolio(model);
+            
+            console.log('[SimpleProfileModal] Rendering complete');
+        } catch (error) {
+            console.error('[SimpleProfileModal] Error rendering model data:', error);
+            throw error;
         }
-        
-        if (model.pricing?.tier === 'premium') {
-            badgesContainer.innerHTML += '<span class="badge premium">⭐ 프리미엄</span>';
-        } else if (model.pricing?.tier === 'vip') {
-            badgesContainer.innerHTML += '<span class="badge vip">💎 VIP</span>';
-        }
-        
-        // Availability status
-        const statusEl = this.modal.querySelector('.availability-status');
-        const isAvailable = model.availability?.status === 'available';
-        statusEl.textContent = isAvailable ? '✅ 예약 가능' : '⏸️ 예약 중';
-        statusEl.className = `availability-status ${isAvailable ? 'available' : 'busy'}`;
-        
-        // Price
-        const priceEl = this.modal.querySelector('.price-range');
-        const price = model.pricing?.basePrice || 100000;
-        priceEl.textContent = `₩${price.toLocaleString('ko-KR')}부터`;
-        
-        // Bio
-        this.modal.querySelector('.model-bio').textContent = 
-            model.profile?.bio || '안녕하세요! 프로페셔널 모델입니다.';
-        
-        // Specialties
-        const specialtiesContainer = this.modal.querySelector('.specialty-tags');
-        const specialties = model.profile?.specialties || ['fashion'];
-        specialtiesContainer.innerHTML = specialties
-            .map(spec => `<span class="tag">${this.getSpecialtyName(spec)}</span>`)
-            .join('');
-        
-        // Contact email
-        this.modal.querySelector('.contact-email').textContent = 
-            model.personalInfo?.email || 'contact@xbrush.com';
-        
-        // Portfolio
-        this.renderPortfolio(model);
     }
     
     renderPortfolio(model) {
