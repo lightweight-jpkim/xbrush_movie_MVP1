@@ -1134,21 +1134,34 @@
     <script>
         // Wait for Firebase to be fully initialized
         window.addEventListener('load', async function() {
-            let retries = 10;
+            console.log('Page loaded, checking Firebase status...');
+            console.log('window.firebase:', !!window.firebase);
+            console.log('window.AppConfig:', !!window.AppConfig);
+            console.log('window.firebaseDB:', !!window.firebaseDB);
+            console.log('window.firebaseModelStorage:', !!window.firebaseModelStorage);
+            
+            let retries = 20; // Increase retries
             while (retries > 0) {
                 if (window.firebase && window.firebaseDB && window.firebaseModelStorage) {
                     console.log('Firebase services ready!');
                     break;
                 }
-                console.log('Waiting for Firebase initialization...');
+                console.log(`Waiting for Firebase initialization... (${retries} retries left)`);
+                console.log('Current status - firebase:', !!window.firebase, 'firebaseDB:', !!window.firebaseDB, 'firebaseModelStorage:', !!window.firebaseModelStorage);
                 await new Promise(resolve => setTimeout(resolve, 500));
                 retries--;
             }
             
             if (!window.firebaseDB) {
                 console.error('Firebase failed to initialize properly');
+                console.error('Final status - firebase:', !!window.firebase, 'AppConfig:', !!window.AppConfig, 'firebaseDB:', !!window.firebaseDB);
                 alert('Firebase 초기화에 실패했습니다. 페이지를 새로고침해주세요.');
             }
+        });
+        
+        // Also listen for Firebase ready event
+        window.addEventListener('firebaseReady', function() {
+            console.log('Firebase ready event received!');
         });
         
         // Secret admin access: Press Ctrl+Shift+A
