@@ -306,7 +306,6 @@ class ModelDisplay {
         
         // Pre-review rights or response time
         const hasPreReviewRights = contract.secondConfirm === true;
-        const responseTime = stats.responseTime || 2; // Default 2 hours
         const responseIndicator = hasPreReviewRights 
             ? '<span class="pre-review-badge" title="사전 검토 권리 보유">🔍 검토 필요</span>'
             : `<span class="response-time-badge" title="평균 응답 시간">⚡ ${responseTime}시간 내</span>`;
