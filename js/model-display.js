@@ -250,7 +250,8 @@ class ModelDisplay {
             ratings = {},
             stats = {},
             availability = {},
-            flags = {}
+            flags = {},
+            contract = {}
         } = model;
 
         // Extract data with enhanced schema support
@@ -302,6 +303,13 @@ class ModelDisplay {
         // Status badge
         const statusClass = isAvailable ? '' : 'busy';
         const availabilityText = isAvailable ? '즉시 가능' : '예약 중';
+        
+        // Pre-review rights or response time
+        const hasPreReviewRights = contract.secondConfirm === true;
+        const responseTime = stats.responseTime || 2; // Default 2 hours
+        const responseIndicator = hasPreReviewRights 
+            ? '<span class="pre-review-badge" title="사전 검토 권리 보유">🔍 검토 필요</span>'
+            : `<span class="response-time-badge" title="평균 응답 시간">⚡ ${responseTime}시간 내</span>`;
 
         // Format price
         const formattedPrice = new Intl.NumberFormat('ko-KR').format(basePrice);
@@ -344,6 +352,9 @@ class ModelDisplay {
                     <div class="model-meta-row">
                         <h3 class="model-name">${name}</h3>
                         <span class="model-availability ${statusClass}">${availabilityText}</span>
+                    </div>
+                    <div class="model-response-info">
+                        ${responseIndicator}
                     </div>
                     <p class="model-intro">${tagline}</p>
                     <div class="model-specialties">

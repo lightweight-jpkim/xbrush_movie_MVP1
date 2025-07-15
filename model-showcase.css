@@ -509,6 +509,36 @@
     color: white;
 }
 
+/* Model Response Info */
+.model-response-info {
+    margin: 8px 0;
+    display: flex;
+    gap: 8px;
+}
+
+.pre-review-badge,
+.response-time-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.pre-review-badge {
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #F59E0B;
+}
+
+.response-time-badge {
+    background: #DBEAFE;
+    color: #1E40AF;
+    border: 1px solid #3B82F6;
+}
+
 .model-card-footer {
     display: flex;
     justify-content: space-between;

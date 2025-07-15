@@ -172,6 +172,28 @@
     color: #ed8936;
 }
 
+/* Profile Response Info */
+.profile-response-info {
+    margin: 12px 0;
+    padding: 12px;
+    background: #F8FAFC;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.profile-response-info .pre-review-badge,
+.profile-response-info .response-time-badge {
+    flex-shrink: 0;
+}
+
+.profile-response-info .info-text {
+    font-size: 13px;
+    color: #64748B;
+    line-height: 1.4;
+}
+
 .price-range {
     font-size: 1.2rem;
     font-weight: 700;

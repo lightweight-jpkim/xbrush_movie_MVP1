@@ -207,6 +207,17 @@ class SimpleProfileModal {
             statusEl.textContent = isAvailable ? '✅ 예약 가능' : '⏸️ 예약 중';
             statusEl.className = `availability-status ${isAvailable ? 'available' : 'busy'}`;
             
+            // Pre-review rights or response time
+            const hasPreReviewRights = model.contract?.secondConfirm === true;
+            const responseTime = model.stats?.responseTime || 2;
+            
+            // Add response info after availability status
+            const responseInfoHTML = hasPreReviewRights 
+                ? '<div class="profile-response-info"><span class="pre-review-badge">🔍 사전 검토 권리 보유</span><span class="info-text">모든 결과물은 모델의 사전 승인이 필요합니다</span></div>'
+                : `<div class="profile-response-info"><span class="response-time-badge">⚡ ${responseTime}시간 내 응답</span><span class="info-text">빠른 피드백으로 프로젝트를 신속히 진행합니다</span></div>`;
+            
+            statusEl.insertAdjacentHTML('afterend', responseInfoHTML);
+            
             // Price
             const priceEl = this.modal.querySelector('.price-range');
             const price = model.pricing?.basePrice || 100000;
