@@ -22,6 +22,10 @@ class SimpleProfileModal {
                 <div class="modal-container">
                     <button class="modal-close" aria-label="Close">×</button>
                     
+                    <div class="modal-loading-overlay">
+                        <div class="loading-text">로딩 중...</div>
+                    </div>
+                    
                     <div class="modal-content">
                         <!-- Profile Header -->
                         <div class="profile-header">
@@ -115,9 +119,12 @@ class SimpleProfileModal {
             }
             
             // Show loading state
+            console.log('[SimpleProfileModal] Adding loading class');
             this.modal.classList.add('loading');
             this.modal.style.display = 'block';
             document.body.style.overflow = 'hidden';
+            console.log('[SimpleProfileModal] Modal classes:', this.modal.className);
+            console.log('[SimpleProfileModal] Modal display:', this.modal.style.display);
             
             // Fetch model data
             console.log('[SimpleProfileModal] Fetching model data...');
@@ -131,11 +138,14 @@ class SimpleProfileModal {
             this.renderModelData(model);
             
             // Show modal with animation
+            console.log('[SimpleProfileModal] Removing loading class and adding show class');
             requestAnimationFrame(() => {
                 this.modal.classList.remove('loading');
                 // Force a reflow to ensure the loading class is removed
                 void this.modal.offsetHeight;
                 this.modal.classList.add('show');
+                console.log('[SimpleProfileModal] Final modal classes:', this.modal.className);
+                console.log('[SimpleProfileModal] Modal container visible?', this.modal.querySelector('.modal-container').style.visibility);
             });
             
         } catch (error) {

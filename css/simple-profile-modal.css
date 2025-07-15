@@ -343,24 +343,31 @@
 }
 
 /* Loading State */
-.simple-profile-modal.loading .modal-content {
-    display: flex;
+.modal-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    display: none;
     align-items: center;
     justify-content: center;
-    min-height: 400px;
+    z-index: 100;
+    border-radius: 16px;
 }
 
-.simple-profile-modal.loading .modal-content::after {
-    content: '로딩 중...';
+.simple-profile-modal.loading .modal-loading-overlay {
+    display: flex;
+}
+
+.loading-text {
     font-size: 1.2rem;
     color: #718096;
 }
 
-/* Hide all content while loading */
-.simple-profile-modal.loading .profile-header,
-.simple-profile-modal.loading .profile-tabs,
-.simple-profile-modal.loading .tab-contents,
-.simple-profile-modal.loading .modal-actions {
+/* Hide loading overlay when not loading */
+.simple-profile-modal.show .modal-loading-overlay {
     display: none;
 }
 
