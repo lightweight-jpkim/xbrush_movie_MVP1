@@ -1044,6 +1044,20 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Pre-review Rights Section -->
+                    <div class="form-section">
+                        <h3>사전 검토 권리</h3>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label class="checkbox-label" style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="editPreReviewRights" style="width: 20px; height: 20px;">
+                                    <span>사전 검토 권리 활성화</span>
+                                </label>
+                                <p class="help-text" style="margin-top: 10px; color: #666; font-size: 14px;">활성화하면 모든 생성 결과물에 대해 모델의 사전 승인이 필요합니다.</p>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -1125,7 +1139,7 @@
         // Load models for management
         async function loadModels() {
             const tbody = document.getElementById('modelsTableBody');
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">로딩 중...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">로딩 중...</td></tr>';
             
             try {
                 // Ensure adapter is initialized
@@ -1186,8 +1200,8 @@
                                 ${getTierName(tier)}
                             </span>
                         </td>
-                        <td>
-                            <label class="toggle-switch">
+                        <td style="text-align: center;">
+                            <label class="toggle-switch" title="${model.contract?.secondConfirm ? '사전 검토 활성화됨' : '사전 검토 비활성화됨'}">
                                 <input type="checkbox" 
                                        ${model.contract?.secondConfirm ? 'checked' : ''} 
                                        onchange="togglePreReview('${model.id}', this.checked)">
@@ -1467,6 +1481,9 @@
             document.getElementById('editRating').value = model.rating || 0;
             document.getElementById('editTotalLicenses').value = model.totalLicenses || 0;
             document.getElementById('editResponseTime').value = model.responseTime || '';
+            
+            // Pre-review rights
+            document.getElementById('editPreReviewRights').checked = model.contract?.secondConfirm || false;
         }
         
         function closeEditModal() {
@@ -1534,6 +1551,10 @@
                     rating: parseFloat(document.getElementById('editRating').value) || 0,
                     totalLicenses: parseInt(document.getElementById('editTotalLicenses').value) || 0,
                     responseTime: document.getElementById('editResponseTime').value,
+                    contract: {
+                        ...(currentEditingModel.contract || {}),
+                        secondConfirm: document.getElementById('editPreReviewRights').checked
+                    },
                     updatedAt: new Date().toISOString()
                 };
                 
