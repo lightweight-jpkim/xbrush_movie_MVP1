@@ -29,7 +29,13 @@ window.AppConfig = {
     features: {
         enableFirebase: true,
         enableLocalStorage: true,
+        enableAnonymousAuth: false,
         debugMode: false
+    },
+    
+    // Helper function to check if a feature is enabled
+    isFeatureEnabled: function(featureName) {
+        return this.features[featureName] || false;
     }
 };
 
