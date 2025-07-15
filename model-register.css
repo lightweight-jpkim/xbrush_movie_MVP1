@@ -1,43 +1,27 @@
 /* Model Register Specific Styles */
 
-/* Progress Navigation - Show only the progress bar, hide buttons */
-.model-progress-nav {
-    display: block !important;
+/* Simple Progress Bar */
+.simple-progress-bar {
+    width: 100%;
     padding: 20px 40px;
     background: white;
-    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.model-progress-nav .progress-steps {
-    position: relative;
-    height: 8px;
-}
-
-.model-progress-nav .step {
-    display: none !important;
-}
-
-.model-progress-nav .progress-line {
-    display: block !important;
+.progress-track {
+    width: 100%;
     height: 8px;
     background: #e2e8f0;
     border-radius: 4px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
+    overflow: hidden;
 }
 
-.model-progress-nav .progress-line-active {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 8px;
+.progress-fill {
+    height: 100%;
     background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
     border-radius: 4px;
+    width: 0%;
     transition: width 0.3s ease;
-    z-index: 1;
 }
 
 /* Header Styles */

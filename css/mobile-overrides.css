@@ -2,17 +2,13 @@
 
 /* Mobile view - max-width: 768px */
 @media screen and (max-width: 768px) {
-    /* Keep model registration progress bar visible but compact on mobile */
-    .model-progress-nav {
+    /* Simple progress bar on mobile */
+    .simple-progress-bar {
         padding: 10px 20px !important;
     }
     
-    .model-progress-nav .progress-steps {
-        height: 4px !important;
-    }
-    
-    .model-progress-nav .progress-line,
-    .model-progress-nav .progress-line-active {
+    .progress-track,
+    .progress-fill {
         height: 4px !important;
     }
     

@@ -65,49 +65,12 @@
             </div>
         </header>
 
-        <!-- Progress Navigation -->
-        <nav class="model-progress-nav" role="navigation" aria-label="모델 등록 진행률">
-            <div class="progress-steps" id="modelProgressSteps">
-                <div class="progress-line">
-                    <div class="progress-line-active" id="modelProgressLine" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                
-                <button class="step active" data-step="1" type="button" aria-label="1단계: 진입 및 자격 안내">
-                    <div class="step-number">1</div>
-                    <div class="step-label">진입 안내</div>
-                </button>
-                
-                <button class="step" data-step="2" type="button" aria-label="2단계: KYC 2단계 인증">
-                    <div class="step-number">2</div>
-                    <div class="step-label">본인 인증</div>
-                </button>
-                
-                <button class="step" data-step="3" type="button" aria-label="3단계: 계약 조건 설정">
-                    <div class="step-number">3</div>
-                    <div class="step-label">계약 조건</div>
-                </button>
-                
-                <button class="step" data-step="4" type="button" aria-label="4단계: 포트폴리오 업로드">
-                    <div class="step-number">4</div>
-                    <div class="step-label">포트폴리오</div>
-                </button>
-                
-                <button class="step" data-step="5" type="button" aria-label="5단계: 제품 등록">
-                    <div class="step-number">5</div>
-                    <div class="step-label">제품 등록</div>
-                </button>
-                
-                <button class="step" data-step="6" type="button" aria-label="6단계: 검수 승인">
-                    <div class="step-number">6</div>
-                    <div class="step-label">검수 승인</div>
-                </button>
-                
-                <button class="step" data-step="7" type="button" aria-label="7단계: 등록 완료">
-                    <div class="step-number">7</div>
-                    <div class="step-label">등록 완료</div>
-                </button>
+        <!-- Simple Progress Bar -->
+        <div class="simple-progress-bar">
+            <div class="progress-track">
+                <div class="progress-fill" id="simpleProgressFill"></div>
             </div>
-        </nav>
+        </div>
 
         <!-- Main Content Area -->
         <main class="model-content-area">

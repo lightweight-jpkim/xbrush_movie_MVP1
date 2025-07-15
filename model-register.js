@@ -284,6 +284,14 @@ class ModelRegistrationApp {
         
         // Update progress line
         const progressPercentage = (this.currentStep / this.totalSteps) * 100;
+        
+        // Update new simple progress bar
+        const simpleProgressFill = document.getElementById('simpleProgressFill');
+        if (simpleProgressFill) {
+            simpleProgressFill.style.width = `${progressPercentage}%`;
+        }
+        
+        // Keep old progress line for compatibility
         const progressLine = document.getElementById('modelProgressLine');
         if (progressLine) {
             progressLine.style.width = `${progressPercentage}%`;
