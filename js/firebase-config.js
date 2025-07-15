@@ -29,10 +29,17 @@ function initializeFirebaseServices() {
         firebase.initializeApp(firebaseConfig);
         console.log('Firebase app initialized');
 
-        // Initialize Firestore
+        // Initialize Firestore with cache settings
         const db = firebase.firestore();
+        
+        // Configure Firestore settings with cache
+        const settings = {
+            cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
+        };
+        db.settings(settings);
+        
         window.firebaseDB = db;
-        console.log('Firestore initialized');
+        console.log('Firestore initialized with cache settings');
 
         // Initialize Storage for images
         const storage = firebase.storage();
@@ -44,8 +51,11 @@ function initializeFirebaseServices() {
         window.firebaseAuth = auth;
         console.log('Auth initialized');
 
-        // Enable Firestore offline persistence
-        db.enablePersistence()
+        // Enable Firestore offline persistence using the newer method
+        firebase.firestore().enablePersistence({ synchronizeTabs: true })
+            .then(() => {
+                console.log('Offline persistence enabled');
+            })
             .catch((err) => {
                 if (err.code === 'failed-precondition') {
                     console.warn('Multiple tabs open, persistence can only be enabled in one tab at a time.');
