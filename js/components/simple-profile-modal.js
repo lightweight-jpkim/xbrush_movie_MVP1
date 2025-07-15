@@ -105,18 +105,28 @@ class SimpleProfileModal {
     }
     
     async open(modelId) {
+        console.log('[SimpleProfileModal] Opening profile for model:', modelId);
         try {
+            // Check if modal exists
+            if (!this.modal) {
+                console.error('[SimpleProfileModal] Modal element not found!');
+                this.createModalStructure();
+                this.modal = document.getElementById('simpleProfileModal');
+            }
+            
             // Show loading state
             this.modal.classList.add('loading');
             this.modal.style.display = 'block';
             document.body.style.overflow = 'hidden';
             
             // Fetch model data
+            console.log('[SimpleProfileModal] Fetching model data...');
             const model = await this.fetchModelData(modelId);
             if (!model) {
                 throw new Error('Model not found');
             }
             
+            console.log('[SimpleProfileModal] Model data loaded:', model);
             this.currentModel = model;
             this.renderModelData(model);
             
@@ -127,7 +137,7 @@ class SimpleProfileModal {
             });
             
         } catch (error) {
-            console.error('Error loading model:', error);
+            console.error('[SimpleProfileModal] Error loading model:', error);
             this.close();
             if (window.showToast) {
                 window.showToast('모델 정보를 불러올 수 없습니다.', 'error');

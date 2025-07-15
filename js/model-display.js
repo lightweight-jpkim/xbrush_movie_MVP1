@@ -313,7 +313,14 @@ class ModelDisplay {
                          onload="this.classList.add('loaded');"
                          onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\\'image-error\\'><div class=\\'image-error-icon\\'>🖼️</div><div>이미지 로드 실패</div></div>';">
                     <div class="model-card-overlay">
-                        <button class="view-profile-btn" onclick="event.stopPropagation(); window.simpleProfileModal ? window.simpleProfileModal.open('${id}') : window.modelDetailModal.open('${id}')">프로필 보기</button>
+                        <div class="overlay-buttons">
+                            <button class="overlay-btn primary" onclick="event.stopPropagation(); sessionStorage.setItem('selectedModelForMovie', '${id}'); sessionStorage.setItem('skipToStep2', 'true'); window.location.href = 'index.html#step2';">
+                                <span>🎬</span> 동영상 제작
+                            </button>
+                            <button class="overlay-btn" onclick="event.stopPropagation(); if(window.simpleProfileModal) { window.simpleProfileModal.open('${id}'); } else { console.error('SimpleProfileModal not found'); }">
+                                <span>👤</span> 프로필 보기
+                            </button>
+                        </div>
                     </div>
                     <div class="model-quick-stats">
                         <div class="quick-stat">
