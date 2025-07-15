@@ -442,11 +442,11 @@ class PremiumModelManager {
         if (!this.carouselContainer) return;
         
         let scrollSpeed = 0.5; // pixels per frame
-        let isPaused = false;
-        let animationId = null;
+        this.autoScrollPaused = false;
+        this.autoScrollAnimation = null;
         
         const scroll = () => {
-            if (!isPaused) {
+            if (!this.autoScrollPaused && this.autoScrollAnimation !== null) {
                 const container = this.carouselContainer;
                 const maxScroll = container.scrollWidth - container.clientWidth;
                 
@@ -459,47 +459,41 @@ class PremiumModelManager {
                     const halfWidth = container.scrollWidth / 2;
                     container.scrollLeft = container.scrollLeft - halfWidth;
                 }
+                
+                this.autoScrollAnimation = requestAnimationFrame(scroll);
             }
-            
-            animationId = requestAnimationFrame(scroll);
         };
         
         // Start scrolling
-        animationId = requestAnimationFrame(scroll);
+        this.autoScrollAnimation = requestAnimationFrame(scroll);
         
         // Pause on hover
         this.carouselContainer.addEventListener('mouseenter', () => {
-            isPaused = true;
+            this.autoScrollPaused = true;
         });
         
         this.carouselContainer.addEventListener('mouseleave', () => {
-            isPaused = false;
+            if (this.autoScrollAnimation !== null) {
+                this.autoScrollPaused = false;
+                this.autoScrollAnimation = requestAnimationFrame(scroll);
+            }
         });
         
         // Also pause on touch for mobile
         this.carouselContainer.addEventListener('touchstart', () => {
-            isPaused = true;
+            this.autoScrollPaused = true;
         });
         
         this.carouselContainer.addEventListener('touchend', () => {
             // Resume after a short delay to allow for scrolling
             setTimeout(() => {
-                isPaused = false;
+                if (this.autoScrollAnimation !== null) {
+                    this.autoScrollPaused = false;
+                    this.autoScrollAnimation = requestAnimationFrame(scroll);
+                }
             }, 1000);
         });
         
-        // Store animation ID for cleanup if needed
-        this.autoScrollAnimation = animationId;
-        this.isPaused = false;
-        
-        // Store pause function for external access
-        this.pauseAutoScroll = () => {
-            isPaused = true;
-        };
-        
-        this.resumeAutoScroll = () => {
-            isPaused = false;
-        };
     }
     
     /**
@@ -510,7 +504,7 @@ class PremiumModelManager {
             cancelAnimationFrame(this.autoScrollAnimation);
             this.autoScrollAnimation = null;
         }
-        this.isPaused = true;
+        this.autoScrollPaused = true;
     }
 
     /**
