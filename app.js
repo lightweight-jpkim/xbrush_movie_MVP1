@@ -1203,13 +1203,13 @@ function selectModel(element, modelId, tier) {
         app.dataService.updateField('model', modelId);
         app.dataService.updateField('modelTier', tier);
         
-        // If this is a premium model, stop auto-scroll and center it
+        // Stop premium carousel auto-scroll if it exists (for ANY model selection)
+        if (window.premiumManager && window.premiumManager.autoScrollAnimation) {
+            window.premiumManager.stopAutoScroll();
+        }
+        
+        // If this is a premium model in carousel, center it
         if (element.closest('.premium-models-carousel')) {
-            // Stop auto-scroll
-            if (window.premiumManager && window.premiumManager.autoScrollAnimation) {
-                window.premiumManager.stopAutoScroll();
-            }
-            
             // Center the selected model
             const carousel = element.closest('.premium-models-carousel');
             const cardRect = element.getBoundingClientRect();
@@ -1226,6 +1226,8 @@ function selectModel(element, modelId, tier) {
         
         if (tier === 'premium') {
             showToast('🎬 프리미엄 배우가 선택되었습니다! 100 크레딧이 차감됩니다.', 'info');
+        } else if (tier === 'vip') {
+            showToast('💎 VIP 모델이 선택되었습니다!', 'info');
         }
         
         app.stepManager.checkNextButton();
