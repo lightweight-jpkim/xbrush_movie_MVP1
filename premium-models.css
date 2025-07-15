@@ -588,6 +588,24 @@
     transform: scale(1.05);
 }
 
+/* IG Icon Styling */
+.ig-text {
+    font-weight: 700;
+    font-size: 0.85em;
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.sns-stat:hover .ig-text,
+.sns-highlight:hover .ig-text {
+    background: #e1306c;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
 /* Price Preview */
 .price-preview {
     display: flex;

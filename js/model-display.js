@@ -328,18 +328,18 @@ class ModelDisplay {
                     </div>
                     <div class="model-quick-stats">
                         <div class="quick-stat">
-                            <span>📷</span>
-                            <span>${completedProjects}개 완료</span>
+                            <span class="stat-icon">📷</span>
+                            <span class="stat-text">${completedProjects}</span>
                         </div>
                         <div class="quick-stat">
                             <a href="https://instagram.com/${instagramHandle.replace('@', '')}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="sns-link">
-                                <span>📱</span>
-                                <span>${instagramHandle}</span>
+                                <span class="stat-icon ig-icon">IG</span>
+                                <span class="stat-text">${instagramHandle}</span>
                             </a>
                         </div>
                         <div class="quick-stat">
-                            <span>⭐</span>
-                            <span>${Number(rating || 0).toFixed(1)}점</span>
+                            <span class="stat-icon">⭐</span>
+                            <span class="stat-text">${Number(rating || 0).toFixed(1)}</span>
                         </div>
                     </div>
                 </div>

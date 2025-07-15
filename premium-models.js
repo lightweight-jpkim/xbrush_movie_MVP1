@@ -205,7 +205,7 @@ class PremiumModelManager {
                         ${model.rating > 0 ? `<span class="rating">⭐ ${Number(model.rating).toFixed(1)}</span>` : ''}
                         <span class="licenses">${model.totalLicenses || 0}건</span>
                         <a href="https://instagram.com/${instagramHandle.replace('@', '')}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="sns-stat">
-                            <span>📱 ${instagramHandle}</span>
+                            <span class="ig-text">IG</span> <span>${instagramHandle}</span>
                         </a>
                     </div>
                     <div class="premium-features">
@@ -249,7 +249,7 @@ class PremiumModelManager {
                         <span>📊 ${model.totalLicenses || 0}+ 프로젝트</span>
                         <span>⭐ ${model.rating || 'New'}</span>
                         <a href="https://instagram.com/${(model.socialMedia?.instagram || '@' + model.displayName.toLowerCase().replace(/\s+/g, '')).replace('@', '')}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="sns-highlight">
-                            <span>📱 ${model.socialMedia?.instagram || '@' + model.displayName.toLowerCase().replace(/\s+/g, '')}</span>
+                            <span class="ig-text">IG</span> <span>${model.socialMedia?.instagram || '@' + model.displayName.toLowerCase().replace(/\s+/g, '')}</span>
                         </a>
                     </div>
                     <div class="price-preview">
