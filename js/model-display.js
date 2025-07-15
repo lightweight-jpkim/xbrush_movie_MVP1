@@ -268,6 +268,10 @@ class ModelDisplay {
         const completedProjects = stats?.completedProjects || 0;
         const responseTime = stats?.responseTime || 2;
         const isAvailable = availability?.status === 'available';
+        
+        // Extract social media links
+        const socialMedia = model.socialMedia || {};
+        const instagramHandle = socialMedia.instagram || `@${name.toLowerCase().replace(/\s+/g, '')}`;
         const isVerified = profile?.verificationStatus?.identity || false;
         const isPremium = profile?.verificationStatus?.premium || false;
         const isNew = flags?.newModel || false;
@@ -328,8 +332,10 @@ class ModelDisplay {
                             <span>${completedProjects}개 완료</span>
                         </div>
                         <div class="quick-stat">
-                            <span>⏱️</span>
-                            <span>${responseTime}시간 응답</span>
+                            <a href="https://instagram.com/${instagramHandle.replace('@', '')}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="sns-link">
+                                <span>📱</span>
+                                <span>${instagramHandle}</span>
+                            </a>
                         </div>
                         <div class="quick-stat">
                             <span>⭐</span>

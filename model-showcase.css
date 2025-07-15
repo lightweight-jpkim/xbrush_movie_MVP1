@@ -670,6 +670,20 @@
     gap: 4px;
 }
 
+.quick-stat .sns-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.quick-stat .sns-link:hover {
+    color: #e1306c;
+    transform: scale(1.05);
+}
+
 /* Enhanced Content Section */
 .model-card-content-enhanced {
     padding: 20px;

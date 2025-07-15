@@ -183,6 +183,7 @@ class PremiumModelManager {
     createPremiumModelCard(model) {
         const badge = model.premiumBadge || (model.tier === 'vip' ? '💎 VIP 모델' : '⭐ 프리미엄');
         const badgeClass = model.tier === 'vip' ? 'vip-badge' : '';
+        const instagramHandle = model.socialMedia?.instagram || `@${model.displayName.toLowerCase().replace(/\s+/g, '')}`;
 
         return `
             <div class="model-card premium-model-card" onclick="viewModel('${model.id}')">
@@ -203,7 +204,9 @@ class PremiumModelManager {
                     <div class="model-stats">
                         ${model.rating > 0 ? `<span class="rating">⭐ ${Number(model.rating).toFixed(1)}</span>` : ''}
                         <span class="licenses">${model.totalLicenses || 0}건</span>
-                        ${model.responseTime ? `<span class="response">⚡ ${model.responseTime}</span>` : ''}
+                        <a href="https://instagram.com/${instagramHandle.replace('@', '')}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="sns-stat">
+                            <span>📱 ${instagramHandle}</span>
+                        </a>
                     </div>
                     <div class="premium-features">
                         ${this.getPremiumFeatures(model.tier).map(feature => 
@@ -245,7 +248,9 @@ class PremiumModelManager {
                     <div class="model-highlights">
                         <span>📊 ${model.totalLicenses || 0}+ 프로젝트</span>
                         <span>⭐ ${model.rating || 'New'}</span>
-                        <span>⚡ ${model.responseTime || '빠른 응답'}</span>
+                        <a href="https://instagram.com/${(model.socialMedia?.instagram || '@' + model.displayName.toLowerCase().replace(/\s+/g, '')).replace('@', '')}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="sns-highlight">
+                            <span>📱 ${model.socialMedia?.instagram || '@' + model.displayName.toLowerCase().replace(/\s+/g, '')}</span>
+                        </a>
                     </div>
                     <div class="price-preview">
                         <span class="from-price">₩${(model.lowestPrice || 300000).toLocaleString()}부터</span>
