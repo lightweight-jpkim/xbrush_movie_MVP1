@@ -1,0 +1,47 @@
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+logs/
+*.log
+
+# Dependency directories
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+
+# Firebase
+.firebase/
+.firebaserc
+
+# Backup files
+*.backup
+*.bak
+
+# Large media files (use external hosting instead)
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
