@@ -44,8 +44,6 @@
     opacity: 0;
     transition: all 0.3s ease;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
     pointer-events: none;
     visibility: hidden;
     z-index: 10001;
@@ -87,9 +85,10 @@
 }
 
 .simple-profile-modal .modal-content {
-    flex: 1;
+    height: 100%;
     overflow-y: auto;
-    background: #f9fafb;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Profile Header */
@@ -101,6 +100,7 @@
     align-items: center;
     position: relative;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .profile-header::before {
@@ -240,9 +240,7 @@
     display: flex;
     background: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    flex-shrink: 0;
 }
 
 .tab-btn {
@@ -280,13 +278,15 @@
 
 /* Tab Contents */
 .tab-contents {
-    min-height: 350px;
+    flex: 1;
     background: white;
+    overflow-y: auto;
 }
 
 .tab-content {
     display: none;
     padding: 40px;
+    min-height: 100%;
 }
 
 .tab-content.active {
@@ -397,6 +397,7 @@
     background: white;
     border-top: 1px solid #e5e7eb;
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+    flex-shrink: 0;
 }
 
 .modal-actions .btn {
@@ -444,12 +445,12 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: white;
+    background: rgba(255, 255, 255, 0.95);
     display: none;
     align-items: center;
     justify-content: center;
     z-index: 100;
-    border-radius: 16px;
+    border-radius: 20px;
 }
 
 .simple-profile-modal.loading .modal-loading-overlay {

@@ -24,6 +24,17 @@
     transition: width 0.3s ease;
 }
 
+/* Progress info text */
+.progress-info {
+    margin-bottom: 12px;
+}
+
+.progress-step-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #4a5568;
+}
+
 /* Header Styles */
 .model-register-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -99,31 +110,36 @@
 
 .step-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
+    padding: 0 20px;
 }
 
 .step-badge {
     display: inline-block;
-    background: #e2e8f0;
-    color: #4a5568;
-    padding: 8px 16px;
-    border-radius: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 10px 24px;
+    border-radius: 24px;
     font-size: 0.9rem;
     font-weight: 600;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
 .step-title {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
     font-weight: 700;
-    color: #2d3748;
-    margin: 0 0 10px 0;
+    color: #1a202c;
+    margin: 0 0 16px 0;
+    line-height: 1.2;
 }
 
 .step-description {
-    font-size: 1.1rem;
-    color: #718096;
-    margin: 0;
+    font-size: 1.2rem;
+    color: #64748b;
+    margin: 0 auto;
+    max-width: 600px;
+    line-height: 1.6;
 }
 
 /* Step 0: Entry & Qualification Guide */
@@ -131,59 +147,109 @@
 .requirements-card,
 .terms-preview-card {
     background: white;
-    border-radius: 16px;
-    padding: 30px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 32px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f1f5f9;
+    transition: all 0.3s ease;
+}
+
+.qualification-card:hover,
+.requirements-card:hover,
+.terms-preview-card:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
 }
 
 .card-header {
-    margin-bottom: 25px;
+    margin-bottom: 32px;
+    text-align: center;
 }
 
 .card-title {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    color: #2d3748;
-    margin: 0 0 8px 0;
+    color: #1a202c;
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
 }
 
 .card-subtitle {
-    color: #718096;
+    color: #64748b;
     margin: 0;
+    font-size: 1.05rem;
 }
 
 .benefits-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
 }
 
 .benefit-item {
     text-align: center;
-    padding: 20px;
-    background: #f7fafc;
-    border-radius: 12px;
+    padding: 32px 24px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 16px;
     border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.benefit-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.benefit-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.benefit-item:hover::before {
+    transform: translateX(0);
 }
 
 .benefit-icon {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
+    font-size: 3rem;
+    margin-bottom: 20px;
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
 }
 
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.benefit-item:nth-child(2) .benefit-icon { animation-delay: 0.5s; }
+.benefit-item:nth-child(3) .benefit-icon { animation-delay: 1s; }
+.benefit-item:nth-child(4) .benefit-icon { animation-delay: 1.5s; }
+
 .benefit-item h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #2d3748;
-    margin: 0 0 8px 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 10px 0;
 }
 
 .benefit-item p {
-    color: #718096;
-    font-size: 0.9rem;
+    color: #64748b;
+    font-size: 0.95rem;
     margin: 0;
+    line-height: 1.5;
 }
 
 .requirements-list {
@@ -193,17 +259,31 @@
 .requirement-item {
     display: flex;
     align-items: flex-start;
-    gap: 15px;
-    padding: 20px;
-    background: #f7fafc;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    margin-bottom: 15px;
+    gap: 20px;
+    padding: 24px;
+    background: white;
+    border-radius: 16px;
+    border: 2px solid #f1f5f9;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+}
+
+.requirement-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.1);
 }
 
 .requirement-icon {
-    font-size: 2rem;
-    margin-top: 5px;
+    font-size: 2.5rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .requirement-content {
@@ -211,39 +291,47 @@
 }
 
 .requirement-content h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #2d3748;
-    margin: 0 0 5px 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 8px 0;
 }
 
 .requirement-content p {
-    color: #718096;
+    color: #64748b;
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 .requirement-status {
-    background: #fed7d7;
-    color: #c53030;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-top: 8px;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #dc2626;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-top: 12px;
     display: inline-block;
+    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.1);
 }
 
 .terms-list {
     list-style: none;
     padding: 0;
     margin: 0;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 24px;
 }
 
 .terms-list li {
-    padding: 10px 0;
+    padding: 16px 16px 16px 48px;
     border-bottom: 1px solid #e2e8f0;
-    color: #4a5568;
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    position: relative;
 }
 
 .terms-list li:last-child {
@@ -252,20 +340,59 @@
 
 .terms-list li:before {
     content: "✓";
-    color: #38a169;
-    font-weight: 600;
-    margin-right: 10px;
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    width: 24px;
+    height: 24px;
+    background: #10b981;
+    color: white;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
 }
 
 .action-section {
-    margin-top: 40px;
+    margin-top: 48px;
     text-align: center;
+    padding: 32px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .btn-large {
-    padding: 16px 32px;
-    font-size: 1.1rem;
-    font-weight: 600;
+    padding: 18px 40px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-large::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s;
+}
+
+.btn-large:hover::before {
+    left: 100%;
 }
 
 /* Step 1: KYC Verification */
