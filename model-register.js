@@ -2035,32 +2035,74 @@ class ModelRegistrationApp {
      * Show toast notification
      */
     showToast(message, type = 'info') {
+        // Add animation styles if not exists
+        if (!document.getElementById('toast-animations')) {
+            const style = document.createElement('style');
+            style.id = 'toast-animations';
+            style.textContent = `
+                @keyframes slideInUp {
+                    from {
+                        transform: translateY(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
+                }
+                @keyframes slideOutDown {
+                    from {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
+                    to {
+                        transform: translateY(100%);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Remove existing toast if any
+        const existingToast = document.querySelector('.toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+        
         // Create toast element
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
         toast.style.cssText = `
             position: fixed;
-            top: 20px;
+            bottom: 20px;
             right: 20px;
             background: ${this.getToastColor(type)};
             color: white;
-            padding: 15px 20px;
+            padding: 12px 20px;
             border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
             z-index: 10000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            animation: slideIn 0.3s ease;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideInUp 0.3s ease-out;
         `;
         
         toast.textContent = message;
         document.body.appendChild(toast);
         
-        // Auto remove after 5 seconds
+        // Auto remove after 3 seconds
         setTimeout(() => {
-            toast.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => {
-                document.body.removeChild(toast);
-            }, 300);
-        }, 5000);
+            if (toast.parentElement) {
+                toast.style.animation = 'slideOutDown 0.3s ease-out';
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, 300);
+            }
+        }, 3000);
     }
 
     /**
