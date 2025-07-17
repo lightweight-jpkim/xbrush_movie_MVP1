@@ -2124,8 +2124,19 @@ class ModelRegistrationApp {
      * Go back to main application
      */
     goBack() {
-        if (confirm('모델 등록을 취소하고 메인 페이지로 돌아가시겠습니까?')) {
-            window.location.href = 'index.html';
+        if (confirm('모델 등록을 취소하고 이전 페이지로 돌아가시겠습니까?')) {
+            // Use navigation manager if available
+            if (window.navigationManager) {
+                window.navigationManager.goBack();
+            } else {
+                // Fallback: check referrer
+                var referrer = document.referrer;
+                if (referrer && referrer.includes('models.html')) {
+                    window.location.href = 'models.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }
         }
     }
 
