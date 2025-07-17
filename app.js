@@ -3175,9 +3175,9 @@ async function loadFeaturedModels() {
  * Wait for Firebase to be ready
  */
 async function waitForFirebase() {
-    let retries = 20; // 10 seconds total
+    let retries = 100; // 10 seconds total with 100ms intervals
     while (retries > 0 && (!window.firebaseDB || !window.modelStorageAdapter)) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 100)); // Reduced from 500ms to 100ms
         retries--;
     }
     if (!window.modelStorageAdapter) {

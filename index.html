@@ -1074,18 +1074,19 @@
         function checkAndLoadModels() {
             if (window.firebaseDB && window.modelStorageAdapter && typeof loadFeaturedModels === 'function') {
                 console.log('[Main Page] Firebase is ready, loading models...');
-                loadFeaturedModels();
-                // Load celebrity models
-                if (typeof loadCelebrityModels === 'function') {
-                    loadCelebrityModels();
-                }
-                // Load premium models carousel
-                if (window.premiumManager) {
-                    premiumManager.loadPremiumCarousel('premiumModelsCarousel');
-                }
+                // Load all models in parallel for faster loading
+                Promise.all([
+                    loadFeaturedModels(),
+                    typeof loadCelebrityModels === 'function' ? loadCelebrityModels() : Promise.resolve(),
+                    window.premiumManager ? premiumManager.loadPremiumCarousel('premiumModelsCarousel') : Promise.resolve()
+                ]).then(() => {
+                    console.log('[Main Page] All models loaded');
+                }).catch(error => {
+                    console.error('[Main Page] Error loading models:', error);
+                });
             } else {
                 console.log('[Main Page] Waiting for Firebase or loadFeaturedModels function...');
-                setTimeout(checkAndLoadModels, 500);
+                setTimeout(checkAndLoadModels, 100); // Reduced from 500ms to 100ms
             }
         }
         
@@ -1096,9 +1097,9 @@
             checkAndLoadModels();
         }
         
-        // Also listen for the firebaseReady event as backup
+        // Also listen for Firebase ready event for faster response
         window.addEventListener('firebaseReady', function() {
-            console.log('[Main Page] Firebase ready event received');
+            console.log('[Main Page] Firebase ready event received, loading models immediately');
             checkAndLoadModels();
         });
         
