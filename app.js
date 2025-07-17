@@ -167,7 +167,10 @@ class DataService {
             videoCreated: false,
             hasChosenImagePreview: false,
             skipImagePreview: false,
-            selectedVideoCuts: {}
+            selectedVideoCuts: {},
+            termsAgreed: false,
+            termsAgreements: null,
+            termsAgreedAt: null
         };
     }
 
@@ -191,6 +194,13 @@ class DataService {
      */
     getData() {
         return { ...this.selectedData }; // Return a copy
+    }
+    
+    /**
+     * Getter for direct data access
+     */
+    get data() {
+        return this.selectedData;
     }
 
     /**
@@ -1411,15 +1421,22 @@ function initializeCurrentImageComparison() {
  * Navigation functions
  */
 function nextStep() {
-    // Show terms popup when starting from step 1
-    if (app && app.stepManager.currentStep === 1 && window.TermsPopup) {
+    // Show terms popup when moving from step 1 to step 2 (after model selection)
+    if (app && app.stepManager.currentStep === 1 && window.TermsPopup && !app.dataService.selectedData.termsAgreed) {
+        // Check if model is selected first
+        if (!app.dataService.selectedData.model) {
+            showToast('먼저 모델을 선택해주세요.', 'warning');
+            return;
+        }
+        
         const termsPopup = new TermsPopup({
             context: 'movie-maker',
             onAgree: (agreements) => {
                 // Store agreements in app data
                 if (app.dataService) {
-                    app.dataService.data.termsAgreements = agreements;
-                    app.dataService.data.termsAgreedAt = new Date().toISOString();
+                    app.dataService.selectedData.termsAgreements = agreements;
+                    app.dataService.selectedData.termsAgreedAt = new Date().toISOString();
+                    app.dataService.selectedData.termsAgreed = true;
                 }
                 
                 showToast('약관에 동의하셨습니다. 동영상 제작을 시작합니다!', 'success');
