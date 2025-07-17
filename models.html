@@ -162,6 +162,7 @@
     <script src="js/components/simple-profile-modal.js"></script>
     <script src="js/model-display.js"></script>
     <script src="js/navigation-manager.js"></script>
+    <script src="js/url-state-manager.js"></script>
     <script src="js/model-navigation.js"></script>
     <script src="premium-models.js"></script>
     <script>
@@ -231,6 +232,11 @@
         // Filter models based on selected filter
         async function filterModels(filter) {
             currentFilter = filter;
+            
+            // Update URL state
+            if (window.urlStateManager) {
+                window.urlStateManager.setFilter(filter);
+            }
             
             // Update active button
             document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -303,8 +309,61 @@
         
         // Initialize model display when page loads
         document.addEventListener('DOMContentLoaded', async function() {
-            // Check URL filter
-            checkUrlFilter();
+            // Set up URL state manager listeners
+            if (window.urlStateManager) {
+                // Listen for filter changes from URL (browser back/forward)
+                window.urlStateManager.addListener('filter', function(filter) {
+                    // Only update if filter actually changed
+                    if (currentFilter !== (filter || 'all')) {
+                        // Update UI without updating URL again
+                        currentFilter = filter || 'all';
+                        document.querySelectorAll('.filter-btn').forEach(btn => {
+                            btn.classList.remove('active');
+                            if (btn.getAttribute('data-filter') === currentFilter) {
+                                btn.classList.add('active');
+                            }
+                        });
+                        // Re-filter models
+                        if (currentFilter === 'all') {
+                            filteredModels = allModels;
+                        } else if (currentFilter === 'premium' || currentFilter === 'vip') {
+                            filteredModels = allModels.filter(model => model.tier === currentFilter);
+                        } else if (currentFilter === 'fast') {
+                            filteredModels = allModels.filter(model => model.tags && model.tags.includes('fast'));
+                        } else {
+                            filteredModels = allModels.filter(model => 
+                                model.category === currentFilter || 
+                                (model.tags && model.tags.includes(currentFilter))
+                            );
+                        }
+                        if (window.modelDisplay) {
+                            window.modelDisplay.setModels(filteredModels);
+                            window.modelDisplay.currentPage = 1;
+                            window.modelDisplay.displayModelsWithPagination();
+                        }
+                    }
+                });
+                
+                // Listen for page changes from URL (browser back/forward)
+                window.urlStateManager.addListener('page', function(page) {
+                    if (window.modelDisplay && window.modelDisplay.goToPage && window.modelDisplay.currentPage !== (page || 1)) {
+                        window.modelDisplay.currentPage = page || 1;
+                        window.modelDisplay.displayModelsWithPagination();
+                    }
+                });
+                
+                // Check initial URL state
+                var initialFilter = window.urlStateManager.getState('filter', 'all');
+                var initialPage = window.urlStateManager.getState('page', 1);
+                
+                // Apply initial filter
+                if (initialFilter !== 'all') {
+                    filterModels(initialFilter);
+                }
+            } else {
+                // Fallback: Check URL filter the old way
+                checkUrlFilter();
+            }
             
             // Wait for Firebase to be ready
             let retries = 10;

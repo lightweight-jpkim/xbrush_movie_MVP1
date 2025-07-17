@@ -217,8 +217,14 @@ class ModelDisplay {
     /**
      * Go to specific page
      */
-    async goToPage(page) {
+    async goToPage(page, updateURL = true) {
         this.currentPage = page;
+        
+        // Update URL state only if not called from URL state listener
+        if (updateURL && window.urlStateManager) {
+            window.urlStateManager.setPage(page);
+        }
+        
         await this.displayModelsWithPagination();
         
         // Scroll to top of models section
