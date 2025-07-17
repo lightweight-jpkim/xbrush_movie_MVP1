@@ -30,6 +30,7 @@ node_modules/
 # Configuration files with sensitive data
 js/slack-config.js
 js/slack-config-*.js
+js/slack-webhook-config.js
 js/firebase-config-real.js
 config/production.js
 .env
