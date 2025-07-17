@@ -1752,7 +1752,7 @@ class ModelRegistrationApp {
     /**
      * Start review process
      */
-    startReviewProcess() {
+    async startReviewProcess() {
         console.log('Starting review process...');
         
         // Disable the button to prevent multiple clicks
@@ -1760,6 +1760,56 @@ class ModelRegistrationApp {
         if (startButton) {
             startButton.disabled = true;
             startButton.textContent = '검수 진행 중...';
+        }
+        
+        // Save model with pending status for admin approval
+        try {
+            // Prepare model data with pending status
+            const pendingModelData = {
+                id: `model-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                registrationDate: new Date().toISOString(),
+                status: 'pending', // Set as pending for admin review
+                createdAt: new Date().toISOString(),
+                
+                // Basic info from registration
+                personalInfo: {
+                    name: this.registrationData.productInfo?.name || '테스트 모델',
+                    email: this.registrationData.ocrData?.email || 'test@example.com',
+                    phone: this.registrationData.ocrData?.phone || '010-0000-0000',
+                    intro: this.registrationData.productInfo?.intro || '',
+                    categories: this.registrationData.productInfo?.categories || [],
+                    thumbnailUrl: this.registrationData.productInfo?.thumbnailUrl || ''
+                },
+                
+                // Contract info
+                contract: {
+                    ...this.registrationData.contract,
+                    secondConfirm: false
+                },
+                
+                // KYC verification status
+                kyc: {
+                    verified: true,
+                    verificationDate: new Date().toISOString()
+                },
+                
+                // Basic tier
+                tier: 'basic',
+                
+                // Registration step data
+                registrationData: this.registrationData
+            };
+            
+            // Save to Firebase
+            if (window.modelStorageAdapter) {
+                const modelId = await window.modelStorageAdapter.saveModel(pendingModelData);
+                console.log('Pending model saved with ID:', modelId);
+                this.pendingModelId = modelId; // Store for later use
+                this.showToast('검수 신청이 등록되었습니다.', 'success');
+            }
+        } catch (error) {
+            console.error('Failed to save pending model:', error);
+            this.showToast('검수 신청 중 오류가 발생했습니다.', 'error');
         }
         
         // Simulate review process
@@ -2272,10 +2322,13 @@ class ModelRegistrationApp {
             console.log('=== STARTING MODEL ACTIVATION ===');
             console.log('Registration data available:', this.registrationData);
             
+            // If we have a pending model ID, update it; otherwise create new
+            const modelId = this.pendingModelId || `model-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            
             // Prepare complete model data
             const modelData = {
                 // Basic info
-                id: `model-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                id: modelId,
                 registrationDate: new Date().toISOString(),
                 status: 'active',
                 createdAt: window.firebase ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString(),
@@ -2442,13 +2495,22 @@ class ModelRegistrationApp {
                     });
                     
                     // Use Firebase adapter
-                    const modelId = await window.modelStorageAdapter.saveModel(modelData);
+                    let savedModelId;
+                    if (this.pendingModelId) {
+                        // Update existing pending model
+                        console.log('Updating existing pending model:', this.pendingModelId);
+                        await window.modelStorageAdapter.updateModel(this.pendingModelId, modelData);
+                        savedModelId = this.pendingModelId;
+                    } else {
+                        // Create new model
+                        savedModelId = await window.modelStorageAdapter.saveModel(modelData);
+                    }
                     console.log('=== MODEL SAVED TO FIREBASE ===');
-                    console.log('Model ID:', modelId);
+                    console.log('Model ID:', savedModelId);
                     
                     // Verify the model was saved
                     console.log('Verifying model in Firebase...');
-                    const savedModel = await window.modelStorageAdapter.getModel(modelId);
+                    const savedModel = await window.modelStorageAdapter.getModel(savedModelId);
                     if (!savedModel) {
                         console.error('Model verification failed - not found in Firebase');
                         throw new Error('Model verification failed');
