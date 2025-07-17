@@ -1411,7 +1411,28 @@ function initializeCurrentImageComparison() {
  * Navigation functions
  */
 function nextStep() {
-    if (app) app.stepManager.nextStep();
+    // Show terms popup when starting from step 1
+    if (app && app.stepManager.currentStep === 1 && window.TermsPopup) {
+        const termsPopup = new TermsPopup({
+            context: 'movie-maker',
+            onAgree: (agreements) => {
+                // Store agreements in app data
+                if (app.dataService) {
+                    app.dataService.data.termsAgreements = agreements;
+                    app.dataService.data.termsAgreedAt = new Date().toISOString();
+                }
+                
+                showToast('약관에 동의하셨습니다. 동영상 제작을 시작합니다!', 'success');
+                app.stepManager.nextStep();
+            },
+            onCancel: () => {
+                showToast('약관 동의가 필요합니다.', 'warning');
+            }
+        });
+        termsPopup.show();
+    } else if (app) {
+        app.stepManager.nextStep();
+    }
 }
 
 function prevStep() {

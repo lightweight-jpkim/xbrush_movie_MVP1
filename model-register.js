@@ -314,8 +314,28 @@ class ModelRegistrationApp {
      * Start registration process
      */
     startRegistration() {
-        this.showToast('모델 등록을 시작합니다!', 'success');
-        this.goToStep(2);
+        // Show terms and conditions popup first
+        if (window.TermsPopup) {
+            const termsPopup = new TermsPopup({
+                context: 'model-register',
+                onAgree: (agreements) => {
+                    // Store agreements
+                    this.registrationData.termsAgreements = agreements;
+                    this.registrationData.termsAgreedAt = new Date().toISOString();
+                    
+                    this.showToast('약관에 동의하셨습니다. 모델 등록을 시작합니다!', 'success');
+                    this.goToStep(2);
+                },
+                onCancel: () => {
+                    this.showToast('약관 동의가 필요합니다.', 'warning');
+                }
+            });
+            termsPopup.show();
+        } else {
+            // Fallback if terms popup not loaded
+            this.showToast('모델 등록을 시작합니다!', 'success');
+            this.goToStep(2);
+        }
     }
 
     /**
