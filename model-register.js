@@ -2012,6 +2012,41 @@ class ModelRegistrationApp {
                 }
             }
             
+            // Send Slack notification for new model registration
+            if (window.slackNotifier) {
+                const modelData = {
+                    id: registrationSummary.id || 'pending',
+                    personalInfo: {
+                        name: this.registrationData.personalInfo?.name || 'Unknown',
+                        categories: this.registrationData.personalInfo?.categories || []
+                    },
+                    status: 'pending_approval',
+                    approvalType: '신규 모델 등록'
+                };
+                
+                // Send registration notification
+                window.slackNotifier.notifyModelRegistration(modelData)
+                    .then(result => {
+                        if (result.success) {
+                            console.log('Slack notification sent successfully');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to send Slack notification:', error);
+                    });
+                
+                // Send approval request notification
+                window.slackNotifier.notifyApprovalRequest(modelData)
+                    .then(result => {
+                        if (result.success) {
+                            console.log('Approval request notification sent');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to send approval notification:', error);
+                    });
+            }
+            
             this.showToast('모델 등록이 성공적으로 완료되었습니다! 🎉', 'success');
             
             console.log('Registration completed:', registrationSummary);

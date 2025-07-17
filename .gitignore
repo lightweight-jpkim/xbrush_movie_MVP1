@@ -27,6 +27,11 @@ node_modules/
 .env.local
 .env.*.local
 
+# Configuration files with sensitive data
+js/slack-config.js
+js/firebase-config-real.js
+config/production.js
+
 # Build outputs
 dist/
 build/

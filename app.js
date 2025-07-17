@@ -719,6 +719,27 @@ class StepManager {
                     clearInterval(progressInterval);
                     this.dataService.updateField('videoCreated', true);
                     
+                    // Send Slack notification for movie creation
+                    if (window.slackNotifier) {
+                        const movieData = {
+                            projectName: this.dataService.selectedData.productName || 'Untitled',
+                            modelName: this.dataService.selectedData.modelName || 'Unknown Model',
+                            videoType: this.dataService.selectedData.format || 'Unknown Format',
+                            style: this.dataService.selectedData.style || 'Unknown Style',
+                            targetAudience: this.dataService.selectedData.targetAudience || 'Unknown'
+                        };
+                        
+                        window.slackNotifier.notifyMovieCreation(movieData)
+                            .then(result => {
+                                if (result.success) {
+                                    console.log('Movie creation notification sent to Slack');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Failed to send Slack notification:', error);
+                            });
+                    }
+                    
                     setTimeout(() => {
                         showToast('최종 영상 제작이 완료되었습니다! 🎬', 'success');
                         this.nextStep();
