@@ -7,12 +7,12 @@ window.AppConfig = {
     // Firebase Configuration
     getFirebaseConfig: function() {
         return {
-            apiKey: "AIzaSyDKEEwYE0xq_Pb4RXyEjxD4N4ahXQT9DF0",
-            authDomain: "xbrush-48b47.firebaseapp.com",
-            projectId: "xbrush-48b47",
-            storageBucket: "xbrush-48b47.appspot.com",
-            messagingSenderId: "613805779826",
-            appId: "1:613805779826:web:6a693cf4240b2cc0c3326f"
+            apiKey: "AIzaSyCsQzvoYysNkHcxR4NztCdqTVkD_HgtJEU",
+            authDomain: "xbrush-moviemaker-mvp.firebaseapp.com",
+            projectId: "xbrush-moviemaker-mvp",
+            storageBucket: "xbrush-moviemaker-mvp.firebasestorage.app",
+            messagingSenderId: "138732810619",
+            appId: "1:138732810619:web:a35c938d2d3b2880db4dde"
         };
     },
     

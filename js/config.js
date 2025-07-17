@@ -15,7 +15,7 @@
         // Firebase configuration
         // In production, these should be loaded from environment variables or a secure config service
         firebase: {
-            // Default configuration (public keys are okay to expose, but should still be in env vars for best practice)
+            // Updated to use xbrush-moviemaker-mvp
             apiKey: "AIzaSyCsQzvoYysNkHcxR4NztCdqTVkD_HgtJEU",
             authDomain: "xbrush-moviemaker-mvp.firebaseapp.com",
             projectId: "xbrush-moviemaker-mvp",
