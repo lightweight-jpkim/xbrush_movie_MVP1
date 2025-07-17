@@ -546,9 +546,14 @@
                     </div>
                 </div>
 
-                <div class="action-buttons">
-                    <button class="btn btn-outline" onclick="prevModelStep()">이전 단계</button>
+                <!-- Original buttons hidden -->
+                <div class="action-buttons hidden-for-fixed">
                     <button class="btn btn-primary" id="step2Next" onclick="nextModelStep()" disabled>계약 완료 및 다음 단계</button>
+                </div>
+                
+                <!-- Fixed bottom button -->
+                <div class="fixed-bottom-actions">
+                    <button class="btn btn-primary btn-full-width" id="step2NextFixed" onclick="nextModelStep()" disabled>계약 완료 및 다음 단계</button>
                 </div>
             </section>
 
@@ -621,9 +626,14 @@
                     </div>
                 </div>
 
-                <div class="action-buttons">
-                    <button class="btn btn-outline" onclick="prevModelStep()">이전 단계</button>
+                <!-- Original buttons hidden -->
+                <div class="action-buttons hidden-for-fixed">
                     <button class="btn btn-primary" id="step4Next" onclick="nextModelStep()" disabled>다음 단계</button>
+                </div>
+                
+                <!-- Fixed bottom button -->
+                <div class="fixed-bottom-actions">
+                    <button class="btn btn-primary btn-full-width" id="step4NextFixed" onclick="nextModelStep()" disabled>다음 단계</button>
                 </div>
             </section>
 
@@ -868,9 +878,14 @@
                     </div>
                 </div>
 
-                <div class="action-buttons">
-                    <button class="btn btn-outline" onclick="prevModelStep()">이전 단계</button>
+                <!-- Original buttons hidden -->
+                <div class="action-buttons hidden-for-fixed">
                     <button class="btn btn-primary" id="step5Next" onclick="nextModelStep()" disabled>다음 단계</button>
+                </div>
+                
+                <!-- Fixed bottom button -->
+                <div class="fixed-bottom-actions">
+                    <button class="btn btn-primary btn-full-width" id="step5NextFixed" onclick="nextModelStep()" disabled>다음 단계</button>
                 </div>
             </section>
 
@@ -964,9 +979,14 @@
                     <p class="admin-approval-note">테스트용 관리자 승인 기능입니다</p>
                 </div>
 
-                <div class="action-buttons">
-                    <button class="btn btn-outline" onclick="prevModelStep()">이전 단계</button>
+                <!-- Original buttons hidden -->
+                <div class="action-buttons hidden-for-fixed">
                     <button class="btn btn-primary" id="step6Next" onclick="startReviewProcess()" disabled>승인 대기</button>
+                </div>
+                
+                <!-- Fixed bottom button -->
+                <div class="fixed-bottom-actions">
+                    <button class="btn btn-primary btn-full-width" id="step6NextFixed" onclick="startReviewProcess()" disabled>승인 대기</button>
                 </div>
             </section>
 

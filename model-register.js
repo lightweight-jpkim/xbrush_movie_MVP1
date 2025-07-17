@@ -259,10 +259,14 @@ class ModelRegistrationApp {
                 
             case 6:
                 // Enable the review start button instead of auto-starting
+                this.updateButtonState('step6Next', true);
                 const reviewButton = document.getElementById('step6Next');
+                const fixedReviewButton = document.getElementById('step6NextFixed');
                 if (reviewButton) {
-                    reviewButton.disabled = false;
                     reviewButton.textContent = '검수 신청';
+                }
+                if (fixedReviewButton) {
+                    fixedReviewButton.textContent = '검수 신청';
                 }
                 this.showToast('등록 정보를 확인하고 검수를 신청하세요. 🔍', 'info');
                 break;
@@ -848,9 +852,10 @@ class ModelRegistrationApp {
      */
     checkContractCompletion() {
         const isComplete = this.signatureCanvas && this.signatureCanvas.hasSignature;
+        this.updateButtonState('step2Next', isComplete);
+        
         const nextButton = document.getElementById('step2Next');
         if (nextButton) {
-            nextButton.disabled = !isComplete;
             if (!isComplete) {
                 nextButton.title = "전자 서명을 완료해주세요";
             } else {
@@ -1198,9 +1203,10 @@ class ModelRegistrationApp {
      */
     checkPortfolioCompletion() {
         const hasImages = this.uploadedImages.length > 0;
+        this.updateButtonState('step4Next', hasImages);
+        
         const nextButton = document.getElementById('step4Next');
         if (nextButton) {
-            nextButton.disabled = !hasImages;
             if (!hasImages) {
                 nextButton.title = "포트폴리오 이미지를 업로드해주세요";
             } else {
@@ -1644,12 +1650,10 @@ class ModelRegistrationApp {
         const isComplete = modelName && modelIntro && categories.length > 0 && hasThumbnail;
         console.log('- Form is complete:', isComplete);
         
-        const nextButton = document.getElementById('step5Next');
-        if (nextButton) {
-            nextButton.disabled = !isComplete;
-            console.log('- Next button disabled:', nextButton.disabled);
-            
-            // Also save the form data if complete
+        this.updateButtonState('step5Next', isComplete);
+        console.log('- Next button disabled:', !isComplete);
+        
+        // Also save the form data if complete
             if (isComplete) {
                 this.registrationData.productInfo = {
                     name: modelName,
@@ -1791,10 +1795,14 @@ class ModelRegistrationApp {
         console.log('Starting review process...');
         
         // Disable the button to prevent multiple clicks
+        this.updateButtonState('step6Next', false);
         const startButton = document.getElementById('step6Next');
+        const fixedStartButton = document.getElementById('step6NextFixed');
         if (startButton) {
-            startButton.disabled = true;
             startButton.textContent = '검수 진행 중...';
+        }
+        if (fixedStartButton) {
+            fixedStartButton.textContent = '검수 진행 중...';
         }
         
         // Save model with pending status for admin approval
@@ -1881,10 +1889,14 @@ class ModelRegistrationApp {
             if (statusDesc) statusDesc.textContent = '검수가 완료되었습니다. 관리자 승인을 기다리고 있습니다.';
             
             // Keep the button disabled - only admin approval can enable it
+            this.updateButtonState('step6Next', false);
             const nextButton = document.getElementById('step6Next');
+            const fixedNextButton = document.getElementById('step6NextFixed');
             if (nextButton) {
-                nextButton.disabled = true;
                 nextButton.textContent = '승인 대기 중';
+            }
+            if (fixedNextButton) {
+                fixedNextButton.textContent = '승인 대기 중';
             }
             
             this.showToast('검수 신청이 완료되었습니다. 관리자 승인을 기다려주세요.', 'info');
@@ -2293,12 +2305,20 @@ class ModelRegistrationApp {
         if (statusDesc) statusDesc.textContent = '관리자 권한으로 모든 검수가 승인되었습니다.';
         
         // Enable next button
+        this.updateButtonState('step6Next', true);
         const nextButton = document.getElementById('step6Next');
+        const fixedNextButton = document.getElementById('step6NextFixed');
         if (nextButton) {
-            nextButton.disabled = false;
             nextButton.textContent = '최종 단계로 이동';
             // Remove any existing onclick handler and use the default one
             nextButton.onclick = () => {
+                console.log('Moving to final step from admin approval');
+                this.nextModelStep();
+            };
+        }
+        if (fixedNextButton) {
+            fixedNextButton.textContent = '최종 단계로 이동';
+            fixedNextButton.onclick = () => {
                 console.log('Moving to final step from admin approval');
                 this.nextModelStep();
             };
