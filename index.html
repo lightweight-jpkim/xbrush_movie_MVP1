@@ -1078,9 +1078,30 @@
     <script src="js/navigation-manager.js"></script>
     <script src="js/url-state-manager.js"></script>
     
-    <!-- Slack Configuration (create from slack-config.example.js) -->
-    <script src="js/slack-config.js"></script>
-    <script src="js/slack-notifier.js"></script>
+    <!-- Slack Configuration -->
+    <script>
+        // Load appropriate config based on environment
+        var configScript = document.createElement('script');
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            configScript.src = 'js/slack-config.js'; // Local development config
+        } else {
+            configScript.src = 'js/slack-config-live.js'; // Live server config
+        }
+        configScript.onerror = function() {
+            console.warn('Slack config not found, notifications will be disabled');
+            // Load notifier anyway
+            var notifierScript = document.createElement('script');
+            notifierScript.src = 'js/slack-notifier.js';
+            document.head.appendChild(notifierScript);
+        };
+        configScript.onload = function() {
+            // Load notifier after config is loaded
+            var notifierScript = document.createElement('script');
+            notifierScript.src = 'js/slack-notifier.js';
+            document.head.appendChild(notifierScript);
+        };
+        document.head.appendChild(configScript);
+    </script>
     <script src="js/model-navigation.js"></script>
     
     <script src="app.js"></script>
