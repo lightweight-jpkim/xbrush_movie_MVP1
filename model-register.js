@@ -1665,9 +1665,6 @@ class ModelRegistrationApp {
                 };
                 console.log('Product info saved:', this.registrationData.productInfo);
             }
-        } else {
-            console.error('Step 5 next button not found');
-        }
     }
 
     /**
