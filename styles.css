@@ -1081,7 +1081,7 @@ body {
 /* Toast Notifications */
 .toast {
     position: fixed;
-    top: 100px;
+    bottom: 20px;
     right: 20px;
     padding: 12px 20px;
     border-radius: 8px;
@@ -1116,6 +1116,28 @@ body {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+@keyframes slideInUp {
+    0% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutDown {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
 }
 
 @keyframes pulse {
@@ -1592,7 +1614,7 @@ body {
     .toast {
         left: 12px;
         right: 12px;
-        top: 90px;
+        bottom: 120px; /* Higher on mobile to avoid fixed bottom button */
         max-width: none;
     }
     

@@ -58,7 +58,7 @@ function showToast(message, type = 'info') {
         // Add styles
         Object.assign(toast.style, {
             position: 'fixed',
-            top: '20px',
+            bottom: '20px',
             right: '20px',
             background: type === 'error' ? '#e53e3e' : 
                        type === 'success' ? '#38a169' : 
@@ -71,7 +71,7 @@ function showToast(message, type = 'info') {
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             zIndex: '10000',
             maxWidth: '300px',
-            animation: 'slideInRight 0.3s ease-out'
+            animation: 'slideInUp 0.3s ease-out'
         });
         
         document.body.appendChild(toast);
@@ -79,7 +79,7 @@ function showToast(message, type = 'info') {
         // Auto-remove after delay
         setTimeout(() => {
             if (toast.parentElement) {
-                toast.style.animation = 'slideOutRight 0.3s ease-out';
+                toast.style.animation = 'slideOutDown 0.3s ease-out';
                 setTimeout(() => {
                     if (toast.parentElement) {
                         toast.remove();
