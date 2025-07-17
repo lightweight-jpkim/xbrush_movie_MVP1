@@ -3044,7 +3044,6 @@ function initializeEnhancedImageSelection() {
  * Load and display featured models on the main page
  */
 async function loadFeaturedModels() {
-    // SIMPLIFIED VERSION WITH HARDCODED SAMPLE MODELS
     const featuredModelsGrid = document.getElementById('featuredModelsGrid');
     const modelCount = document.getElementById('modelCount');
     
@@ -3053,55 +3052,10 @@ async function loadFeaturedModels() {
         return;
     }
     
-    // First show sample models immediately
-    featuredModelsGrid.innerHTML = `
-        <div class="featured-model-card" style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
-            <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
-                <span style="font-size: 60px;">👤</span>
-            </div>
-            <div class="featured-model-info">
-                <div class="featured-model-name">샘플 모델 1</div>
-                <div class="featured-model-intro">프로페셔널 AI 모델</div>
-            </div>
-        </div>
-        <div class="featured-model-card" style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
-            <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center;">
-                <span style="font-size: 60px;">👥</span>
-            </div>
-            <div class="featured-model-info">
-                <div class="featured-model-name">샘플 모델 2</div>
-                <div class="featured-model-intro">크리에이티브 전문가</div>
-            </div>
-        </div>
-        <div class="featured-model-card" style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
-            <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center;">
-                <span style="font-size: 60px;">🎭</span>
-            </div>
-            <div class="featured-model-info">
-                <div class="featured-model-name">샘플 모델 3</div>
-                <div class="featured-model-intro">광고 전문 모델</div>
-            </div>
-        </div>
-        <div class="featured-model-card" style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
-            <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); display: flex; align-items: center; justify-content: center;">
-                <span style="font-size: 60px;">✨</span>
-            </div>
-            <div class="featured-model-info">
-                <div class="featured-model-name">샘플 모델 4</div>
-                <div class="featured-model-intro">라이프스타일 모델</div>
-            </div>
-        </div>
-    `;
+    // Show loading state (no sample models)
+    featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>모델을 불러오는 중...</p></div>';
     
-    if (modelCount) {
-        modelCount.textContent = '총 4개 (샘플)';
-    }
-    
-    // Now try to load real models
     try {
-        // Show loading state
-        featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>모델을 불러오는 중...</p></div>';
-        
         // Wait for Firebase to be ready
         console.log('[Featured Models] Waiting for Firebase...');
         await waitForFirebase();
