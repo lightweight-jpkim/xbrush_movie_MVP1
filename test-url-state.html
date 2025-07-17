@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL State Management Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background: #667eea;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .status {
+            background: #e0e7ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .log {
+            background: #f7fafc;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            color: #22c55e;
+        }
+        .error {
+            color: #ef4444;
+        }
+        .warning {
+            color: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <h1>URL State Management Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Movie Making Steps</h2>
+        <div class="test-controls">
+            <button onclick="testMovieStep(1)">Step 1</button>
+            <button onclick="testMovieStep(2)">Step 2</button>
+            <button onclick="testMovieStep(3)">Step 3</button>
+            <button onclick="testMovieStep(4)">Step 4</button>
+            <button onclick="testMovieStep(5)">Step 5</button>
+            <button onclick="testMovieStep(6)">Step 6 (Restricted)</button>
+            <button onclick="testMovieStep(7)">Step 7 (Restricted)</button>
+        </div>
+        <div class="status" id="movieStatus">Ready to test movie making steps</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Model Registration Steps</h2>
+        <div class="test-controls">
+            <button onclick="testModelStep(1)">Step 1</button>
+            <button onclick="testModelStep(2)">Step 2</button>
+            <button onclick="testModelStep(3)">Step 3</button>
+            <button onclick="testModelStep(4)">Step 4</button>
+            <button onclick="testModelStep(5)">Step 5</button>
+            <button onclick="testModelStep(6)">Step 6</button>
+        </div>
+        <div class="status" id="modelStatus">Ready to test model registration steps</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Pagination</h2>
+        <div class="test-controls">
+            <button onclick="testPagination(1)">Page 1</button>
+            <button onclick="testPagination(2)">Page 2</button>
+            <button onclick="testPagination(3)">Page 3</button>
+            <button onclick="testPagination(5)">Page 5</button>
+            <button onclick="testPagination(10)">Page 10</button>
+        </div>
+        <div class="status" id="paginationStatus">Ready to test pagination</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Browser Navigation</h2>
+        <div class="test-controls">
+            <button onclick="window.history.back()">Browser Back</button>
+            <button onclick="window.history.forward()">Browser Forward</button>
+            <button onclick="location.reload()">Reload Page</button>
+        </div>
+        <div class="status" id="browserStatus">Use browser back/forward buttons to test URL state</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Event Log</h2>
+        <div class="log" id="eventLog"></div>
+    </div>
+    
+    <script src="js/url-state-manager.js"></script>
+    <script>
+        // Initialize URL state manager
+        const urlStateManager = new URLStateManager();
+        window.urlStateManager = urlStateManager;
+        
+        // Log function
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('eventLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'error' : type === 'warning' ? 'warning' : type === 'success' ? 'success' : '';
+            logDiv.innerHTML = `<div class="${color}">[${timestamp}] ${message}</div>` + logDiv.innerHTML;
+        }
+        
+        // Test movie step navigation
+        function testMovieStep(step) {
+            log(`Testing movie step ${step}`);
+            
+            // Simulate step restriction for steps 6+
+            const currentStep = urlStateManager.getState('movieStep') || 1;
+            if (currentStep >= 6 && step < currentStep) {
+                log(`⚠️ Cannot go back from step ${currentStep} to step ${step} (restricted)`, 'warning');
+                document.getElementById('movieStatus').innerHTML = `<span class="warning">Blocked: Cannot go back from step ${currentStep} to ${step}</span>`;
+                return;
+            }
+            
+            urlStateManager.updateState({ movieStep: step });
+            document.getElementById('movieStatus').innerHTML = `<span class="success">✓ Navigated to movie step ${step}</span>`;
+            log(`Successfully navigated to movie step ${step}`, 'success');
+        }
+        
+        // Test model step navigation
+        function testModelStep(step) {
+            log(`Testing model step ${step}`);
+            urlStateManager.updateState({ step: step });
+            document.getElementById('modelStatus').innerHTML = `<span class="success">✓ Navigated to model step ${step}</span>`;
+            log(`Successfully navigated to model step ${step}`, 'success');
+        }
+        
+        // Test pagination
+        function testPagination(page) {
+            log(`Testing pagination page ${page}`);
+            urlStateManager.setPage(page);
+            document.getElementById('paginationStatus').innerHTML = `<span class="success">✓ Navigated to page ${page}</span>`;
+            log(`Successfully navigated to page ${page}`, 'success');
+        }
+        
+        // Listen for URL state changes
+        urlStateManager.addListener('movieStep', (step) => {
+            log(`URL state changed: movieStep = ${step}`);
+            document.getElementById('movieStatus').innerHTML = `Movie step ${step} (from URL)`;
+        });
+        
+        urlStateManager.addListener('step', (step) => {
+            log(`URL state changed: step = ${step}`);
+            document.getElementById('modelStatus').innerHTML = `Model step ${step} (from URL)`;
+        });
+        
+        urlStateManager.addListener('page', (page) => {
+            log(`URL state changed: page = ${page}`);
+            document.getElementById('paginationStatus').innerHTML = `Page ${page} (from URL)`;
+        });
+        
+        // Listen for browser navigation
+        window.addEventListener('popstate', (e) => {
+            log('Browser navigation detected (popstate)', 'warning');
+            document.getElementById('browserStatus').innerHTML = '<span class="warning">Browser navigation detected</span>';
+        });
+        
+        // Check initial state
+        const initialState = urlStateManager.getCurrentState();
+        if (Object.keys(initialState).length > 0) {
+            log(`Initial URL state: ${JSON.stringify(initialState)}`, 'success');
+        }
+    </script>
+</body>
+</html>

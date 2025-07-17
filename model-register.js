@@ -187,13 +187,18 @@ class ModelRegistrationApp {
     /**
      * Go to specific step
      */
-    goToStep(stepNumber) {
+    goToStep(stepNumber, updateURL = true) {
         if (stepNumber < 1 || stepNumber > this.totalSteps) return;
         
         // Validate step progression
         if (stepNumber > this.currentStep + 1) {
             this.showToast('이전 단계를 먼저 완료해주세요.', 'warning');
             return;
+        }
+
+        // Update URL state
+        if (updateURL && window.urlStateManager) {
+            window.urlStateManager.updateState({ step: stepNumber });
         }
 
         // Hide current step
@@ -2807,6 +2812,32 @@ document.addEventListener('DOMContentLoaded', () => {
     modelApp = new ModelRegistrationApp();
     window.modelApp = modelApp; // Make it globally accessible
     console.log('Model Registration App initialized and stored globally');
+    
+    // Set up URL state management for steps
+    if (window.urlStateManager) {
+        // Listen for step changes from URL (browser back/forward)
+        window.urlStateManager.addListener('step', function(step) {
+            if (step && modelApp) {
+                const stepNumber = parseInt(step, 10);
+                if (!isNaN(stepNumber) && stepNumber !== modelApp.currentStep) {
+                    // Use goToStep with updateURL=false to prevent infinite loop
+                    modelApp.goToStep(stepNumber, false);
+                }
+            }
+        });
+        
+        // Check initial URL state
+        const initialStep = window.urlStateManager.getState('step');
+        if (initialStep && modelApp) {
+            const stepNumber = parseInt(initialStep, 10);
+            if (!isNaN(stepNumber) && stepNumber > 1 && stepNumber <= modelApp.totalSteps) {
+                // Navigate to the step from URL (if valid and not step 1)
+                setTimeout(() => {
+                    modelApp.goToStep(stepNumber, false);
+                }, 100);
+            }
+        }
+    }
 });
 
 // Global debug function

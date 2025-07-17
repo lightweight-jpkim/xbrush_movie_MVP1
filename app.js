@@ -412,7 +412,7 @@ class StepManager {
     /**
      * Navigate to a specific step
      */
-    goToStep(step) {
+    goToStep(step, updateURL = true) {
         try {
             // Validate step number
             if (step < 1 || step > STEPS.TOTAL) {
@@ -420,10 +420,25 @@ class StepManager {
                 return;
             }
 
+            // Check restriction: can't go back after VIDEO_CREATION (step 6)
+            if (this.currentStep >= STEPS.VIDEO_CREATION && step < this.currentStep) {
+                showToast('⚠️ 이미지 생성 이후에는 이전 단계로 돌아갈 수 없습니다.', 'warning');
+                // If this was triggered by browser back, we need to update URL to current step
+                if (!updateURL && window.urlStateManager) {
+                    window.urlStateManager.updateState({ step: this.currentStep }, true);
+                }
+                return;
+            }
+
             // Check if previous steps are completed
             if (step > 1 && !this.dataService.isStepCompleted(step - 1)) {
                 showToast('이전 단계를 먼저 완료해주세요.', 'warning');
                 return;
+            }
+
+            // Update URL state
+            if (updateURL && window.urlStateManager) {
+                window.urlStateManager.updateState({ step: step });
             }
 
             // Deactivate current step
@@ -1149,6 +1164,32 @@ let app; // Global app instance
 function initializeApp() {
     try {
         app = new VideoCreationApp();
+        
+        // Set up URL state management for steps
+        if (window.urlStateManager) {
+            // Listen for step changes from URL (browser back/forward)
+            window.urlStateManager.addListener('step', function(step) {
+                if (step && app && app.stepManager) {
+                    const stepNumber = parseInt(step, 10);
+                    if (!isNaN(stepNumber) && stepNumber !== app.stepManager.currentStep) {
+                        // Use goToStep with updateURL=false to prevent infinite loop
+                        app.stepManager.goToStep(stepNumber, false);
+                    }
+                }
+            });
+            
+            // Check initial URL state
+            const initialStep = window.urlStateManager.getState('step');
+            if (initialStep && app && app.stepManager) {
+                const stepNumber = parseInt(initialStep, 10);
+                if (!isNaN(stepNumber) && stepNumber > 1 && stepNumber <= STEPS.TOTAL) {
+                    // Navigate to the step from URL (if valid and not step 1)
+                    setTimeout(() => {
+                        app.stepManager.goToStep(stepNumber, false);
+                    }, 100);
+                }
+            }
+        }
         
         // Check if we're coming from model showcase with a selected model
         const skipToStep2 = sessionStorage.getItem('skipToStep2');
