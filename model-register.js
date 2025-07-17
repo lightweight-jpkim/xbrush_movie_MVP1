@@ -1769,7 +1769,9 @@ class ModelRegistrationApp {
                 id: `model-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 registrationDate: new Date().toISOString(),
                 status: 'pending', // Set as pending for admin review
-                createdAt: new Date().toISOString(),
+                createdAt: window.firebase && window.firebase.firestore ? 
+                    firebase.firestore.FieldValue.serverTimestamp() : 
+                    new Date().toISOString(),
                 
                 // Basic info from registration
                 personalInfo: {
@@ -1802,10 +1804,27 @@ class ModelRegistrationApp {
             
             // Save to Firebase
             if (window.modelStorageAdapter) {
+                console.log('=== SAVING PENDING MODEL FOR APPROVAL ===');
+                console.log('Model data:', JSON.stringify(pendingModelData, null, 2));
+                
                 const modelId = await window.modelStorageAdapter.saveModel(pendingModelData);
-                console.log('Pending model saved with ID:', modelId);
+                console.log('Pending model saved successfully!');
+                console.log('Model ID:', modelId);
+                console.log('Status:', pendingModelData.status);
+                console.log('Firebase project:', window.firebase?.app()?.options?.projectId);
+                
                 this.pendingModelId = modelId; // Store for later use
                 this.showToast('검수 신청이 등록되었습니다.', 'success');
+                
+                // Verify the model was saved
+                const savedModel = await window.modelStorageAdapter.getModel(modelId);
+                console.log('Verification - Model found in DB:', !!savedModel);
+                if (savedModel) {
+                    console.log('Saved model status:', savedModel.status);
+                }
+            } else {
+                console.error('ModelStorageAdapter not available!');
+                this.showToast('Firebase 연결 오류가 발생했습니다.', 'error');
             }
         } catch (error) {
             console.error('Failed to save pending model:', error);

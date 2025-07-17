@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Pending Models</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .model-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .status-pending {
+            color: orange;
+            font-weight: bold;
+        }
+        .status-active {
+            color: green;
+            font-weight: bold;
+        }
+        .debug-log {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug Pending Models</h1>
+    
+    <div class="section">
+        <h2>Debug Console</h2>
+        <button onclick="checkFirebaseConnection()">Check Firebase Connection</button>
+        <button onclick="loadAllModels()">Load All Models</button>
+        <button onclick="loadPendingModels()">Load Pending Models</button>
+        <button onclick="createTestPendingModel()">Create Test Pending Model</button>
+        <button onclick="clearLogs()">Clear Logs</button>
+        <div id="debugLog" class="debug-log"></div>
+    </div>
+    
+    <div class="section">
+        <h2>All Models in Database</h2>
+        <div id="allModels"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Pending Models Only</h2>
+        <div id="pendingModels"></div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/app-namespace.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-model-storage.js"></script>
+    <script src="js/model-storage-adapter.js"></script>
+
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('debugLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const colorMap = {
+                info: '#0f0',
+                error: '#f00',
+                warning: '#ff0',
+                success: '#0ff'
+            };
+            const color = colorMap[type] || '#fff';
+            logDiv.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[${type}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('debugLog').innerHTML = '';
+            log('Logs cleared');
+        }
+
+        async function checkFirebaseConnection() {
+            log('Checking Firebase connection...');
+            
+            // Check basic Firebase
+            if (!window.firebase) {
+                log('Firebase SDK not loaded!', 'error');
+                return;
+            }
+            log('Firebase SDK loaded ✓', 'success');
+            
+            // Check Firestore
+            if (!window.firebaseDB) {
+                log('Firestore not initialized!', 'error');
+                return;
+            }
+            log('Firestore initialized ✓', 'success');
+            
+            // Check model storage adapter
+            if (!window.modelStorageAdapter) {
+                log('Model storage adapter not initialized!', 'error');
+                return;
+            }
+            log('Model storage adapter initialized ✓', 'success');
+            
+            // Check Firebase model storage
+            if (!window.firebaseModelStorage) {
+                log('Firebase model storage not initialized!', 'error');
+                return;
+            }
+            log('Firebase model storage initialized ✓', 'success');
+            
+            // Test Firestore connection
+            try {
+                log('Testing Firestore connection...');
+                const testDoc = await window.firebaseDB.collection('test').doc('test').get();
+                log('Firestore connection successful ✓', 'success');
+            } catch (error) {
+                log(`Firestore connection error: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadAllModels() {
+            log('Loading all models from Firebase...');
+            
+            try {
+                const models = await window.modelStorageAdapter.getAllModels();
+                log(`Found ${models.length} total models`, 'info');
+                
+                const allModelsDiv = document.getElementById('allModels');
+                allModelsDiv.innerHTML = '';
+                
+                if (models.length === 0) {
+                    allModelsDiv.innerHTML = '<p>No models found in database</p>';
+                    return;
+                }
+                
+                models.forEach((model, index) => {
+                    log(`Model ${index + 1}: ID=${model.id}, Status=${model.status}, Name=${model.personalInfo?.name || model.name || 'Unknown'}`);
+                    
+                    const modelCard = document.createElement('div');
+                    modelCard.className = 'model-card';
+                    modelCard.innerHTML = `
+                        <h3>Model ${index + 1}</h3>
+                        <p><strong>ID:</strong> ${model.id}</p>
+                        <p><strong>Status:</strong> <span class="status-${model.status}">${model.status || 'undefined'}</span></p>
+                        <p><strong>Name:</strong> ${model.personalInfo?.name || model.name || 'Unknown'}</p>
+                        <p><strong>Email:</strong> ${model.personalInfo?.email || model.email || 'Unknown'}</p>
+                        <p><strong>Created:</strong> ${model.createdAt || model.registrationDate || 'Unknown'}</p>
+                        <details>
+                            <summary>Full Data</summary>
+                            <pre>${JSON.stringify(model, null, 2)}</pre>
+                        </details>
+                    `;
+                    allModelsDiv.appendChild(modelCard);
+                });
+                
+                // Count by status
+                const statusCounts = {};
+                models.forEach(model => {
+                    const status = model.status || 'undefined';
+                    statusCounts[status] = (statusCounts[status] || 0) + 1;
+                });
+                
+                log('Status breakdown:', 'info');
+                Object.entries(statusCounts).forEach(([status, count]) => {
+                    log(`  ${status}: ${count} models`);
+                });
+                
+            } catch (error) {
+                log(`Error loading models: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        async function loadPendingModels() {
+            log('Loading pending models specifically...');
+            
+            try {
+                // Method 1: Using getPendingModels
+                log('Method 1: Using getPendingModels()...');
+                const pendingModels = await window.modelStorageAdapter.getPendingModels();
+                log(`getPendingModels() returned ${pendingModels.length} models`, 'info');
+                
+                // Method 2: Manual filter
+                log('Method 2: Manual filter from getAllModels()...');
+                const allModels = await window.modelStorageAdapter.getAllModels();
+                const filteredPending = allModels.filter(m => m.status === 'pending');
+                log(`Manual filter found ${filteredPending.length} pending models`, 'info');
+                
+                // Method 3: Direct Firestore query
+                log('Method 3: Direct Firestore query...');
+                const snapshot = await window.firebaseDB.collection('models')
+                    .where('status', '==', 'pending')
+                    .get();
+                log(`Direct Firestore query found ${snapshot.size} pending models`, 'info');
+                
+                const pendingModelsDiv = document.getElementById('pendingModels');
+                pendingModelsDiv.innerHTML = '';
+                
+                if (filteredPending.length === 0) {
+                    pendingModelsDiv.innerHTML = '<p>No pending models found</p>';
+                } else {
+                    filteredPending.forEach((model, index) => {
+                        const modelCard = document.createElement('div');
+                        modelCard.className = 'model-card';
+                        modelCard.innerHTML = `
+                            <h3>Pending Model ${index + 1}</h3>
+                            <p><strong>ID:</strong> ${model.id}</p>
+                            <p><strong>Status:</strong> <span class="status-pending">${model.status}</span></p>
+                            <p><strong>Name:</strong> ${model.personalInfo?.name || model.name || 'Unknown'}</p>
+                            <p><strong>Email:</strong> ${model.personalInfo?.email || model.email || 'Unknown'}</p>
+                            <p><strong>Created:</strong> ${model.createdAt || model.registrationDate || 'Unknown'}</p>
+                            <button onclick="approveModel('${model.id}')">Approve</button>
+                            <details>
+                                <summary>Full Data</summary>
+                                <pre>${JSON.stringify(model, null, 2)}</pre>
+                            </details>
+                        `;
+                        pendingModelsDiv.appendChild(modelCard);
+                    });
+                }
+                
+            } catch (error) {
+                log(`Error loading pending models: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        async function createTestPendingModel() {
+            log('Creating test pending model...');
+            
+            const testModel = {
+                id: `test-model-${Date.now()}`,
+                registrationDate: new Date().toISOString(),
+                status: 'pending',
+                createdAt: new Date().toISOString(),
+                personalInfo: {
+                    name: '테스트 펜딩 모델',
+                    email: 'test-pending@example.com',
+                    phone: '010-1234-5678',
+                    intro: '이것은 테스트 펜딩 모델입니다',
+                    categories: ['fashion', 'beauty'],
+                    thumbnailUrl: ''
+                },
+                contract: {
+                    agreed: true,
+                    secondConfirm: false
+                },
+                tier: 'basic',
+                testModel: true
+            };
+            
+            try {
+                log(`Creating model with ID: ${testModel.id}`);
+                log(`Model status: ${testModel.status}`);
+                
+                const modelId = await window.modelStorageAdapter.saveModel(testModel);
+                log(`Test model created successfully with ID: ${modelId}`, 'success');
+                
+                // Verify it was saved
+                const savedModel = await window.modelStorageAdapter.getModel(modelId);
+                if (savedModel) {
+                    log(`Verification: Model saved with status: ${savedModel.status}`, 'success');
+                } else {
+                    log('Verification failed: Model not found after save', 'error');
+                }
+                
+                // Reload the lists
+                await loadAllModels();
+                await loadPendingModels();
+                
+            } catch (error) {
+                log(`Error creating test model: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        async function approveModel(modelId) {
+            log(`Approving model ${modelId}...`);
+            
+            try {
+                await window.modelStorageAdapter.updateModel(modelId, { 
+                    status: 'active',
+                    approvedAt: new Date().toISOString()
+                });
+                log(`Model ${modelId} approved successfully`, 'success');
+                
+                // Reload the lists
+                await loadAllModels();
+                await loadPendingModels();
+                
+            } catch (error) {
+                log(`Error approving model: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', async () => {
+            log('Page loaded, waiting for Firebase...');
+            
+            // Wait for Firebase
+            let retries = 0;
+            while (retries < 20) {
+                if (window.firebaseDB && window.modelStorageAdapter) {
+                    log('Firebase services ready!', 'success');
+                    await checkFirebaseConnection();
+                    await loadAllModels();
+                    await loadPendingModels();
+                    break;
+                }
+                await new Promise(resolve => setTimeout(resolve, 500));
+                retries++;
+            }
+            
+            if (retries >= 20) {
+                log('Failed to initialize Firebase after 10 seconds', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

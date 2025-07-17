@@ -1148,6 +1148,27 @@
                 }
                 
                 const models = await window.modelStorageAdapter.getAllModels();
+                console.log('=== ADMIN: LOADED MODELS ===');
+                console.log('Total models:', models.length);
+                console.log('Firebase project:', window.firebase?.app()?.options?.projectId);
+                
+                // Log status breakdown
+                const statusCount = {};
+                models.forEach(model => {
+                    const status = model.status || 'no-status';
+                    statusCount[status] = (statusCount[status] || 0) + 1;
+                });
+                console.log('Status breakdown:', statusCount);
+                
+                // Log pending models specifically
+                const pendingModels = models.filter(m => m.status === 'pending');
+                console.log('Pending models:', pendingModels.length);
+                if (pendingModels.length > 0) {
+                    pendingModels.forEach(m => {
+                        console.log(`- ${m.personalInfo?.name || m.name} (ID: ${m.id})`);
+                    });
+                }
+                
                 displayModels(models);
             } catch (error) {
                 console.error('Error loading models:', error);
