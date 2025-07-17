@@ -30,6 +30,9 @@ class VideoCreationApp {
                 initializeCurrentImageComparison();
             }, 100);
             
+            // Check initial button states
+            this.stepManager.checkNextButton();
+            
             // Removed startup toast notification for cleaner UX
         } catch (error) {
             handleError(error, 'Application initialization');

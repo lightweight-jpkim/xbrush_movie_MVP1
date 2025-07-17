@@ -257,6 +257,24 @@ body {
     box-shadow: none !important;
 }
 
+/* Also style disabled attribute */
+.btn:disabled,
+.btn-primary:disabled {
+    background: #e2e8f0 !important;
+    color: #a0aec0 !important;
+    cursor: not-allowed !important;
+    border: 2px solid #e2e8f0 !important;
+    box-shadow: none !important;
+    opacity: 0.6;
+}
+
+.btn:disabled:hover,
+.btn-primary:disabled:hover {
+    background: #e2e8f0 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
 /* Focus State for Accessibility */
 .btn:focus {
     outline: none;
@@ -1063,14 +1081,14 @@ body {
 /* Toast Notifications */
 .toast {
     position: fixed;
-    top: 20px;
+    top: 80px;
     right: 20px;
     padding: 12px 20px;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 10000;
+    z-index: 9999;
     max-width: 300px;
 }
 
@@ -1574,7 +1592,7 @@ body {
     .toast {
         left: 12px;
         right: 12px;
-        top: 12px;
+        top: 70px;
         max-width: none;
     }
     
