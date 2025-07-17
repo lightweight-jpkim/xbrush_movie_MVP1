@@ -605,6 +605,11 @@ class StepManager {
             
             if (nextButton) {
                 this.uiController.updateButtonState(`step${this.currentStep}Next`, isCompleted);
+                // Also update the fixed button if it exists
+                const fixedButton = safeGetElement(`step${this.currentStep}NextFixed`);
+                if (fixedButton) {
+                    this.uiController.updateButtonState(`step${this.currentStep}NextFixed`, isCompleted);
+                }
             }
         } catch (error) {
             handleError(error, 'Next button check');

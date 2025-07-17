@@ -1081,7 +1081,7 @@ body {
 /* Toast Notifications */
 .toast {
     position: fixed;
-    top: 80px;
+    top: 100px;
     right: 20px;
     padding: 12px 20px;
     border-radius: 8px;
@@ -1592,7 +1592,7 @@ body {
     .toast {
         left: 12px;
         right: 12px;
-        top: 70px;
+        top: 90px;
         max-width: none;
     }
     

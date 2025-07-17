@@ -1,0 +1,68 @@
+/* Fixed Bottom Button Styles */
+
+/* Container for fixed bottom buttons */
+.fixed-bottom-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    padding: 16px;
+    z-index: 100;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Full width button style */
+.btn-full-width {
+    width: 100%;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+/* Ensure proper spacing when fixed bottom is present */
+.has-fixed-bottom {
+    padding-bottom: 100px; /* Space for fixed button container */
+}
+
+/* Hide original action buttons when using fixed bottom */
+.action-buttons.hidden-for-fixed {
+    display: none;
+}
+
+/* Style for step 1 (no previous button) */
+.fixed-bottom-actions.step-first {
+    text-align: center;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .fixed-bottom-actions {
+        padding: 12px;
+    }
+    
+    .btn-full-width {
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+    
+    .has-fixed-bottom {
+        padding-bottom: 80px;
+    }
+}
+
+/* Desktop - center the button with max width */
+@media (min-width: 769px) {
+    .fixed-bottom-actions {
+        padding: 20px;
+    }
+    
+    .fixed-bottom-actions .btn-full-width {
+        max-width: 600px;
+        margin: 0 auto;
+        display: block;
+    }
+}

@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="model-showcase.css">
     <link rel="stylesheet" href="model-register.css">
     <link rel="stylesheet" href="css/terms-popup.css">
+    <link rel="stylesheet" href="css/fixed-bottom-button.css">
     <link rel="stylesheet" href="css/mobile-overrides.css"><!-- Load last for proper cascade -->
     
     <!-- SEO Meta Tags -->
@@ -29,7 +30,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
-<body>
+<body class="has-fixed-bottom">
     <!-- Site Header -->
     <header class="site-header">
         <div class="header-container">
@@ -323,9 +324,14 @@
                     </div>
                 </div>
 
-                <div class="action-buttons">
-                    <button class="btn btn-outline" onclick="prevModelStep()">이전 단계</button>
+                <!-- Original buttons hidden -->
+                <div class="action-buttons hidden-for-fixed">
                     <button class="btn btn-primary" id="step1Next" onclick="nextModelStep()" disabled>다음 단계</button>
+                </div>
+                
+                <!-- Fixed bottom button -->
+                <div class="fixed-bottom-actions step-first">
+                    <button class="btn btn-primary btn-full-width" id="step1NextFixed" onclick="nextModelStep()" disabled>다음 단계</button>
                 </div>
             </section>
 

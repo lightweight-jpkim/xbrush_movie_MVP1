@@ -858,6 +858,21 @@ class ModelRegistrationApp {
             }
         }
     }
+    
+    /**
+     * Update button state for both regular and fixed buttons
+     */
+    updateButtonState(buttonId, enabled) {
+        const button = document.getElementById(buttonId);
+        const fixedButton = document.getElementById(buttonId + 'Fixed');
+        
+        if (button) {
+            button.disabled = !enabled;
+        }
+        if (fixedButton) {
+            fixedButton.disabled = !enabled;
+        }
+    }
 
     /**
      * Validate contract completion
