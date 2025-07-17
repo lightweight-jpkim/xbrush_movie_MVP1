@@ -1421,6 +1421,14 @@ function initializeCurrentImageComparison() {
  * Navigation functions
  */
 function nextStep() {
+    console.log('nextStep called', {
+        app: !!app,
+        currentStep: app?.stepManager?.currentStep,
+        TermsPopup: !!window.TermsPopup,
+        termsAgreed: app?.dataService?.selectedData?.termsAgreed,
+        model: app?.dataService?.selectedData?.model
+    });
+    
     // Show terms popup when moving from step 1 to step 2 (after model selection)
     if (app && app.stepManager.currentStep === 1 && window.TermsPopup && !app.dataService.selectedData.termsAgreed) {
         // Check if model is selected first
@@ -1429,9 +1437,11 @@ function nextStep() {
             return;
         }
         
+        console.log('Showing terms popup for movie maker');
         const termsPopup = new TermsPopup({
             context: 'movie-maker',
             onAgree: (agreements) => {
+                console.log('Terms agreed', agreements);
                 // Store agreements in app data
                 if (app.dataService) {
                     app.dataService.selectedData.termsAgreements = agreements;
@@ -1443,11 +1453,13 @@ function nextStep() {
                 app.stepManager.nextStep();
             },
             onCancel: () => {
+                console.log('Terms cancelled');
                 showToast('약관 동의가 필요합니다.', 'warning');
             }
         });
         termsPopup.show();
     } else if (app) {
+        console.log('Proceeding to next step without terms popup');
         app.stepManager.nextStep();
     }
 }
