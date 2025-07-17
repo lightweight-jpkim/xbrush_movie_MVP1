@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+dist/
+build/
+.firebase/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-*
+
+# Git
+.git/
+.gitignore
+
+# Firebase
+firebase-debug.log
+.firebaserc
+
+# Minified files
+*.min.js
+*.min.css
+
+# Vendor files
+vendor/
+lib/
+
+# Images and media
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.svg
+*.ico
+*.mp4
+*.webm
+*.ogg
+*.mp3
+*.wav
+
+# Other
+*.md
+*.backup
+*.bak
+*.tmp
+*.temp
