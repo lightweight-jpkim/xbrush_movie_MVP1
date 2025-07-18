@@ -954,6 +954,83 @@ class StepManager {
     }
 
     /**
+     * Start video regeneration progress
+     */
+    startVideoRegenerationProgress() {
+        try {
+            // Show video creation progress section
+            const videoCreationProgress = document.getElementById('videoCreationProgress');
+            const imagePreviewSection = document.getElementById('imagePreviewSection');
+            const videoCutSelection = document.getElementById('videoCutSelection');
+            
+            if (videoCreationProgress) {
+                videoCreationProgress.style.display = 'block';
+            }
+            if (imagePreviewSection) {
+                imagePreviewSection.style.display = 'none';
+            }
+            if (videoCutSelection) {
+                videoCutSelection.style.display = 'none';
+            }
+            
+            // Start video regeneration with progress tracking
+            const progressBar = this.domCache.get('progress-fill-step6', () => 
+                document.querySelector('#step6 .progress-fill')
+            );
+            const statusText = safeGetElement('videoCreationStatus');
+            
+            if (!progressBar || !statusText) {
+                console.error('Video creation progress elements not found');
+                return;
+            }
+            
+            // Initialize progress
+            let progress = 0;
+            progressBar.style.width = '0%';
+            statusText.textContent = '영상 재생성 준비 중...';
+            
+            // Simulate video regeneration progress
+            const progressInterval = setInterval(() => {
+                const increment = Math.random() * 15 + 5;
+                progress = Math.min(progress + increment, 95);
+                
+                progressBar.style.width = progress + '%';
+                
+                // Update status based on progress
+                if (progress < 25) {
+                    statusText.textContent = '기존 영상 분석 중...';
+                } else if (progress < 50) {
+                    statusText.textContent = '새로운 스타일 적용 중...';
+                } else if (progress < 75) {
+                    statusText.textContent = '영상 편집 중...';
+                } else {
+                    statusText.textContent = '최종 렌더링 중...';
+                }
+                
+                // Complete when progress reaches 95%
+                if (progress >= 95) {
+                    clearInterval(progressInterval);
+                    
+                    // Complete the progress
+                    progressBar.style.width = '100%';
+                    statusText.textContent = '영상 재생성 완료!';
+                    
+                    setTimeout(() => {
+                        showToast('영상 재생성이 완료되었습니다! 🎬', 'success');
+                        this.goToStep(7);
+                    }, 1000);
+                }
+            }, 800);
+            
+            // Store interval for cleanup
+            window.videoRegenerationInterval = progressInterval;
+            
+        } catch (error) {
+            handleError(error, 'Video regeneration process');
+        }
+    }
+
+    /**
      * Start partial video regeneration progress for mixed scenarios
      */
     startPartialVideoRegenerationProgress() {
