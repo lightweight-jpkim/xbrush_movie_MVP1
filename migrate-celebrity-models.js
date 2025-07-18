@@ -92,7 +92,7 @@ const celebrityModels = [
         attributes: ['편안함', '신뢰감', '친근함'],
         tier: 'premium',
         sortPriority: 4500,
-        sampleVideo: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/안동 사과 TVCM 18s 버전 모델 이상아.mp4'
+        sampleVideo: 'https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/1.mp4'
     },
     {
         id: 'model_syj_001',
