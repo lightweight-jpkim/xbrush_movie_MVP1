@@ -79,6 +79,12 @@ class VideoCreationApp {
                 return;
             }
             
+            // Prevent direct access to step 8 - it should only be accessed through advanced menu
+            if (stepNumber === 8) {
+                showToast('⚠️ 영상 컷 선택은 고급 편집 모드를 통해서만 접근할 수 있습니다.', 'warning');
+                return;
+            }
+            
             this.stepManager.goToStep(stepNumber);
         } catch (error) {
             handleError(error, 'Step navigation');
@@ -427,6 +433,13 @@ class StepManager {
                 if (!updateURL && window.urlStateManager) {
                     window.urlStateManager.updateState({ step: this.currentStep }, true);
                 }
+                return;
+            }
+            
+            // Check if trying to access step 8 without proper flow
+            if (step === 8 && !window.isFromAdvancedEditMode) {
+                console.warn('Step 8 can only be accessed through advanced edit mode');
+                showToast('⚠️ 영상 컷 선택은 고급 편집 모드를 통해서만 접근할 수 있습니다.', 'warning');
                 return;
             }
 
@@ -928,14 +941,9 @@ class StepManager {
                     window.imageToVideoInProgress = false;
                     
                     setTimeout(() => {
-                        showToast('영상 컷 생성이 완료되었습니다! 컷을 선택해주세요. ✂️', 'success');
-                        // Navigate to Step 8 (Video Cut Selection)
-                        this.goToStep(8);
-                        
-                        // Initialize video cuts after navigation
-                        setTimeout(() => {
-                            initializeEnhancedVideoCuts();
-                        }, 300);
+                        showToast('영상 제작이 완료되었습니다! 🎬', 'success');
+                        // Navigate to Step 7 (Results) - NOT Step 8
+                        this.goToStep(7);
                     }, VIDEO_CONFIG.COMPLETION_DELAY);
                 }
             }, VIDEO_CONFIG.PROGRESS_INTERVAL);
@@ -1568,13 +1576,9 @@ function approveScenario() {
         app.dataService.updateField('scenarioApproved', true);
         app.stepManager.checkNextButton();
         
-        const nextButton = safeGetElement('step5Next');
-        if (nextButton) {
-            nextButton.style.display = 'block';
-        }
+        showToast('시나리오가 승인되었습니다! 영상 제작을 시작합니다.', 'success');
         
-        showToast('시나리오가 승인되었습니다! 영상 제작을 시작할 수 있습니다.', 'success');
-        
+        // Directly go to next step without showing the redundant button
         setTimeout(() => {
             nextStep();
         }, 1000);
@@ -1836,10 +1840,14 @@ function executeEditOption(option, cost) {
                 // Navigate to Step 8 (Video Cut Selection)
                 setTimeout(() => {
                     if (app && app.stepManager) {
+                        // Set flag to allow access to step 8
+                        window.isFromAdvancedEditMode = true;
                         app.stepManager.goToStep(8);
                         // Initialize video cuts after navigation
                         setTimeout(() => {
                             initializeEnhancedVideoCuts();
+                            // Reset flag after navigation
+                            window.isFromAdvancedEditMode = false;
                         }, 300);
                     }
                 }, 500);

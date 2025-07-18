@@ -100,6 +100,11 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+/* Hide step 8 button - it should only be accessed through advanced menu */
+.step[data-step="8"] {
+    display: none !important;
+}
+
 .step:hover:not(.active) {
     background: linear-gradient(135deg, #f7fafc, #edf2f7);
     transform: translateY(-2px);
