@@ -220,6 +220,11 @@ body {
     display: block;
 }
 
+/* Ensure step6Actions stays hidden even when parent becomes active */
+#step6Actions {
+    display: none !important;
+}
+
 /* Button Styles - Bold & Modern Design */
 .btn {
     display: inline-flex;

@@ -320,7 +320,14 @@ class UIController {
         try {
             const element = safeGetElement(elementId);
             if (element) {
-                element.style.display = show ? 'block' : 'none';
+                // Use both style.display and hidden class for consistency
+                if (show) {
+                    element.style.display = 'block';
+                    element.classList.remove('hidden');
+                } else {
+                    element.style.display = 'none';
+                    element.classList.add('hidden');
+                }
             }
         } catch (error) {
             handleError(error, 'Element toggle');
