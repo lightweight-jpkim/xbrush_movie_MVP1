@@ -213,7 +213,10 @@ class PremiumModelManager {
             <div class="model-card premium-model-card" onclick="viewModel('${model.id}')">
                 <div class="premium-badge ${badgeClass}">${badge}</div>
                 <div class="model-image premium-image">
-                    <img src="${model.profileImage}" alt="${model.displayName}" loading="lazy">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" 
+                         data-src="${model.profileImage}" 
+                         alt="${model.displayName}" 
+                         class="lazy-image">
                     ${model.premiumVideo ? `
                         <div class="video-preview-icon">
                             <svg viewBox="0 0 24 24">
@@ -256,7 +259,10 @@ class PremiumModelManager {
                     ${isTopRated ? '<span class="top-rated">TOP RATED</span>' : ''}
                 </div>
                 <div class="model-visual">
-                    <img src="${model.profileImage}" alt="${model.displayName}" loading="lazy">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" 
+                         data-src="${model.profileImage}" 
+                         alt="${model.displayName}" 
+                         class="lazy-image">
                     ${model.premiumVideo ? `
                         <button class="preview-video-btn" onclick="event.stopPropagation(); previewVideo('${model.premiumVideo}')">
                             <svg viewBox="0 0 24 24">
@@ -295,7 +301,10 @@ class PremiumModelManager {
                  onkeydown="if(event.key==='Enter') selectModel(this, '${model.id}', '${model.tier}')"
                  aria-label="${model.displayName} 선택">
                 <div class="model-visual">
-                    <img src="${model.profileImage}" alt="${model.displayName}" loading="lazy">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" 
+                         data-src="${model.profileImage}" 
+                         alt="${model.displayName}" 
+                         class="lazy-image">
                 </div>
                 <div class="model-details">
                     <div class="model-header">

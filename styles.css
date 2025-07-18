@@ -105,6 +105,41 @@ body {
     display: none !important;
 }
 
+/* Lazy Loading Styles */
+.lazy-image {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.lazy-loading {
+    background: #f0f0f0;
+    background-image: linear-gradient(90deg, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
+    background-size: 200% 100%;
+    animation: lazy-loading-shimmer 1.5s ease-in-out infinite;
+}
+
+.lazy-loaded {
+    opacity: 1;
+}
+
+.lazy-error {
+    opacity: 1;
+    background: #f8f8f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+}
+
+@keyframes lazy-loading-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
 .step:hover:not(.active) {
     background: linear-gradient(135deg, #f7fafc, #edf2f7);
     transform: translateY(-2px);
@@ -1445,8 +1480,14 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    /* Use relative units for better scalability */
+    html {
+        font-size: 14px;
+    }
+    
     .container {
-        padding: 16px;
+        padding: 1rem;
+        max-width: 100%;
     }
     
     .progress-steps {
@@ -2687,4 +2728,88 @@ body {
 
 #celebrityModelsGrid .card p {
     padding: 0 1rem 1rem 1rem;
+}
+
+/* Additional Mobile Responsiveness Improvements */
+@media (max-width: 768px) {
+    /* Prevent horizontal scrolling */
+    body {
+        overflow-x: hidden;
+    }
+    
+    /* Fix button sizes for touch */
+    button, .btn {
+        min-height: 44px; /* iOS touch target size */
+        min-width: 44px;
+    }
+    
+    /* Improve form inputs */
+    input[type="text"], 
+    input[type="email"], 
+    input[type="tel"],
+    textarea, 
+    select {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 0.75rem;
+        width: 100%;
+    }
+    
+    /* Fix modals on mobile */
+    .modal-content {
+        margin: 1rem;
+        max-height: 90vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Improve video display */
+    .video-preview {
+        max-height: 50vh;
+        width: 100%;
+    }
+    
+    /* Fix model cards */
+    .model-card, .premium-model-card {
+        min-width: auto;
+        max-width: 100%;
+    }
+    
+    /* Fix text sizing */
+    .heading {
+        font-size: 1.75rem;
+        line-height: 1.3;
+    }
+    
+    /* Fix grid layouts */
+    .model-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    /* Improve spacing */
+    .step-content {
+        padding: 1rem 0;
+    }
+    
+    /* Fix premium carousel on mobile */
+    .premium-models-carousel {
+        margin: 0 -1rem;
+        padding: 0 1rem;
+    }
+    
+    /* Ensure images are responsive */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    /* Fix navigation spacing */
+    .navigation-buttons {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .navigation-buttons .btn {
+        width: 100%;
+    }
 }
