@@ -79,13 +79,32 @@ class SlackNotifier {
                 attachments: options.attachments || []
             };
 
-            const response = await fetch(this.webhookUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
-            });
+            let response;
+            
+            // GitHub Pages requires a different approach due to CORS
+            if (window.location.hostname.includes('github.io')) {
+                console.log('GitHub Pages detected - using alternative method');
+                
+                // For GitHub Pages, we need to use a server-side solution
+                // Option 1: Use your own server endpoint
+                // Option 2: Use a service like Zapier or IFTTT
+                // Option 3: Use Netlify Functions or Vercel
+                
+                console.warn('Slack webhooks cannot be called directly from GitHub Pages due to CORS policy.');
+                console.log('Notification that would be sent:', payload);
+                
+                // Return success but mark as skipped
+                return { success: true, skipped: true, reason: 'CORS restriction on GitHub Pages' };
+            } else {
+                // Direct call for proper web hosting
+                response = await fetch(this.webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+            }
 
             if (!response.ok) {
                 throw new Error(`Slack API error: ${response.status}`);

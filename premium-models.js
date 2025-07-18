@@ -326,12 +326,19 @@ class PremiumModelManager {
      * Scroll carousel
      */
     scrollCarousel(direction) {
-        if (!this.carouselContainer) return;
+        // Get the carousel container
+        const carousel = document.getElementById('premiumModelsCarousel');
+        const container = carousel ? carousel.querySelector('.premium-models-wrapper') : null;
+        
+        if (!container) {
+            console.error('Premium carousel container not found');
+            return;
+        }
         
         const scrollAmount = 220 * 3; // Width of 3 cards + gaps
-        const currentScroll = this.carouselContainer.scrollLeft;
+        const currentScroll = container.scrollLeft;
         
-        this.carouselContainer.scrollTo({
+        container.scrollTo({
             left: direction === 'prev' ? 
                 currentScroll - scrollAmount : 
                 currentScroll + scrollAmount,
@@ -343,7 +350,7 @@ class PremiumModelManager {
      * Initialize drag scroll functionality
      */
     initializeDragScroll() {
-        if (!this.carouselContainer) return;
+        if (!this.carouselWrapper) return;
         
         let isDown = false;
         let startX;
@@ -352,7 +359,7 @@ class PremiumModelManager {
         let rafId;
         let hasMoved = false;
         
-        const container = this.carouselContainer;
+        const container = this.carouselWrapper;
         
         // Prevent text selection while dragging
         const preventDefault = (e) => {
@@ -444,7 +451,7 @@ class PremiumModelManager {
      * Initialize auto-scroll functionality
      */
     initializeAutoScroll() {
-        if (!this.carouselContainer) return;
+        if (!this.carouselWrapper) return;
         
         let scrollSpeed = 0.5; // pixels per frame
         this.autoScrollPaused = false;
@@ -452,11 +459,10 @@ class PremiumModelManager {
         
         const scroll = () => {
             if (!this.autoScrollPaused && this.autoScrollAnimation !== null) {
-                const container = this.carouselContainer;
-                const wrapper = this.carouselWrapper;
-                const cards = wrapper.querySelectorAll('.premium-model-card');
+                const container = this.carouselWrapper;
+                const cards = container.querySelectorAll('.premium-model-card');
                 const totalCards = cards.length;
-                const originalSetSize = totalCards / 3; // Since we triplicate (or more)
+                const originalSetSize = Math.floor(totalCards / 2); // Since we duplicate
                 const cardWidth = 240; // 220px width + 20px gap
                 const originalSetWidth = originalSetSize * cardWidth;
                 
@@ -466,7 +472,7 @@ class PremiumModelManager {
                 // If we've scrolled past the first set of models, reset seamlessly
                 if (container.scrollLeft >= originalSetWidth) {
                     // Jump back exactly one set of models
-                    container.scrollLeft = 0;
+                    container.scrollLeft = container.scrollLeft - originalSetWidth;
                 }
                 
                 this.autoScrollAnimation = requestAnimationFrame(scroll);
@@ -477,11 +483,11 @@ class PremiumModelManager {
         this.autoScrollAnimation = requestAnimationFrame(scroll);
         
         // Pause on hover
-        this.carouselContainer.addEventListener('mouseenter', () => {
+        this.carouselWrapper.addEventListener('mouseenter', () => {
             this.autoScrollPaused = true;
         });
         
-        this.carouselContainer.addEventListener('mouseleave', () => {
+        this.carouselWrapper.addEventListener('mouseleave', () => {
             if (this.autoScrollAnimation !== null) {
                 this.autoScrollPaused = false;
                 this.autoScrollAnimation = requestAnimationFrame(scroll);
@@ -489,11 +495,11 @@ class PremiumModelManager {
         });
         
         // Also pause on touch for mobile
-        this.carouselContainer.addEventListener('touchstart', () => {
+        this.carouselWrapper.addEventListener('touchstart', () => {
             this.autoScrollPaused = true;
         });
         
-        this.carouselContainer.addEventListener('touchend', () => {
+        this.carouselWrapper.addEventListener('touchend', () => {
             // Resume after a short delay to allow for scrolling
             setTimeout(() => {
                 if (this.autoScrollAnimation !== null) {
