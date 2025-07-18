@@ -14,7 +14,7 @@
             this.addAriaLabels();
             this.setupKeyboardNavigation();
             this.setupFocusManagement();
-            this.setupSkipLinks();
+            // this.setupSkipLinks(); // Removed skip links per user request
             this.announcePageChanges();
         },
 
