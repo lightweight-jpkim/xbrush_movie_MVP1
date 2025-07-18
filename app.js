@@ -2413,16 +2413,24 @@ function proceedWithSelectedCuts() {
     try {
         // Get current cut configuration
         const cutConfiguration = getCurrentCutConfiguration();
-        const { regenerationCount, totalCost } = updateCostCalculation();
+        const costData = updateCostCalculation();
         
         console.log('Cut configuration:', cutConfiguration);
+        console.log('Cost data returned:', costData);
+        
+        // Ensure we have valid values
+        const regenerationCount = costData?.regenerationCount || 0;
+        const totalCost = costData?.totalCost || 0;
+        
         console.log('Regeneration count:', regenerationCount, 'Total cost:', totalCost);
         
         // Store configuration for use during processing
         window.currentCutConfiguration = cutConfiguration;
         
         // Show appropriate message based on configuration
+        console.log('About to check regeneration count conditions...');
         if (regenerationCount === 0) {
+            console.log('Regeneration count is 0');
             showToast('기존 영상을 그대로 사용합니다.', 'info');
             
             // Skip regeneration and go directly to results
@@ -2444,6 +2452,7 @@ function proceedWithSelectedCuts() {
             }, 1000);
             
         } else if (regenerationCount === 3) {
+            console.log('Regeneration count is 3');
             showToast(`전체 컷을 새로 생성합니다... (${totalCost} 토큰 소모)`, 'info');
             
             // Navigate to Step 6 for full regeneration
@@ -2462,21 +2471,38 @@ function proceedWithSelectedCuts() {
             }, 1000);
             
         } else {
-            showToast(`${regenerationCount}개 컷을 새로 생성합니다... (${totalCost} 토큰 소모)`, 'info');
+            console.log('Regeneration count is:', regenerationCount, '(partial regeneration)');
+            try {
+                showToast(`${regenerationCount}개 컷을 새로 생성합니다... (${totalCost} 토큰 소모)`, 'info');
+            } catch (e) {
+                console.error('Error showing toast:', e);
+            }
+            
+            console.log('Setting up navigation to Step 6...');
             
             // Navigate to Step 6 for partial regeneration
             setTimeout(() => {
+                console.log('Timeout fired, checking app and stepManager...');
+                console.log('app exists:', !!app);
+                console.log('app.stepManager exists:', !!(app && app.stepManager));
+                
                 if (app && app.stepManager) {
+                    console.log('Calling goToStep(6)...');
                     app.stepManager.goToStep(6);
                     
                     // Set flag to trigger partial video regeneration progress
                     window.videoRegenerationInProgress = true;
                     window.partialRegenerationInProgress = true;
                     
+                    console.log('Flags set, scheduling regeneration progress...');
+                    
                     // Start the video regeneration progress
                     setTimeout(() => {
+                        console.log('Starting partial video regeneration progress...');
                         startPartialVideoRegenerationProgress();
                     }, 500);
+                } else {
+                    console.error('app or stepManager not available!');
                 }
             }, 1000);
         }
