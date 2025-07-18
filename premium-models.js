@@ -115,7 +115,8 @@ class PremiumModelManager {
                             prevBtn.addEventListener('click', (e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                this.scrollCarousel('prev');
+                                console.log('Prev button clicked');
+                                window.premiumManager.scrollCarousel('prev');
                             });
                         }
                         
@@ -123,7 +124,8 @@ class PremiumModelManager {
                             nextBtn.addEventListener('click', (e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                this.scrollCarousel('next');
+                                console.log('Next button clicked');
+                                window.premiumManager.scrollCarousel('next');
                             });
                         }
                     }, 100);
