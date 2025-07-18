@@ -3,1819 +3,454 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>xBrush Admin Dashboard</title>
-    
-    <!-- External CSS -->
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="css/breadcrumb.css">
-    <link rel="stylesheet" href="model-showcase.css">
-    <link rel="stylesheet" href="premium-models.css">
-    <link rel="stylesheet" href="css/validation.css">
-    
+    <title>xBrush Admin - Model Management</title>
     <style>
         body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             background: #f7fafc;
-            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
         }
         
-        .admin-header {
-            background: #2d3748;
-            color: white;
-            padding: 20px 0;
-            margin-bottom: 30px;
-        }
-        
-        .admin-container {
-            max-width: 1400px;
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
         }
         
-        .admin-title {
-            font-size: 2rem;
-            font-weight: 700;
-            margin: 0;
-        }
-        
-        .admin-subtitle {
-            opacity: 0.8;
-            margin-top: 5px;
-        }
-        
-        /* Tab Navigation */
-        .admin-nav-tabs {
+        .header {
             background: white;
-            border-radius: 8px;
-            padding: 5px;
-            display: flex;
-            gap: 5px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .tab-btn {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            background: transparent;
-            color: #718096;
-            font-weight: 500;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-        }
-        
-        .tab-btn:hover {
-            background: #f7fafc;
-        }
-        
-        .tab-btn.active {
-            background: #667eea;
-            color: white;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        /* Stats Cards */
-        .admin-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             margin-bottom: 30px;
         }
         
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #667eea;
-        }
-        
-        .stat-label {
-            color: #718096;
-            font-size: 0.9rem;
-            margin-top: 5px;
-        }
-        
-        .stat-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-top: 8px;
-        }
-        
-        .badge-warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-        
-        .badge-success {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        
-        .badge-danger {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        
-        /* Controls Section */
-        .admin-controls {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .search-box {
-            flex: 1;
-            min-width: 200px;
-            max-width: 400px;
-        }
-        
-        .search-box input {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: 0.95rem;
-        }
-        
-        .admin-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        /* Table Styles */
-        .models-table {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            overflow: hidden;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        th {
-            background: #f7fafc;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            color: #4a5568;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        tr:hover {
-            background: #f7fafc;
-        }
-        
-        .model-thumbnail {
-            width: 60px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-        
-        .model-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .model-details h4 {
-            margin: 0;
-            font-size: 1rem;
+        .header h1 {
+            margin: 0 0 10px 0;
             color: #2d3748;
         }
         
-        .model-details p {
-            margin: 2px 0;
-            font-size: 0.85rem;
-            color: #718096;
+        .header p {
+            margin: 0;
+            color: #4a5568;
         }
         
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
+        .admin-actions {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }
         
-        .status-active {
-            background: #c6f6d5;
-            color: #276749;
+        .admin-actions h2 {
+            margin: 0 0 20px 0;
+            color: #2d3748;
         }
         
-        .status-pending {
-            background: #fef3c7;
-            color: #92400e;
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
         }
         
-        .status-inactive {
-            background: #e2e8f0;
-            color: #718096;
-        }
-        
-        .action-btn {
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 0.85rem;
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            margin: 0 2px;
-            border: none;
         }
         
-        .action-btn.approve {
-            background: #48bb78;
+        .btn-primary {
+            background: #3182ce;
             color: white;
         }
         
-        .action-btn.reject {
-            background: #f56565;
+        .btn-primary:hover {
+            background: #2c5aa0;
+        }
+        
+        .btn-success {
+            background: #38a169;
             color: white;
         }
         
-        .action-btn.view {
-            background: #4299e1;
+        .btn-success:hover {
+            background: #2f855a;
+        }
+        
+        .btn-danger {
+            background: #e53e3e;
             color: white;
         }
         
-        .action-btn.premium {
-            background: #667eea;
-            color: white;
+        .btn-danger:hover {
+            background: #c53030;
         }
         
-        /* Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
-        
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-        
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        
-        input:checked + .toggle-slider {
-            background-color: #f59e0b;
-        }
-        
-        input:checked + .toggle-slider:before {
-            transform: translateX(20px);
-        }
-        
-        /* Plan Review Styles */
-        .review-section {
+        .models-grid {
             background: white;
+            padding: 30px;
             border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
-        .review-queue {
-            display: flex;
-            flex-direction: column;
+        .models-grid h2 {
+            margin: 0 0 20px 0;
+            color: #2d3748;
+        }
+        
+        .model-list {
+            display: grid;
             gap: 20px;
         }
         
-        .review-item {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .review-item:hover {
-            border-color: #667eea;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
-        }
-        
-        .review-header {
+        .model-item {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            transition: border-color 0.2s;
+        }
+        
+        .model-item:hover {
+            border-color: #cbd5e0;
+        }
+        
+        .model-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            margin-right: 20px;
+            border: 3px solid #e2e8f0;
+        }
+        
+        .model-info {
+            flex: 1;
+        }
+        
+        .model-info h3 {
+            margin: 0 0 5px 0;
+            color: #2d3748;
+        }
+        
+        .model-info p {
+            margin: 0 0 10px 0;
+            color: #4a5568;
+            font-size: 0.9rem;
         }
         
         .model-meta {
             display: flex;
             gap: 15px;
+            font-size: 0.8rem;
+            color: #718096;
         }
         
-        .model-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-        
-        .tier-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.875rem;
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
             font-weight: 600;
+            text-transform: uppercase;
         }
         
-        .tier-basic {
-            background: #e5e7eb;
-            color: #4b5563;
+        .status-pending {
+            background: #fed7d7;
+            color: #c53030;
         }
         
-        .tier-professional {
-            background: #dbeafe;
-            color: #1e40af;
+        .status-approved {
+            background: #c6f6d5;
+            color: #2f855a;
         }
         
-        .tier-enterprise {
-            background: #fef3c7;
-            color: #92400e;
+        .status-rejected {
+            background: #fed7d7;
+            color: #c53030;
         }
         
-        .tier-celebrity {
-            background: #ede9fe;
-            color: #6b21a8;
-        }
-        
-        .plan-details {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-        
-        .detail-label {
-            color: #6b7280;
-            font-size: 0.875rem;
-        }
-        
-        .detail-value {
-            font-weight: 600;
-            color: #1f2937;
-        }
-        
-        .review-actions {
+        .model-actions {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
         }
         
-        .btn-approve {
-            background: #10b981;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8rem;
         }
         
-        .btn-approve:hover {
-            background: #059669;
-        }
-        
-        .btn-reject {
-            background: #ef4444;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-reject:hover {
-            background: #dc2626;
-        }
-        
-        .btn-request-info {
-            background: #f59e0b;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-request-info:hover {
-            background: #d97706;
-        }
-        
-        /* Navigation buttons */
-        .nav-btn {
-            display: inline-block;
-            padding: 8px 16px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-        
-        .nav-btn.btn-primary {
-            background: #667eea;
-            color: white;
-        }
-        
-        .nav-btn.btn-outline {
-            background: transparent;
-            color: white;
-            border: 1px solid white;
-        }
-        
-        .nav-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-        
-        /* Edit Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            overflow-y: auto;
-        }
-        
-        .modal-content {
-            background-color: #fefefe;
-            margin: 2% auto;
-            padding: 0;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 800px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .modal-header {
-            padding: 20px 30px;
-            background: #667eea;
-            color: white;
-            border-radius: 12px 12px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-        }
-        
-        .close {
-            color: white;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-        
-        .close:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .modal-body {
-            padding: 30px;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-        
-        .form-section {
-            margin-bottom: 30px;
-            padding-bottom: 30px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .form-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        
-        .form-section h3 {
-            margin: 0 0 20px 0;
-            color: #374151;
-            font-size: 1.25rem;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        .form-group {
+        .status-info {
+            background: #bee3f8;
+            color: #2c5aa0;
+            padding: 15px;
+            border-radius: 8px;
             margin-bottom: 20px;
         }
         
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-        
-        /* Thumbnail upload styles */
-        .thumbnail-section {
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-        }
-        
-        .thumbnail-upload-area {
-            flex: 1;
-        }
-        
-        .thumbnail-preview {
-            width: 150px;
-            height: 150px;
-            border: 2px dashed #e5e7eb;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background: #f9fafb;
-            position: relative;
-        }
-        
-        .thumbnail-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .thumbnail-preview-placeholder {
+        .loading {
             text-align: center;
-            color: #9ca3af;
-            font-size: 0.875rem;
-        }
-        
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            margin-top: 10px;
-        }
-        
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: -9999px;
-        }
-        
-        .file-input-label {
-            background: #667eea;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: inline-block;
-            font-size: 0.875rem;
-            transition: background 0.3s ease;
-        }
-        
-        .file-input-label:hover {
-            background: #5a67d8;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #374151;
-            font-weight: 500;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        textarea.form-control {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
-        
-        .checkbox-label input {
-            margin-right: 6px;
-        }
-        
-        .modal-footer {
-            padding: 20px 30px;
-            background: #f9fafb;
-            border-top: 1px solid #e5e7eb;
-            border-radius: 0 0 12px 12px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-        
-        .btn-save {
-            background: #10b981;
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        
-        .btn-save:hover {
-            background: #059669;
-        }
-        
-        .btn-cancel {
-            background: #6b7280;
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        
-        .btn-cancel:hover {
-            background: #4b5563;
+            padding: 40px;
+            color: #4a5568;
         }
     </style>
 </head>
 <body>
-    <!-- Admin Header -->
-    <header class="admin-header">
-        <div class="admin-container">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h1 class="admin-title">xBrush Admin Dashboard</h1>
-                    <p class="admin-subtitle">통합 관리자 대시보드</p>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <a href="javascript:void(0)" onclick="goBackFromAdmin()" class="nav-btn btn-outline">← 돌아가기</a>
-                    <a href="models.html" class="nav-btn btn-primary">모델 목록</a>
-                </div>
+    <div class="container">
+        <div class="header">
+            <h1>🛠️ xBrush 모델 관리 시스템</h1>
+            <p>등록된 모델을 검토하고 승인/거절 처리를 할 수 있습니다.</p>
+        </div>
+        
+        <div class="admin-actions">
+            <h2>관리 작업</h2>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="addMockData()">
+                    📦 테스트 데이터 추가
+                </button>
+                <button class="btn btn-success" onclick="approveAllPending()">
+                    ✅ 모든 대기 모델 승인
+                </button>
+                <button class="btn btn-danger" onclick="clearAllData()">
+                    🗑️ 모든 데이터 삭제
+                </button>
+                <button class="btn btn-primary" onclick="refreshModels()">
+                    🔄 새로고침
+                </button>
             </div>
         </div>
-    </header>
-
-    <div class="admin-container">
-        <!-- Tab Navigation -->
-        <div class="admin-nav-tabs">
-            <button class="tab-btn active" data-tab="dashboard">대시보드</button>
-            <button class="tab-btn" data-tab="models">모델 관리</button>
-            <button class="tab-btn" data-tab="plan-review">플랜 검토</button>
-            <button class="tab-btn" data-tab="users">사용자 관리</button>
-            <button class="tab-btn" data-tab="analytics">분석</button>
-        </div>
-
-        <!-- Dashboard Tab -->
-        <div id="dashboard" class="tab-content active">
-            <div class="admin-stats">
-                <div class="stat-card">
-                    <div class="stat-value" id="totalModels">0</div>
-                    <div class="stat-label">전체 모델</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="activeModels">0</div>
-                    <div class="stat-label">활성 모델</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="pendingModels">0</div>
-                    <div class="stat-label">승인 대기</div>
-                    <span class="stat-badge badge-warning">검토 필요</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="premiumModels">0</div>
-                    <div class="stat-label">프리미엄 모델</div>
-                </div>
-            </div>
-
-            <div class="review-section">
-                <h2>빠른 작업</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
-                    <button class="btn btn-primary" onclick="switchTab('models')">모델 승인하기</button>
-                    <button class="btn btn-primary" onclick="switchTab('plan-review')">플랜 검토하기</button>
-                    <button class="btn btn-primary" onclick="exportData()">데이터 내보내기</button>
-                    <button class="btn btn-primary" onclick="viewAnalytics()">분석 보기</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Models Management Tab -->
-        <div id="models" class="tab-content">
-            <div class="admin-controls">
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="모델 이름, 이메일로 검색..." onkeyup="searchModels()">
-                </div>
-                <div class="admin-actions">
-                    <select id="statusFilter" onchange="filterModels()">
-                        <option value="all">모든 상태</option>
-                        <option value="pending">승인 대기</option>
-                        <option value="active">활성</option>
-                        <option value="inactive">비활성</option>
-                    </select>
-                    <button class="btn btn-primary" onclick="exportModels()">내보내기</button>
-                </div>
-            </div>
-
-            <div class="models-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>모델 정보</th>
-                            <th>상태</th>
-                            <th>카테고리</th>
-                            <th>등록일</th>
-                            <th>티어</th>
-                            <th>사전 검토</th>
-                            <th>작업</th>
-                        </tr>
-                    </thead>
-                    <tbody id="modelsTableBody">
-                        <!-- Models will be loaded here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Plan Review Tab -->
-        <div id="plan-review" class="tab-content">
-            <div class="admin-stats">
-                <div class="stat-card">
-                    <div class="stat-value" id="pendingPlans">0</div>
-                    <div class="stat-label">검토 대기 플랜</div>
-                    <span class="stat-badge badge-warning">긴급</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="approvedToday">0</div>
-                    <div class="stat-label">오늘 승인됨</div>
-                    <span class="stat-badge badge-success">완료</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="rejectedToday">0</div>
-                    <div class="stat-label">오늘 거절됨</div>
-                    <span class="stat-badge badge-danger">거절</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="avgReviewTime">0</div>
-                    <div class="stat-label">평균 검토 시간</div>
-                </div>
-            </div>
-
-            <div class="review-section">
-                <h2>라이선스 플랜 검토 대기열</h2>
-                <div class="review-queue" id="reviewQueue">
-                    <!-- Plan review items will be loaded here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Users Tab -->
-        <div id="users" class="tab-content">
-            <div class="review-section">
-                <h2>사용자 관리</h2>
-                <p>사용자 관리 기능은 개발 중입니다.</p>
-            </div>
-        </div>
-
-        <!-- Analytics Tab -->
-        <div id="analytics" class="tab-content">
-            <div class="review-section">
-                <h2>분석 대시보드</h2>
-                <p>분석 기능은 개발 중입니다.</p>
+        
+        <div class="models-grid">
+            <h2>등록된 모델 목록</h2>
+            <div id="statusInfo" class="status-info" style="display: none;"></div>
+            <div id="modelsList" class="model-list">
+                <div class="loading">모델 목록을 불러오는 중...</div>
             </div>
         </div>
     </div>
 
-    <!-- Edit Model Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>모델 정보 수정</h2>
-                <button class="close" onclick="closeEditModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="editModelForm">
-                    <input type="hidden" id="editModelId" />
-                    
-                    <!-- Personal Information Section -->
-                    <div class="form-section">
-                        <h3>개인 정보</h3>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="editName">이름 *</label>
-                                <input type="text" class="form-control" id="editName" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editEmail">이메일 *</label>
-                                <input type="email" class="form-control" id="editEmail" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editPhone">전화번호</label>
-                                <input type="tel" class="form-control" id="editPhone">
-                            </div>
-                            <div class="form-group">
-                                <label for="editStatus">상태</label>
-                                <select class="form-control" id="editStatus">
-                                    <option value="pending">승인 대기</option>
-                                    <option value="active">활성</option>
-                                    <option value="inactive">비활성</option>
-                                </select>
-                            </div>
-                            <div class="form-group full-width">
-                                <label for="editIntro">소개</label>
-                                <textarea class="form-control" id="editIntro" rows="3"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Tier and Categories Section -->
-                    <div class="form-section">
-                        <h3>티어 및 카테고리</h3>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="editTier">티어</label>
-                                <select class="form-control" id="editTier">
-                                    <option value="basic">베이직</option>
-                                    <option value="professional">프로페셔널</option>
-                                    <option value="premium">프리미엄</option>
-                                    <option value="vip">VIP</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="editSortPriority">정렬 우선순위</label>
-                                <input type="number" class="form-control" id="editSortPriority" value="0" min="0">
-                            </div>
-                            <div class="form-group full-width">
-                                <label>카테고리</label>
-                                <div class="checkbox-group">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="categories" value="fashion"> 패션
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="categories" value="beauty"> 뷰티
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="categories" value="lifestyle"> 라이프스타일
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="categories" value="food"> 푸드
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="categories" value="tech"> 테크
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Pricing Section -->
-                    <div class="form-section">
-                        <h3>가격 정보</h3>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="editBasePrice">기본 가격</label>
-                                <input type="number" class="form-control" id="editBasePrice" min="0">
-                            </div>
-                            <div class="form-group">
-                                <label for="editLowestPrice">최저 가격</label>
-                                <input type="number" class="form-control" id="editLowestPrice" min="0">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Profile Section -->
-                    <div class="form-section">
-                        <h3>프로필 정보</h3>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="editDisplayName">표시 이름</label>
-                                <input type="text" class="form-control" id="editDisplayName">
-                            </div>
-                            <div class="form-group">
-                                <label for="editTagline">태그라인</label>
-                                <input type="text" class="form-control" id="editTagline">
-                            </div>
-                            <div class="form-group full-width">
-                                <label for="editProfileImage">프로필 이미지 URL</label>
-                                <input type="url" class="form-control" id="editProfileImage">
-                            </div>
-                            <div class="form-group full-width">
-                                <label>썸네일</label>
-                                <div class="thumbnail-section">
-                                    <div class="thumbnail-upload-area">
-                                        <input type="url" class="form-control" id="editThumbnailUrl" placeholder="썸네일 URL 입력">
-                                        <div class="file-input-wrapper">
-                                            <input type="file" id="thumbnailFile" accept="image/*" onchange="handleThumbnailUpload(event)">
-                                            <label for="thumbnailFile" class="file-input-label">이미지 업로드</label>
-                                        </div>
-                                    </div>
-                                    <div class="thumbnail-preview" id="thumbnailPreview">
-                                        <div class="thumbnail-preview-placeholder">
-                                            <div>썸네일 미리보기</div>
-                                            <div style="font-size: 2rem; margin-top: 8px;">📷</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Statistics Section -->
-                    <div class="form-section">
-                        <h3>통계 및 평가</h3>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="editRating">평점</label>
-                                <input type="number" class="form-control" id="editRating" min="0" max="5" step="0.1">
-                            </div>
-                            <div class="form-group">
-                                <label for="editTotalLicenses">총 라이선스</label>
-                                <input type="number" class="form-control" id="editTotalLicenses" min="0">
-                            </div>
-                            <div class="form-group">
-                                <label for="editResponseTime">응답 시간</label>
-                                <input type="text" class="form-control" id="editResponseTime" placeholder="예: 2시간, 즉시 가능">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Pre-review Rights Section -->
-                    <div class="form-section">
-                        <h3>사전 검토 권리</h3>
-                        <div class="form-grid">
-                            <div class="form-group full-width">
-                                <label class="checkbox-label" style="display: flex; align-items: center; gap: 10px;">
-                                    <input type="checkbox" id="editPreReviewRights" style="width: 20px; height: 20px;">
-                                    <span>사전 검토 권리 활성화</span>
-                                </label>
-                                <p class="help-text" style="margin-top: 10px; color: #666; font-size: 14px;">활성화하면 모든 생성 결과물에 대해 모델의 사전 승인이 필요합니다.</p>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-cancel" onclick="closeEditModal()">취소</button>
-                <button type="button" class="btn-save" onclick="saveModelChanges()">저장</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firebase Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    
-    <!-- Application Scripts -->
-    <script src="js/config.js"></script>
-    <script src="js/app-namespace.js"></script>
-    <script src="js/firebase-config.js"></script>
-    <script src="js/firebase-model-storage.js"></script>
-    <script src="js/model-storage-adapter.js"></script>
-    <script src="js/image-storage.js"></script>
+    <!-- JavaScript Files -->
+    <script src="constants.js"></script>
     <script src="utils.js"></script>
-    <script src="js/navigation-manager.js"></script>
-
+    <script src="db.js"></script>
+    
     <script>
-        // Navigation function
-        function goBackFromAdmin() {
-            if (window.navigationManager) {
-                window.navigationManager.goBack();
-            } else {
-                window.location.href = 'index.html';
+        class AdminApp {
+            constructor() {
+                this.init();
             }
-        }
-        
-        // Tab switching functionality
-        function switchTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
             
-            // Remove active class from all buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Show selected tab
-            document.getElementById(tabName).classList.add('active');
-            
-            // Activate corresponding button
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-            
-            // Load data for the tab
-            if (tabName === 'models') {
-                loadModels();
-            } else if (tabName === 'plan-review') {
-                loadPlanReviews();
-            } else if (tabName === 'dashboard') {
-                loadDashboardStats();
+            async init() {
+                try {
+                    await xbrushDB.init();
+                    await this.loadModels();
+                    console.log('Admin app initialized');
+                } catch (error) {
+                    console.error('Admin app initialization error:', error);
+                    this.showStatus('데이터베이스 초기화에 실패했습니다.', 'error');
+                }
             }
-        }
-
-        // Add event listeners to tab buttons
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tabName = btn.getAttribute('data-tab');
-                switchTab(tabName);
-            });
-        });
-
-        // Load dashboard stats
-        async function loadDashboardStats() {
-            try {
-                const models = await window.modelStorageAdapter.getAllModels();
-                const activeModels = models.filter(m => m.status === 'active');
-                const pendingModels = models.filter(m => m.status === 'pending');
-                const premiumModels = models.filter(m => m.tier === 'premium' || m.tier === 'vip');
+            
+            async loadModels() {
+                try {
+                    const models = await xbrushDB.getAllModels();
+                    this.renderModels(models);
+                } catch (error) {
+                    console.error('Error loading models:', error);
+                    this.showStatus('모델 목록을 불러오는데 실패했습니다.', 'error');
+                }
+            }
+            
+            renderModels(models) {
+                const listElement = document.getElementById('modelsList');
                 
-                document.getElementById('totalModels').textContent = models.length;
-                document.getElementById('activeModels').textContent = activeModels.length;
-                document.getElementById('pendingModels').textContent = pendingModels.length;
-                document.getElementById('premiumModels').textContent = premiumModels.length;
-            } catch (error) {
-                console.error('Error loading stats:', error);
-            }
-        }
-
-        // Load models for management
-        async function loadModels() {
-            const tbody = document.getElementById('modelsTableBody');
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">로딩 중...</td></tr>';
-            
-            try {
-                // Ensure adapter is initialized
-                if (window.modelStorageAdapter?.ensureInitialized) {
-                    await window.modelStorageAdapter.ensureInitialized();
+                if (models.length === 0) {
+                    listElement.innerHTML = '<div class="loading">등록된 모델이 없습니다.</div>';
+                    return;
                 }
                 
-                const models = await window.modelStorageAdapter.getAllModels();
-                console.log('=== ADMIN: LOADED MODELS ===');
-                console.log('Total models:', models.length);
-                console.log('Firebase project:', window.firebase?.app()?.options?.projectId);
+                listElement.innerHTML = '';
                 
-                // Log status breakdown
-                const statusCount = {};
                 models.forEach(model => {
-                    const status = model.status || 'no-status';
-                    statusCount[status] = (statusCount[status] || 0) + 1;
-                });
-                console.log('Status breakdown:', statusCount);
-                
-                // Log pending models specifically
-                const pendingModels = models.filter(m => m.status === 'pending');
-                console.log('Pending models:', pendingModels.length);
-                if (pendingModels.length > 0) {
-                    pendingModels.forEach(m => {
-                        console.log(`- ${m.personalInfo?.name || m.name} (ID: ${m.id})`);
-                    });
-                }
-                
-                displayModels(models);
-            } catch (error) {
-                console.error('Error loading models:', error);
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">데이터 로딩 실패. 페이지를 새로고침해주세요.</td></tr>';
-                showToast('모델 로딩 중 오류가 발생했습니다.', 'error');
-            }
-        }
-
-        // Display models in table
-        function displayModels(models) {
-            const tbody = document.getElementById('modelsTableBody');
-            
-            if (models.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">등록된 모델이 없습니다.</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = models.map(model => {
-                // Extract data from various possible locations
-                const name = model.personalInfo?.name || model.profile?.displayName || model.displayName || model.name || '이름 없음';
-                const email = model.personalInfo?.email || model.email || '이메일 없음';
-                const thumbnailUrl = model.thumbnailUrl || model.personalInfo?.thumbnailUrl || model.portfolio?.thumbnailUrl || model.profileImage || '/images/default-avatar.png';
-                const status = model.status || 'pending';
-                const categories = model.personalInfo?.categories || model.categories || [];
-                const registrationDate = model.registrationDate || model.createdAt || new Date().toISOString();
-                const tier = model.tier || 'basic';
-                
-                return `
-                    <tr>
-                        <td>
-                            <div class="model-info">
-                                <img src="${thumbnailUrl}" 
-                                     alt="${name}" class="model-thumbnail"
-                                     onerror="this.src='/images/default-avatar.png'">
-                                <div class="model-details">
-                                    <h4>${name}</h4>
-                                    <p>${email}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="status-badge status-${status}">
-                                ${status === 'active' ? '활성' : status === 'pending' ? '대기' : '비활성'}
-                            </span>
-                        </td>
-                        <td>${categories.join(', ') || '-'}</td>
-                        <td>${formatDate(registrationDate)}</td>
-                        <td>
-                            <span class="tier-badge tier-${tier}">
-                                ${getTierName(tier)}
-                            </span>
-                        </td>
-                        <td style="text-align: center;">
-                            <label class="toggle-switch" title="${model.contract?.secondConfirm ? '사전 검토 활성화됨' : '사전 검토 비활성화됨'}">
-                                <input type="checkbox" 
-                                       ${model.contract?.secondConfirm ? 'checked' : ''} 
-                                       onchange="togglePreReview('${model.id}', this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </td>
-                        <td>
-                            <button class="action-btn view" onclick="editModel('${model.id}')">편집</button>
-                            ${status === 'pending' ? 
-                                `<button class="action-btn approve" onclick="approveModel('${model.id}')">승인</button>
-                                 <button class="action-btn reject" onclick="rejectModel('${model.id}')">거절</button>` :
-                                `<button class="action-btn premium" onclick="togglePremium('${model.id}')">프리미엄</button>
-                                 <button class="action-btn" onclick="deleteModel('${model.id}')" style="background: #ef4444;">삭제</button>`
-                            }
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        // Load plan reviews
-        async function loadPlanReviews() {
-            try {
-                // This would normally fetch from a plans collection
-                const models = await window.modelStorageAdapter.getAllModels();
-                const pendingPlans = models.filter(m => m.planStatus === 'pending' || m.status === 'pending');
-                
-                document.getElementById('pendingPlans').textContent = pendingPlans.length;
-                document.getElementById('approvedToday').textContent = '0'; // Would calculate from real data
-                document.getElementById('rejectedToday').textContent = '0';
-                document.getElementById('avgReviewTime').textContent = '2.5시간';
-                
-                displayPlanReviews(pendingPlans);
-            } catch (error) {
-                console.error('Error loading plan reviews:', error);
-            }
-        }
-
-        // Display plan reviews
-        function displayPlanReviews(plans) {
-            const reviewQueue = document.getElementById('reviewQueue');
-            
-            if (plans.length === 0) {
-                reviewQueue.innerHTML = '<p style="text-align: center; padding: 40px; color: #718096;">검토 대기 중인 플랜이 없습니다.</p>';
-                return;
-            }
-            
-            reviewQueue.innerHTML = plans.map(plan => `
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="model-meta">
-                            <img src="${plan.thumbnailUrl || plan.profileImage || '/images/default-avatar.png'}" 
-                                 alt="${plan.name}" class="model-avatar">
-                            <div>
-                                <h3>${plan.name || plan.personalInfo?.name || '이름 없음'}</h3>
-                                <p style="color: #6b7280; margin-top: 4px;">
-                                    ${plan.email || plan.personalInfo?.email || '이메일 없음'}
-                                </p>
+                    const modelElement = document.createElement('div');
+                    modelElement.className = 'model-item';
+                    
+                    const createdDate = new Date(model.createdAt).toLocaleDateString('ko-KR');
+                    const updatedDate = new Date(model.updatedAt).toLocaleDateString('ko-KR');
+                    
+                    modelElement.innerHTML = `
+                        <div class="model-image" style="background-image: url('${model.profileImage}')"></div>
+                        <div class="model-info">
+                            <h3>${model.name}</h3>
+                            <p>${model.description}</p>
+                            <div class="model-meta">
+                                <span>ID: ${model.id}</span>
+                                <span>등급: ${model.tier}</span>
+                                <span>등록일: ${createdDate}</span>
+                                <span>수정일: ${updatedDate}</span>
                             </div>
                         </div>
-                        <span class="tier-badge tier-${plan.requestedTier || plan.tier || 'professional'}">
-                            ${getTierName(plan.requestedTier || plan.tier || 'professional')}
-                        </span>
-                    </div>
+                        <div class="model-actions">
+                            <span class="status-badge status-${model.status}">${this.getStatusText(model.status)}</span>
+                            ${this.getActionButtons(model)}
+                        </div>
+                    `;
                     
-                    <div class="plan-details">
-                        <div class="detail-row">
-                            <span class="detail-label">신청 플랜</span>
-                            <span class="detail-value">${getTierName(plan.requestedTier || plan.tier || 'professional')}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">월 예상 수익</span>
-                            <span class="detail-value">₩${((plan.pricing?.basePrice || 100000) * 10).toLocaleString()}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">포트폴리오</span>
-                            <span class="detail-value">${plan.portfolio?.images?.length || 0}개 이미지</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">신청일</span>
-                            <span class="detail-value">${formatDate(plan.createdAt || plan.registrationDate)}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="review-actions">
-                        <button class="btn-approve" onclick="approvePlan('${plan.id}')">
-                            ✓ 승인
-                        </button>
-                        <button class="btn-reject" onclick="rejectPlan('${plan.id}')">
-                            ✗ 거절
-                        </button>
-                        <button class="btn-request-info" onclick="requestMoreInfo('${plan.id}')">
-                            📋 추가 정보 요청
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Model management functions
-        async function togglePremium(modelId) {
-            try {
-                const model = await window.modelStorageAdapter.getModel(modelId);
-                const currentTier = model.tier || 'basic';
-                const newTier = currentTier === 'premium' || currentTier === 'vip' ? 'basic' : 'premium';
-                
-                if (confirm(`${model.personalInfo?.name || model.displayName}의 티어를 ${getTierName(newTier)}로 변경하시겠습니까?`)) {
-                    await window.modelStorageAdapter.updateModel(modelId, { 
-                        tier: newTier,
-                        updatedAt: new Date().toISOString()
-                    });
-                    showToast('티어가 변경되었습니다.', 'success');
-                    loadModels();
-                }
-            } catch (error) {
-                console.error('Error toggling premium:', error);
-                showToast('티어 변경 중 오류가 발생했습니다.', 'error');
-            }
-        }
-        
-        async function approveModel(modelId) {
-            try {
-                await window.modelStorageAdapter.updateModel(modelId, { status: 'active' });
-                showToast('모델이 승인되었습니다.', 'success');
-                loadModels();
-            } catch (error) {
-                console.error('Error approving model:', error);
-                showToast('승인 중 오류가 발생했습니다.', 'error');
-            }
-        }
-
-        async function rejectModel(modelId) {
-            if (!confirm('정말 이 모델을 거절하시겠습니까?')) return;
-            
-            try {
-                await window.modelStorageAdapter.updateModel(modelId, { status: 'rejected' });
-                showToast('모델이 거절되었습니다.', 'success');
-                loadModels();
-            } catch (error) {
-                console.error('Error rejecting model:', error);
-                showToast('거절 중 오류가 발생했습니다.', 'error');
-            }
-        }
-
-        // Plan review functions
-        async function approvePlan(planId) {
-            try {
-                await window.modelStorageAdapter.updateModel(planId, { 
-                    planStatus: 'approved',
-                    status: 'active',
-                    approvedAt: new Date().toISOString()
+                    listElement.appendChild(modelElement);
                 });
-                showToast('플랜이 승인되었습니다.', 'success');
-                loadPlanReviews();
-            } catch (error) {
-                console.error('Error approving plan:', error);
-                showToast('플랜 승인 중 오류가 발생했습니다.', 'error');
             }
-        }
-
-        async function rejectPlan(planId) {
-            const reason = prompt('거절 사유를 입력해주세요:');
-            if (!reason) return;
             
-            try {
-                await window.modelStorageAdapter.updateModel(planId, { 
-                    planStatus: 'rejected',
-                    rejectionReason: reason,
-                    rejectedAt: new Date().toISOString()
-                });
-                showToast('플랜이 거절되었습니다.', 'success');
-                loadPlanReviews();
-            } catch (error) {
-                console.error('Error rejecting plan:', error);
-                showToast('플랜 거절 중 오류가 발생했습니다.', 'error');
-            }
-        }
-
-        function requestMoreInfo(planId) {
-            const info = prompt('요청할 추가 정보를 입력해주세요:');
-            if (!info) return;
-            
-            showToast('추가 정보 요청이 전송되었습니다.', 'success');
-        }
-
-        // Helper functions
-        function formatDate(dateString) {
-            if (!dateString) return '-';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('ko-KR');
-        }
-
-        function getTierName(tier) {
-            const tierNames = {
-                basic: '베이직',
-                professional: '프로페셔널',
-                premium: '프리미엄',
-                enterprise: '엔터프라이즈',
-                celebrity: '셀러브리티',
-                vip: 'VIP'
-            };
-            return tierNames[tier] || '베이직';
-        }
-        
-        function getStatusLabel(status) {
-            const labels = {
-                pending: '승인 대기',
-                active: '활성',
-                inactive: '비활성',
-                rejected: '거절됨'
-            };
-            return labels[status] || status;
-        }
-        
-        function getTierLabel(tier) {
-            return getTierName(tier);
-        }
-
-        // Edit model functions
-        let currentEditingModel = null;
-        
-        async function editModel(modelId) {
-            try {
-                const models = await window.modelStorageAdapter.getAllModels();
-                const model = models.find(m => m.id === modelId);
-                
-                if (!model) {
-                    showToast('모델을 찾을 수 없습니다.', 'error');
-                    return;
-                }
-                
-                currentEditingModel = model;
-                populateEditForm(model);
-                document.getElementById('editModal').style.display = 'block';
-                
-            } catch (error) {
-                console.error('Error loading model for edit:', error);
-                showToast('모델 정보를 불러오는 중 오류가 발생했습니다.', 'error');
-            }
-        }
-        
-        function populateEditForm(model) {
-            // Personal Information
-            document.getElementById('editModelId').value = model.id;
-            document.getElementById('editName').value = model.personalInfo?.name || model.name || '';
-            document.getElementById('editEmail').value = model.personalInfo?.email || model.email || '';
-            document.getElementById('editPhone').value = model.personalInfo?.phone || model.phone || '';
-            document.getElementById('editStatus').value = model.status || 'pending';
-            document.getElementById('editIntro').value = model.personalInfo?.intro || model.intro || '';
-            
-            // Tier and Categories
-            document.getElementById('editTier').value = model.tier || 'basic';
-            document.getElementById('editSortPriority').value = model.sortPriority || 0;
-            
-            // Categories
-            const categories = model.personalInfo?.categories || model.categories || [];
-            document.querySelectorAll('input[name="categories"]').forEach(checkbox => {
-                checkbox.checked = categories.includes(checkbox.value);
-            });
-            
-            // Pricing
-            document.getElementById('editBasePrice').value = model.pricing?.basePrice || model.basePrice || '';
-            document.getElementById('editLowestPrice').value = model.lowestPrice || '';
-            
-            // Profile
-            document.getElementById('editDisplayName').value = model.displayName || model.personalInfo?.name || '';
-            document.getElementById('editTagline').value = model.tagline || '';
-            document.getElementById('editProfileImage').value = model.profileImage || model.personalInfo?.thumbnailUrl || '';
-            
-            // Thumbnail
-            const thumbnailUrl = model.thumbnailUrl || model.personalInfo?.thumbnailUrl || model.portfolio?.thumbnailUrl || '';
-            document.getElementById('editThumbnailUrl').value = thumbnailUrl;
-            updateThumbnailPreview(thumbnailUrl);
-            currentThumbnailFile = null; // Reset file upload
-            
-            // Statistics
-            document.getElementById('editRating').value = model.rating || 0;
-            document.getElementById('editTotalLicenses').value = model.totalLicenses || 0;
-            document.getElementById('editResponseTime').value = model.responseTime || '';
-            
-            // Pre-review rights
-            document.getElementById('editPreReviewRights').checked = model.contract?.secondConfirm || false;
-        }
-        
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-            currentEditingModel = null;
-        }
-        
-        async function saveModelChanges() {
-            if (!currentEditingModel) return;
-            
-            try {
-                showToast('저장 중...', 'info');
-                
-                // Handle thumbnail upload if file is selected
-                let thumbnailUrl = document.getElementById('editThumbnailUrl').value;
-                
-                if (currentThumbnailFile) {
-                    try {
-                        // Upload to Firebase Storage
-                        const storage = window.firebaseStorage;
-                        const storageRef = storage.ref();
-                        const fileName = `models/thumbnails/${currentEditingModel.id}_${Date.now()}.jpg`;
-                        const fileRef = storageRef.child(fileName);
-                        
-                        const snapshot = await fileRef.put(currentThumbnailFile);
-                        thumbnailUrl = await snapshot.ref.getDownloadURL();
-                        
-                        console.log('Thumbnail uploaded:', thumbnailUrl);
-                    } catch (uploadError) {
-                        console.error('Thumbnail upload failed:', uploadError);
-                        showToast('썸네일 업로드 실패. URL을 직접 입력해주세요.', 'error');
-                        return;
-                    }
-                }
-                
-                // Gather all form data
-                const categories = [];
-                document.querySelectorAll('input[name="categories"]:checked').forEach(checkbox => {
-                    categories.push(checkbox.value);
-                });
-                
-                const updatedData = {
-                    personalInfo: {
-                        name: document.getElementById('editName').value,
-                        email: document.getElementById('editEmail').value,
-                        phone: document.getElementById('editPhone').value,
-                        intro: document.getElementById('editIntro').value,
-                        categories: categories,
-                        thumbnailUrl: thumbnailUrl || document.getElementById('editProfileImage').value
-                    },
-                    status: document.getElementById('editStatus').value,
-                    tier: document.getElementById('editTier').value,
-                    sortPriority: parseInt(document.getElementById('editSortPriority').value) || 0,
-                    categories: categories,
-                    pricing: {
-                        basePrice: parseInt(document.getElementById('editBasePrice').value) || 0,
-                        packages: currentEditingModel.pricing?.packages || []
-                    },
-                    basePrice: parseInt(document.getElementById('editBasePrice').value) || 0,
-                    lowestPrice: parseInt(document.getElementById('editLowestPrice').value) || 0,
-                    displayName: document.getElementById('editDisplayName').value,
-                    tagline: document.getElementById('editTagline').value,
-                    profileImage: document.getElementById('editProfileImage').value,
-                    thumbnailUrl: thumbnailUrl,
-                    rating: parseFloat(document.getElementById('editRating').value) || 0,
-                    totalLicenses: parseInt(document.getElementById('editTotalLicenses').value) || 0,
-                    responseTime: document.getElementById('editResponseTime').value,
-                    contract: {
-                        ...(currentEditingModel.contract || {}),
-                        secondConfirm: document.getElementById('editPreReviewRights').checked
-                    },
-                    updatedAt: new Date().toISOString()
+            getStatusText(status) {
+                const statusMap = {
+                    pending: '검토중',
+                    approved: '승인됨',
+                    rejected: '거절됨',
+                    inactive: '비활성'
                 };
-                
-                // Update in Firebase
-                await window.modelStorageAdapter.updateModel(currentEditingModel.id, updatedData);
-                
-                showToast('모델 정보가 성공적으로 업데이트되었습니다.', 'success');
-                closeEditModal();
-                loadModels(); // Reload the models list
-                
-            } catch (error) {
-                console.error('Error saving model changes:', error);
-                showToast('저장 중 오류가 발생했습니다: ' + error.message, 'error');
+                return statusMap[status] || status;
             }
-        }
-        
-        async function deleteModel(modelId) {
-            if (!confirm('정말 이 모델을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
             
-            try {
-                await window.modelStorageAdapter.deleteModel(modelId);
-                showToast('모델이 삭제되었습니다.', 'success');
-                loadModels();
-            } catch (error) {
-                console.error('Error deleting model:', error);
-                showToast('삭제 중 오류가 발생했습니다.', 'error');
-            }
-        }
-        
-        // Toggle pre-review rights
-        async function togglePreReview(modelId, enabled) {
-            try {
-                // Get the current model data
-                const models = await window.modelStorageAdapter.getAllModels();
-                const model = models.find(m => m.id === modelId);
-                
-                if (!model) {
-                    showToast('모델을 찾을 수 없습니다.', 'error');
-                    return;
-                }
-                
-                // Update contract object with new pre-review status
-                const updatedContract = {
-                    ...(model.contract || {}),
-                    secondConfirm: enabled
-                };
-                
-                await window.modelStorageAdapter.updateModel(modelId, { 
-                    contract: updatedContract 
-                });
-                
-                showToast(
-                    enabled ? '사전 검토 권리가 활성화되었습니다.' : '사전 검토 권리가 비활성화되었습니다.', 
-                    'success'
-                );
-                
-                // Refresh the table
-                loadModels();
-            } catch (error) {
-                console.error('Error toggling pre-review:', error);
-                showToast('사전 검토 상태 변경 중 오류가 발생했습니다.', 'error');
-                // Reload to reset the toggle
-                loadModels();
-            }
-        }
-        
-        function viewModel(modelId) {
-            window.open(`model-detail.html?id=${modelId}`, '_blank');
-        }
-
-        function togglePremium(modelId) {
-            if (typeof togglePremiumStatus === 'function') {
-                togglePremiumStatus(modelId);
-            } else {
-                alert('프리미엄 관리 기능을 로드 중입니다...');
-            }
-        }
-
-        // Search functionality
-        function searchModels() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const rows = document.querySelectorAll('#modelsTableBody tr');
-            
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
-        }
-
-        // Filter functionality
-        function filterModels() {
-            const filterValue = document.getElementById('statusFilter').value;
-            const rows = document.querySelectorAll('#modelsTableBody tr');
-            
-            rows.forEach(row => {
-                if (filterValue === 'all') {
-                    row.style.display = '';
+            getActionButtons(model) {
+                if (model.status === 'pending') {
+                    return `
+                        <button class="btn btn-success btn-small" onclick="adminApp.approveModel('${model.id}')">승인</button>
+                        <button class="btn btn-danger btn-small" onclick="adminApp.rejectModel('${model.id}')">거절</button>
+                    `;
+                } else if (model.status === 'approved') {
+                    return `
+                        <button class="btn btn-danger btn-small" onclick="adminApp.deactivateModel('${model.id}')">비활성화</button>
+                    `;
                 } else {
-                    const statusBadge = row.querySelector('.status-badge');
-                    const status = statusBadge ? statusBadge.classList[1].replace('status-', '') : '';
-                    row.style.display = status === filterValue ? '' : 'none';
+                    return `
+                        <button class="btn btn-success btn-small" onclick="adminApp.approveModel('${model.id}')">재승인</button>
+                        <button class="btn btn-danger btn-small" onclick="adminApp.deleteModel('${model.id}')">삭제</button>
+                    `;
                 }
-            });
-        }
-
-        // Export functions
-        function exportModels() {
-            showToast('모델 데이터를 내보내는 중...', 'info');
-            // Implementation would export to CSV/Excel
-        }
-
-        function exportData() {
-            showToast('전체 데이터를 내보내는 중...', 'info');
-            // Implementation would export all data
-        }
-
-        function viewAnalytics() {
-            switchTab('analytics');
-        }
-
-        // Initialize on load
-        window.addEventListener('firebaseReady', function() {
-            loadDashboardStats();
-        });
-
-        // Also check if Firebase is already ready
-        if (window.firebaseDB) {
-            loadDashboardStats();
-        }
-        
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('editModal');
-            if (event.target == modal) {
-                closeEditModal();
-            }
-        }
-        
-        // Thumbnail handling functions
-        let currentThumbnailFile = null;
-        
-        async function handleThumbnailUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            // Validate file type
-            if (!file.type.startsWith('image/')) {
-                showToast('이미지 파일만 업로드 가능합니다.', 'error');
-                return;
             }
             
-            // Validate file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('파일 크기는 5MB 이하여야 합니다.', 'error');
-                return;
+            async approveModel(modelId) {
+                try {
+                    await xbrushDB.updateModelStatus(modelId, 'approved');
+                    await this.loadModels();
+                    this.showStatus(`모델 ${modelId}가 승인되었습니다.`, 'success');
+                } catch (error) {
+                    console.error('Error approving model:', error);
+                    this.showStatus('승인 처리에 실패했습니다.', 'error');
+                }
             }
             
-            currentThumbnailFile = file;
-            
-            // Preview the image
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const preview = document.getElementById('thumbnailPreview');
-                preview.innerHTML = `<img src="${e.target.result}" alt="썸네일 미리보기">`;
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        function updateThumbnailPreview(url) {
-            const preview = document.getElementById('thumbnailPreview');
-            if (url) {
-                preview.innerHTML = `<img src="${url}" alt="썸네일 미리보기" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'thumbnail-preview-placeholder\\'><div>이미지 로드 실패</div><div style=\\'font-size: 2rem; margin-top: 8px;\\'>❌</div></div>';">`;
-            } else {
-                preview.innerHTML = `
-                    <div class="thumbnail-preview-placeholder">
-                        <div>썸네일 미리보기</div>
-                        <div style="font-size: 2rem; margin-top: 8px;">📷</div>
-                    </div>
-                `;
+            async rejectModel(modelId) {
+                try {
+                    await xbrushDB.updateModelStatus(modelId, 'rejected');
+                    await this.loadModels();
+                    this.showStatus(`모델 ${modelId}가 거절되었습니다.`, 'success');
+                } catch (error) {
+                    console.error('Error rejecting model:', error);
+                    this.showStatus('거절 처리에 실패했습니다.', 'error');
+                }
             }
-        }
-        
-        // Improved initialization
-        async function initializeAdmin() {
-            const maxRetries = 20;
-            let retries = 0;
             
-            const checkServices = () => {
-                return window.firebaseDB && 
-                       window.modelStorageAdapter && 
-                       window.firebaseStorage;
-            };
+            async deactivateModel(modelId) {
+                try {
+                    await xbrushDB.updateModelStatus(modelId, 'inactive');
+                    await this.loadModels();
+                    this.showStatus(`모델 ${modelId}가 비활성화되었습니다.`, 'success');
+                } catch (error) {
+                    console.error('Error deactivating model:', error);
+                    this.showStatus('비활성화 처리에 실패했습니다.', 'error');
+                }
+            }
             
-            while (retries < maxRetries) {
-                if (checkServices()) {
-                    console.log('All services ready');
-                    
-                    // Ensure adapter is initialized
-                    if (window.modelStorageAdapter.ensureInitialized) {
-                        try {
-                            await window.modelStorageAdapter.ensureInitialized();
-                        } catch (error) {
-                            console.error('Error initializing adapter:', error);
-                        }
-                    }
-                    
-                    // Setup URL input listener
-                    const urlInput = document.getElementById('editThumbnailUrl');
-                    if (urlInput) {
-                        urlInput.addEventListener('input', function(e) {
-                            if (e.target.value) {
-                                updateThumbnailPreview(e.target.value);
-                                currentThumbnailFile = null; // Clear file if URL is entered
-                            }
-                        });
-                    }
-                    
-                    loadDashboardStats();
+            async deleteModel(modelId) {
+                if (!confirm(`모델 ${modelId}를 완전히 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) {
                     return;
                 }
-                await new Promise(resolve => setTimeout(resolve, 500));
-                retries++;
+                
+                try {
+                    await xbrushDB.deleteModel(modelId);
+                    await this.loadModels();
+                    this.showStatus(`모델 ${modelId}가 삭제되었습니다.`, 'success');
+                } catch (error) {
+                    console.error('Error deleting model:', error);
+                    this.showStatus('삭제 처리에 실패했습니다.', 'error');
+                }
             }
             
-            showToast('Firebase 서비스 초기화 실패. 페이지를 새로고침해주세요.', 'error');
+            showStatus(message, type) {
+                const statusElement = document.getElementById('statusInfo');
+                statusElement.textContent = message;
+                statusElement.className = `status-info status-${type}`;
+                statusElement.style.display = 'block';
+                
+                setTimeout(() => {
+                    statusElement.style.display = 'none';
+                }, 5000);
+            }
         }
         
-        // Call initialization on page load
-        window.addEventListener('DOMContentLoaded', initializeAdmin);
+        // Global functions
+        async function addMockData() {
+            try {
+                await xbrushDB.addMockData();
+                await adminApp.loadModels();
+                adminApp.showStatus('테스트 데이터가 추가되었습니다.', 'success');
+            } catch (error) {
+                console.error('Error adding mock data:', error);
+                adminApp.showStatus('테스트 데이터 추가에 실패했습니다.', 'error');
+            }
+        }
+        
+        async function approveAllPending() {
+            try {
+                const models = await xbrushDB.getAllModels();
+                const pendingModels = models.filter(m => m.status === 'pending');
+                
+                for (const model of pendingModels) {
+                    await xbrushDB.updateModelStatus(model.id, 'approved');
+                }
+                
+                await adminApp.loadModels();
+                adminApp.showStatus(`${pendingModels.length}개의 모델이 승인되었습니다.`, 'success');
+            } catch (error) {
+                console.error('Error approving all pending:', error);
+                adminApp.showStatus('일괄 승인 처리에 실패했습니다.', 'error');
+            }
+        }
+        
+        async function clearAllData() {
+            if (!confirm('모든 모델 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                return;
+            }
+            
+            try {
+                const models = await xbrushDB.getAllModels();
+                for (const model of models) {
+                    await xbrushDB.deleteModel(model.id);
+                }
+                
+                await adminApp.loadModels();
+                adminApp.showStatus('모든 데이터가 삭제되었습니다.', 'success');
+            } catch (error) {
+                console.error('Error clearing data:', error);
+                adminApp.showStatus('데이터 삭제에 실패했습니다.', 'error');
+            }
+        }
+        
+        async function refreshModels() {
+            await adminApp.loadModels();
+            adminApp.showStatus('모델 목록이 새로고침되었습니다.', 'success');
+        }
+        
+        // Initialize admin app
+        let adminApp;
+        document.addEventListener('DOMContentLoaded', () => {
+            adminApp = new AdminApp();
+        });
     </script>
 </body>
 </html>

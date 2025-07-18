@@ -3,72 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XBrush 동영상 광고 제작</title>
-    <!-- Version: 2.0.8 - Testing JPJPKIMJP deployment -->
-    
-    <!-- Favicon to prevent 404 error -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50' x='50' text-anchor='middle' font-size='60' fill='%23667eea'>X</text></svg>" type="image/svg+xml">
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <title>xBrush 동영상 광고 제작</title>
     
     <!-- External CSS -->
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="model-showcase.css">
-    <link rel="stylesheet" href="css/thumbnail-optimization.css">
-    <link rel="stylesheet" href="css/validation.css">
-    <link rel="stylesheet" href="premium-models.css">
-    <link rel="stylesheet" href="css/simple-profile-modal.css">
-    <link rel="stylesheet" href="css/terms-popup.css">
-    <link rel="stylesheet" href="css/fixed-bottom-button.css">
-    <link rel="stylesheet" href="css/breadcrumb.css">
-    <link rel="stylesheet" href="css/mobile-overrides.css"><!-- Load last for proper cascade -->
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="AI 기반 동영상 광고 제작 플랫폼 - XBrush로 전문적인 광고 영상을 쉽고 빠르게 제작하세요">
-    <meta name="keywords" content="AI 동영상 제작, 광고 영상, 비디오 마케팅, XBrush">
-    <meta name="author" content="XBrush">
+    <meta name="description" content="AI 기반 동영상 광고 제작 플랫폼 - xBrush로 전문적인 광고 영상을 쉽고 빠르게 제작하세요">
+    <meta name="keywords" content="AI 동영상 제작, 광고 영상, 비디오 마케팅, xBrush">
+    <meta name="author" content="xBrush">
     
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="XBrush 동영상 광고 제작">
+    <meta property="og:title" content="xBrush 동영상 광고 제작">
     <meta property="og:description" content="AI 기반 동영상 광고 제작 플랫폼">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://xbrush.ai">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
-<body class="has-fixed-bottom">
-    <!-- Header -->
-    <header class="site-header">
-        <div class="header-container">
-            <a href="https://jpjpkimjp.github.io/xbrush_movie_MVP1/index.html" class="logo-section" style="text-decoration: none;">
-                <h1 class="logo">XBrush</h1>
-                <span class="logo-subtitle">AI Video Creator</span>
-            </a>
-            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="메뉴 열기">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-            </button>
-            <nav class="header-nav" id="headerNav">
-                <a href="index.html" class="nav-link active">동영상 제작</a>
-                <a href="models.html" class="nav-link">모델 쇼케이스</a>
-                <a href="model-register.html" class="nav-link btn-primary-small">모델 등록</a>
-            </nav>
-        </div>
-    </header>
-
-    <div class="container" style="padding-top: 20px;">
-        <!-- Progress Navigation - Hidden -->
-        <nav class="progress-nav" role="navigation" aria-label="제작 단계 진행률" style="display: none;">
-            <!-- Mobile Progress Indicator -->
-            <div class="mobile-progress-indicator" id="mobileProgress">
-                <span class="mobile-progress-step">Step</span>
-                <span class="mobile-progress-current" id="mobileCurrentStep">1</span>
-                <span class="mobile-progress-divider">/</span>
-                <span class="mobile-progress-total">7</span>
-                <span class="mobile-progress-label" id="mobileStepLabel">출연자 선택</span>
-            </div>
-            
+<body>
+    <div class="container">
+        <!-- Progress Navigation -->
+        <nav class="progress-nav" role="navigation" aria-label="제작 단계 진행률">
             <div class="progress-steps" id="progress-steps">
                 <div class="progress-line">
                     <div class="progress-line-active" id="progressLine" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
@@ -140,35 +97,6 @@
                 <h1 class="heading">출연자를 선택해주세요</h1>
                 <p class="mb-4">광고에 출연할 모델을 선택하세요. 각 모델은 일관된 외모로 영상에 등장합니다.</p>
                 
-                <!-- Premium Models Carousel -->
-                <div class="premium-models-section" id="premiumModelsSection">
-                    <div class="section-header">
-                        <h3>⭐ 프리미엄 모델</h3>
-                        <p class="section-subtitle">검증된 최고의 모델들을 만나보세요</p>
-                    </div>
-                    <div class="premium-models-carousel" id="premiumModelsCarousel">
-                        <!-- Premium models will be loaded here -->
-                    </div>
-                </div>
-                
-                <!-- Featured Models Showcase -->
-                <div class="featured-models-section mb-4">
-                    <div class="section-header">
-                        <h3 class="section-title">등록된 모델</h3>
-                        <span class="model-count" id="modelCount">로딩 중...</span>
-                    </div>
-                    
-                    <div id="featuredModelsGrid" class="featured-models-grid">
-                        <!-- Models will be loaded here -->
-                    </div>
-                    
-                    <div class="text-center mt-3">
-                        <a href="models.html" class="btn btn-outline">
-                            ➕ 더 많은 모델 보기
-                        </a>
-                    </div>
-                </div>
-                
                 <!-- Virtual Models Section -->
                 <section class="mb-4">
                     <header class="flex items-center mb-2">
@@ -220,17 +148,81 @@
                     </div>
                 </section>
 
+                <!-- Premium Actors Section -->
+                <section>
+                    <header class="flex items-center mb-2">
+                        <h2 class="subheading mb-0 mr-3">실제 배우</h2>
+                        <span class="badge badge-premium">+100 크레딧!</span>
+                    </header>
+                    <p class="description mb-2">실제 배우들의 딥페이크 기술을 활용한 프리미엄 모델입니다. 더욱 자연스럽고 전문적인 광고 제작이 가능합니다.</p>
+                    
+                    <div class="card-grid">
+                        <div class="card" onclick="selectModel(this, 'actor1', 'premium')" role="button" tabindex="0"
+                             onkeydown="if(event.key==='Enter') selectModel(this, 'actor1', 'premium')"
+                             aria-label="채연 모델 선택">
+                            <div class="model-image" data-model="actor1">
+                                <div class="badge premium-badge">100💎</div>
+                            </div>
+                            <h3>채연</h3>
+                            <p>상큼한 20대 채연의 모습 그대로</p>
+                        </div>
+                        
+                        <div class="card" onclick="selectModel(this, 'actor2', 'premium')" role="button" tabindex="0"
+                             onkeydown="if(event.key==='Enter') selectModel(this, 'actor2', 'premium')"
+                             aria-label="이상아 모델 선택">
+                            <div class="model-image" data-model="actor2">
+                                <div class="badge premium-badge">100💎</div>
+                            </div>
+                            <h3>이상아</h3>
+                            <p>밝고 친근한 국민적 매력</p>
+                        </div>
+                        
+                        <div class="card" onclick="selectModel(this, 'actor3', 'premium')" role="button" tabindex="0"
+                             onkeydown="if(event.key==='Enter') selectModel(this, 'actor3', 'premium')"
+                             aria-label="이정재 모델 선택">
+                            <div class="model-image" data-model="actor3">
+                                <div class="badge premium-badge">100💎</div>
+                            </div>
+                            <h3>이정재</h3>
+                            <p>카리스마 있고 믿음직한 리더십</p>
+                        </div>
+                        
+                        <div class="card" onclick="selectModel(this, 'actor4', 'premium')" role="button" tabindex="0"
+                             onkeydown="if(event.key==='Enter') selectModel(this, 'actor4', 'premium')"
+                             aria-label="전지현 모델 선택">
+                            <div class="model-image" data-model="actor4">
+                                <div class="badge premium-badge">100💎</div>
+                            </div>
+                            <h3>전지현</h3>
+                            <p>우아하고 세련된 여성 매력</p>
+                        </div>
+                        
+                        <div class="card" onclick="selectModel(this, 'actor5', 'premium')" role="button" tabindex="0"
+                             onkeydown="if(event.key==='Enter') selectModel(this, 'actor5', 'premium')"
+                             aria-label="박서준 모델 선택">
+                            <div class="model-image" data-model="actor5">
+                                <div class="badge premium-badge">100💎</div>
+                            </div>
+                            <h3>박서준</h3>
+                            <p>젊고 역동적인 현대적 매력</p>
+                        </div>
+                        
+                        <div class="card" onclick="selectModel(this, 'actor6', 'premium')" role="button" tabindex="0"
+                             onkeydown="if(event.key==='Enter') selectModel(this, 'actor6', 'premium')"
+                             aria-label="손예진 모델 선택">
+                            <div class="model-image" data-model="actor6">
+                                <div class="badge premium-badge">100💎</div>
+                            </div>
+                            <h3>손예진</h3>
+                            <p>로맨틱하고 품격 있는 매력</p>
+                        </div>
+                    </div>
+                </section>
                 
-                <!-- Original buttons hidden -->
-                <div class="action-buttons hidden-for-fixed">
+                <div class="action-buttons">
                     <div></div>
                     <button class="btn btn-primary" id="step1Next" onclick="nextStep()" disabled 
                             aria-label="다음 단계로 이동">다음 단계</button>
-                </div>
-                
-                <!-- Fixed bottom button -->
-                <div class="fixed-bottom-actions step-first">
-                    <button class="btn btn-primary btn-full-width" id="step1NextFixed" onclick="nextStep()" disabled>다음 단계</button>
                 </div>
             </section>
 
@@ -592,7 +584,7 @@
                     </div>
                 </div>
                 
-                <div class="action-buttons" id="step6Actions" style="display: none;">
+                <div class="action-buttons" id="step6Actions">
                     <button class="btn btn-outline" onclick="prevStep()" aria-label="이전 단계로 이동">이전 단계</button>
                     <button class="btn btn-primary hidden" id="step6Next" onclick="nextStep()" 
                             aria-label="다음 단계로 이동">다음 단계</button>
@@ -605,17 +597,6 @@
                     
                     <div class="subheading">컷 1: 오프닝 장면</div>
                     <div class="cut-selection-container">
-                        <!-- Current Image Comparison Area -->
-                        <div class="current-image-comparison" id="cut1CurrentComparison">
-                            <div class="current-image-label">현재 이미지</div>
-                            <div class="current-image-container">
-                                <img id="cut1CurrentImage" src="" alt="현재 컷 1 이미지" style="display: none;">
-                                <div class="current-image-placeholder" id="cut1CurrentPlaceholder">
-                                    <div class="placeholder-icon">🖼️</div>
-                                    <div class="placeholder-text">컷 1 이미지가 선택되지 않았습니다</div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="cut-option-toggle">
                             <label class="option-toggle-label">
                                 <input type="radio" name="cut1Mode" value="new" checked onchange="toggleCutMode('cut1', 'new')">
@@ -662,17 +643,6 @@
                     
                     <div class="subheading mt-4">컷 2: 제품 소개</div>
                     <div class="cut-selection-container">
-                        <!-- Current Image Comparison Area -->
-                        <div class="current-image-comparison" id="cut2CurrentComparison">
-                            <div class="current-image-label">현재 이미지</div>
-                            <div class="current-image-container">
-                                <img id="cut2CurrentImage" src="" alt="현재 컷 2 이미지" style="display: none;">
-                                <div class="current-image-placeholder" id="cut2CurrentPlaceholder">
-                                    <div class="placeholder-icon">🖼️</div>
-                                    <div class="placeholder-text">컷 2 이미지가 선택되지 않았습니다</div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="cut-option-toggle">
                             <label class="option-toggle-label">
                                 <input type="radio" name="cut2Mode" value="new" checked onchange="toggleCutMode('cut2', 'new')">
@@ -719,17 +689,6 @@
                     
                     <div class="subheading mt-4">컷 3: 마무리 장면</div>
                     <div class="cut-selection-container">
-                        <!-- Current Image Comparison Area -->
-                        <div class="current-image-comparison" id="cut3CurrentComparison">
-                            <div class="current-image-label">현재 이미지</div>
-                            <div class="current-image-container">
-                                <img id="cut3CurrentImage" src="" alt="현재 컷 3 이미지" style="display: none;">
-                                <div class="current-image-placeholder" id="cut3CurrentPlaceholder">
-                                    <div class="placeholder-icon">🖼️</div>
-                                    <div class="placeholder-text">컷 3 이미지가 선택되지 않았습니다</div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="cut-option-toggle">
                             <label class="option-toggle-label">
                                 <input type="radio" name="cut3Mode" value="new" checked onchange="toggleCutMode('cut3', 'new')">
@@ -777,7 +736,7 @@
                     <div class="action-buttons">
                         <button class="btn btn-outline" onclick="backToVideoOptions()" 
                                 aria-label="이전으로 돌아가기">이전으로</button>
-                        <button class="btn btn-primary btn-disabled" id="step6ImageNext" onclick="proceedToVideoCutSelection()" disabled 
+                        <button class="btn btn-primary" id="step6ImageNext" onclick="proceedToVideoCutSelection()" disabled 
                                 aria-label="선택된 이미지로 영상 컷 생성">선택된 이미지로 영상 컷 생성</button>
                     </div>
                 </div>
@@ -922,12 +881,11 @@
                     <div class="video-cut-preview">
                         <video class="cut-video" muted loop preload="metadata">
                             <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/1.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
+                            <div class="video-placeholder">
+                                <i class="video-icon">🎬</i>
+                                <p>비디오를 로드하는 중...</p>
+                            </div>
                         </video>
-                        <div class="video-placeholder" id="cut1Placeholder">
-                            <div class="video-icon">🎬</div>
-                            <p>비디오를 로드하는 중...</p>
-                        </div>
                         <div class="cut-duration">0-5초</div>
                         <div class="cut-status" id="cut1Status">기존 컷 유지</div>
                     </div>
@@ -952,13 +910,12 @@
                     <h4 class="cut-title">컷 2: 제품 소개 장면</h4>
                     <div class="video-cut-preview">
                         <video class="cut-video" muted loop preload="metadata">
-                            <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/1.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
+                            <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/apple_demo.mp4" type="video/mp4">
+                            <div class="video-placeholder">
+                                <i class="video-icon">🎬</i>
+                                <p>비디오를 로드하는 중...</p>
+                            </div>
                         </video>
-                        <div class="video-placeholder" id="cut2Placeholder">
-                            <div class="video-icon">🎬</div>
-                            <p>비디오를 로드하는 중...</p>
-                        </div>
                         <div class="cut-duration">5-10초</div>
                         <div class="cut-status" id="cut2Status">기존 컷 유지</div>
                     </div>
@@ -984,12 +941,11 @@
                     <div class="video-cut-preview">
                         <video class="cut-video" muted loop preload="metadata">
                             <source src="https://jpjpkimjp.github.io/xbrush_movie_MVP1/images/1.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
+                            <div class="video-placeholder">
+                                <i class="video-icon">🎬</i>
+                                <p>비디오를 로드하는 중...</p>
+                            </div>
                         </video>
-                        <div class="video-placeholder" id="cut3Placeholder">
-                            <div class="video-icon">🎬</div>
-                            <p>비디오를 로드하는 중...</p>
-                        </div>
                         <div class="cut-duration">10-15초</div>
                         <div class="cut-status" id="cut3Status">기존 컷 유지</div>
                     </div>
@@ -1025,123 +981,10 @@
         </main>
     </div>
 
-    <!-- Footer -->
-    <footer class="site-footer">
-        <div class="footer-content">
-            <p>&copy; 2024 xBrush. All rights reserved.</p>
-            <div class="footer-links">
-                <a href="#">이용약관</a>
-                <a href="#">개인정보처리방침</a>
-                <a href="#">문의하기</a>
-                <a href="admin.html" style="opacity: 0.5;">관리자</a>
-                <a href="model-dashboard.html" style="opacity: 0.5;">모델 대시보드</a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Firebase Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    
-    <!-- Application Configuration -->
-    <script src="js/config.js"></script>
-    <script src="js/app-namespace.js"></script>
-    
-    <!-- Firebase Configuration -->
-    <script src="js/firebase-config.js"></script>
-    <script src="js/image-storage-service.js"></script>
-    <script src="js/firebase-model-storage.js"></script>
-    <script src="js/model-storage-adapter.js"></script>
-    
-    <!-- Validation -->
-    <script src="js/validation.js"></script>
-    
-    <!-- Image Optimization -->
-    <script src="js/image-utils.js"></script>
-    <script src="js/image-cache.js"></script>
-    
     <!-- JavaScript Files -->
     <script src="constants.js"></script>
     <script src="utils.js"></script>
-    <script src="js/terms-popup.js"></script>
-    
-    <!-- Utility Classes -->
-    <script src="js/utils/NotificationManager.js"></script>
-    <script src="js/utils/FormValidator.js"></script>
-    <script src="js/utils/ModalManager.js"></script>
-    
-    <!-- Manager Classes -->
-    <script src="js/managers/ButtonStateManager.js"></script>
-    <script src="js/managers/ProgressManager.js"></script>
-    <script src="js/navigation-manager.js"></script>
-    <script src="js/url-state-manager.js"></script>
-    
-    <!-- Slack Notification Service (Firebase-based) -->
-    <script src="js/slack-notifier-firebase.js"></script>
-    <script src="js/model-navigation.js"></script>
-    
-    <!-- Load modular components -->
-    <script src="js/modules/module-loader.js"></script>
-    
+    <script src="db.js"></script>
     <script src="app.js"></script>
-    <script src="premium-models.js"></script>
-    <script src="js/premium-carousel-fix.js"></script>
-    
-    <!-- Load featured models when Firebase is ready -->
-    <script>
-        // Function to load models when ready
-        function checkAndLoadModels() {
-            if (window.firebaseDB && window.modelStorageAdapter && typeof loadFeaturedModels === 'function') {
-                console.log('[Main Page] Firebase is ready, loading models...');
-                // Load all models in parallel for faster loading
-                Promise.all([
-                    loadFeaturedModels(),
-                    typeof loadCelebrityModels === 'function' ? loadCelebrityModels() : Promise.resolve(),
-                    window.premiumManager ? premiumManager.loadPremiumCarousel('premiumModelsCarousel') : Promise.resolve()
-                ]).then(() => {
-                    console.log('[Main Page] All models loaded');
-                }).catch(error => {
-                    console.error('[Main Page] Error loading models:', error);
-                });
-            } else {
-                console.log('[Main Page] Waiting for Firebase or loadFeaturedModels function...');
-                setTimeout(checkAndLoadModels, 100); // Reduced from 500ms to 100ms
-            }
-        }
-        
-        // Start checking after DOM is loaded
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', checkAndLoadModels);
-        } else {
-            checkAndLoadModels();
-        }
-        
-        // Also listen for Firebase ready event for faster response
-        window.addEventListener('firebaseReady', function() {
-            console.log('[Main Page] Firebase ready event received, loading models immediately');
-            checkAndLoadModels();
-        });
-        
-        // Secret admin access: Press Ctrl+Shift+A
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-                window.location.href = 'admin.html';
-            }
-        });
-    </script>
-    
-    <!-- Image Loader -->
-    <script src="js/image-loader.js"></script>
-    
-    <!-- Mobile Menu Handler -->
-    <script src="js/mobile-menu.js"></script>
-    
-    <!-- Mobile Progress Handler -->
-    <script src="js/mobile-progress.js"></script>
-    
-    <!-- Horizontal Scroll Handler -->
-    <script src="js/horizontal-scroll.js"></script>
 </body>
 </html>

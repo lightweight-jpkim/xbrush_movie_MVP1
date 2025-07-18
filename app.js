@@ -25,15 +25,7 @@ class VideoCreationApp {
             this.loadModelImages();
             this.setupFormValidation();
             
-            // Initialize current image comparison
-            setTimeout(() => {
-                initializeCurrentImageComparison();
-            }, 100);
-            
-            // Check initial button states
-            this.stepManager.checkNextButton();
-            
-            // Removed startup toast notification for cleaner UX
+            showToast('애플리케이션이 시작되었습니다.', 'success');
         } catch (error) {
             handleError(error, 'Application initialization');
         }
@@ -79,12 +71,6 @@ class VideoCreationApp {
                 return;
             }
             
-            // Prevent direct access to step 8 - it should only be accessed through advanced menu
-            if (stepNumber === 8) {
-                showToast('⚠️ 영상 컷 선택은 고급 편집 모드를 통해서만 접근할 수 있습니다.', 'warning');
-                return;
-            }
-            
             this.stepManager.goToStep(stepNumber);
         } catch (error) {
             handleError(error, 'Step navigation');
@@ -117,10 +103,11 @@ class VideoCreationApp {
     }
 
     /**
-     * Load model images from configuration
+     * Load model images from configuration and database
      */
-    loadModelImages() {
+    async loadModelImages() {
         try {
+            // Load static model images
             const modelElements = this.domCache.get('model-images', () => 
                 safeGetElements('.model-image')
             );
@@ -133,8 +120,127 @@ class VideoCreationApp {
                     console.warn(`Invalid or missing image for model: ${modelId}`);
                 }
             });
+            
+            // Load registered models from database
+            await this.loadRegisteredModels();
+            
         } catch (error) {
             handleError(error, 'Model image loading');
+        }
+    }
+
+    /**
+     * Load registered models from database
+     */
+    async loadRegisteredModels() {
+        try {
+            // Initialize database
+            await xbrushDB.init();
+            
+            // Get approved models
+            const registeredModels = await xbrushDB.getApprovedModels();
+            
+            if (registeredModels.length > 0) {
+                this.renderRegisteredModels(registeredModels);
+            }
+            
+        } catch (error) {
+            console.error('Error loading registered models:', error);
+            // Don't show error to user as this is optional functionality
+        }
+    }
+
+    /**
+     * Render registered models in Step 1
+     */
+    renderRegisteredModels(models) {
+        const step1 = document.getElementById('step1');
+        if (!step1) return;
+        
+        // Find the virtual models section
+        const virtualSection = step1.querySelector('.card-grid').parentElement;
+        if (!virtualSection) return;
+        
+        // Create registered models section
+        const registeredSection = document.createElement('section');
+        registeredSection.className = 'registered-models-section';
+        registeredSection.innerHTML = `
+            <header class="flex items-center mb-2">
+                <h2 class="subheading mb-0 mr-3">등록된 AI 모델</h2>
+                <span class="badge badge-new">NEW</span>
+            </header>
+            <p class="description mb-2">커뮤니티에서 등록한 실제 모델들입니다.</p>
+            <div class="card-grid" id="registeredModelsGrid"></div>
+        `;
+        
+        const grid = registeredSection.querySelector('#registeredModelsGrid');
+        
+        models.forEach(model => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.setAttribute('data-model', model.id);
+            card.setAttribute('data-tier', model.tier);
+            card.onclick = () => selectModel(card, model.id, model.tier);
+            
+            // Create model image element
+            const modelImage = document.createElement('div');
+            modelImage.className = 'model-image';
+            modelImage.style.backgroundImage = `url('${model.profileImage}')`;
+            
+            // Add tier badge
+            const badge = document.createElement('div');
+            badge.className = `badge ${model.tier === 'premium' ? 'premium-badge' : ''}`;
+            badge.textContent = model.tier === 'premium' ? '100💎' : 'FREE';
+            modelImage.appendChild(badge);
+            
+            // Create card content
+            card.innerHTML = `
+                <h3>${model.name}</h3>
+                <p>${model.description}</p>
+            `;
+            
+            // Prepend the model image
+            card.insertBefore(modelImage, card.firstChild);
+            
+            grid.appendChild(card);
+        });
+        
+        // Insert after virtual models section
+        virtualSection.parentElement.insertBefore(registeredSection, virtualSection.nextSibling);
+        
+        // Update badge style if not already in CSS
+        if (!document.querySelector('#registered-models-styles')) {
+            const style = document.createElement('style');
+            style.id = 'registered-models-styles';
+            style.textContent = `
+                .registered-models-section {
+                    margin-top: 40px;
+                }
+                
+                .badge-new {
+                    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+                    color: white;
+                    padding: 4px 8px;
+                    border-radius: 12px;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+                
+                .flex {
+                    display: flex;
+                }
+                
+                .items-center {
+                    align-items: center;
+                }
+                
+                .mr-3 {
+                    margin-right: 12px;
+                }
+            `;
+            document.head.appendChild(style);
         }
     }
 
@@ -176,10 +282,7 @@ class DataService {
             videoCreated: false,
             hasChosenImagePreview: false,
             skipImagePreview: false,
-            selectedVideoCuts: {},
-            termsAgreed: false,
-            termsAgreements: null,
-            termsAgreedAt: null
+            selectedVideoCuts: {}
         };
     }
 
@@ -203,13 +306,6 @@ class DataService {
      */
     getData() {
         return { ...this.selectedData }; // Return a copy
-    }
-    
-    /**
-     * Getter for direct data access
-     */
-    get data() {
-        return this.selectedData;
     }
 
     /**
@@ -320,14 +416,7 @@ class UIController {
         try {
             const element = safeGetElement(elementId);
             if (element) {
-                // Use both style.display and hidden class for consistency
-                if (show) {
-                    element.style.display = 'block';
-                    element.classList.remove('hidden');
-                } else {
-                    element.style.display = 'none';
-                    element.classList.add('hidden');
-                }
+                element.style.display = show ? 'block' : 'none';
             }
         } catch (error) {
             handleError(error, 'Element toggle');
@@ -425,7 +514,7 @@ class StepManager {
     /**
      * Navigate to a specific step
      */
-    goToStep(step, updateURL = true) {
+    goToStep(step) {
         try {
             // Validate step number
             if (step < 1 || step > STEPS.TOTAL) {
@@ -433,32 +522,10 @@ class StepManager {
                 return;
             }
 
-            // Check restriction: can't go back after VIDEO_CREATION (step 6)
-            if (this.currentStep >= STEPS.VIDEO_CREATION && step < this.currentStep) {
-                showToast('⚠️ 이미지 생성 이후에는 이전 단계로 돌아갈 수 없습니다.', 'warning');
-                // If this was triggered by browser back, we need to update URL to current step
-                if (!updateURL && window.urlStateManager) {
-                    window.urlStateManager.updateState({ step: this.currentStep }, true);
-                }
-                return;
-            }
-            
-            // Check if trying to access step 8 without proper flow
-            if (step === 8 && !window.isFromAdvancedEditMode) {
-                console.warn('Step 8 can only be accessed through advanced edit mode');
-                showToast('⚠️ 영상 컷 선택은 고급 편집 모드를 통해서만 접근할 수 있습니다.', 'warning');
-                return;
-            }
-
             // Check if previous steps are completed
             if (step > 1 && !this.dataService.isStepCompleted(step - 1)) {
                 showToast('이전 단계를 먼저 완료해주세요.', 'warning');
                 return;
-            }
-
-            // Update URL state
-            if (updateURL && window.urlStateManager) {
-                window.urlStateManager.updateState({ step: step });
             }
 
             // Deactivate current step
@@ -501,12 +568,6 @@ class StepManager {
         try {
             switch(step) {
                 case STEPS.VIDEO_CREATION:
-                    // Initialize current image comparison when entering step 6
-                    setTimeout(() => {
-                        initializeCurrentImageComparison();
-                        initializeEnhancedImageSelection();
-                    }, 100);
-                    
                     // Check if this is video regeneration from cut selection
                     if (window.videoRegenerationInProgress) {
                         // Don't auto-start, let startVideoRegenerationProgress handle it
@@ -535,18 +596,23 @@ class StepManager {
                         cameFromImageSelection: window.cameFromImageSelection
                     });
                     
-                    // Always ensure Advanced Edit Mode is visible in Step 7
-                    // This fixes the issue where Advanced Mode box disappears after video workflows
-                    const advancedEditSection = document.getElementById('advancedEditSection');
-                    if (advancedEditSection) {
-                        advancedEditSection.style.display = 'block';
-                        console.log('Advanced Edit Mode ensured visible in Step 7');
-                    }
+                    // More robust flag checking
+                    const shouldHideAdvancedEdit = window.videoRegenerationCompleted && 
+                                                  !window.advancedEditAlreadyHidden && 
+                                                  !window.cameFromImageSelection;
                     
-                    // Only show completion message if video regeneration was completed
-                    if (window.videoRegenerationCompleted && !window.advancedEditAlreadyHidden) {
-                        showToast('영상 제작이 완료되었습니다! 다운로드하거나 새 광고를 만들어보세요.', 'success');
+                    console.log('Should hide Advanced Edit Mode:', shouldHideAdvancedEdit);
+                    
+                    if (shouldHideAdvancedEdit) {
+                        this.hideAdvancedEditAfterCompletion();
                         window.advancedEditAlreadyHidden = true;
+                    } else {
+                        // Always ensure Advanced Edit Mode is visible for image selection workflow
+                        const advancedEditSection = document.getElementById('advancedEditSection');
+                        if (advancedEditSection) {
+                            advancedEditSection.style.display = 'block';
+                            console.log('Advanced Edit Mode kept visible');
+                        }
                     }
                     break;
                 case STEPS.VIDEO_CUT_SELECTION:
@@ -640,11 +706,6 @@ class StepManager {
             
             if (nextButton) {
                 this.uiController.updateButtonState(`step${this.currentStep}Next`, isCompleted);
-                // Also update the fixed button if it exists
-                const fixedButton = safeGetElement(`step${this.currentStep}NextFixed`);
-                if (fixedButton) {
-                    this.uiController.updateButtonState(`step${this.currentStep}NextFixed`, isCompleted);
-                }
             }
         } catch (error) {
             handleError(error, 'Next button check');
@@ -738,27 +799,6 @@ class StepManager {
                 if (progress >= 100) {
                     clearInterval(progressInterval);
                     this.dataService.updateField('videoCreated', true);
-                    
-                    // Send Slack notification for movie creation
-                    if (window.slackNotifier) {
-                        const movieData = {
-                            projectName: this.dataService.selectedData.productName || 'Untitled',
-                            modelName: this.dataService.selectedData.modelName || 'Unknown Model',
-                            videoType: this.dataService.selectedData.format || 'Unknown Format',
-                            style: this.dataService.selectedData.style || 'Unknown Style',
-                            targetAudience: this.dataService.selectedData.targetAudience || 'Unknown'
-                        };
-                        
-                        window.slackNotifier.notifyMovieCreation(movieData)
-                            .then(result => {
-                                if (result.success) {
-                                    console.log('Movie creation notification sent to Slack');
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Failed to send Slack notification:', error);
-                            });
-                    }
                     
                     setTimeout(() => {
                         showToast('최종 영상 제작이 완료되었습니다! 🎬', 'success');
@@ -948,92 +988,20 @@ class StepManager {
                     window.imageToVideoInProgress = false;
                     
                     setTimeout(() => {
-                        showToast('영상 제작이 완료되었습니다! 🎬', 'success');
-                        // Navigate to Step 7 (Results) - NOT Step 8
-                        this.goToStep(7);
+                        showToast('영상 컷 생성이 완료되었습니다! 컷을 선택해주세요. ✂️', 'success');
+                        // Navigate to Step 8 (Video Cut Selection)
+                        this.goToStep(8);
+                        
+                        // Initialize video cuts after navigation
+                        setTimeout(() => {
+                            initializeVideoCuts();
+                        }, 300);
                     }, VIDEO_CONFIG.COMPLETION_DELAY);
                 }
             }, VIDEO_CONFIG.PROGRESS_INTERVAL);
             
         } catch (error) {
             handleError(error, 'Image-to-video generation process');
-        }
-    }
-
-    /**
-     * Start video regeneration progress
-     */
-    startVideoRegenerationProgress() {
-        try {
-            // Show video creation progress section
-            const videoCreationProgress = document.getElementById('videoCreationProgress');
-            const imagePreviewSection = document.getElementById('imagePreviewSection');
-            const videoCutSelection = document.getElementById('videoCutSelection');
-            
-            if (videoCreationProgress) {
-                videoCreationProgress.style.display = 'block';
-            }
-            if (imagePreviewSection) {
-                imagePreviewSection.style.display = 'none';
-            }
-            if (videoCutSelection) {
-                videoCutSelection.style.display = 'none';
-            }
-            
-            // Start video regeneration with progress tracking
-            const progressBar = this.domCache.get('progress-fill-step6', () => 
-                document.querySelector('#step6 .progress-fill')
-            );
-            const statusText = safeGetElement('videoCreationStatus');
-            
-            if (!progressBar || !statusText) {
-                console.error('Video creation progress elements not found');
-                return;
-            }
-            
-            // Initialize progress
-            let progress = 0;
-            progressBar.style.width = '0%';
-            statusText.textContent = '영상 재생성 준비 중...';
-            
-            // Simulate video regeneration progress
-            const progressInterval = setInterval(() => {
-                const increment = Math.random() * 15 + 5;
-                progress = Math.min(progress + increment, 95);
-                
-                progressBar.style.width = progress + '%';
-                
-                // Update status based on progress
-                if (progress < 25) {
-                    statusText.textContent = '기존 영상 분석 중...';
-                } else if (progress < 50) {
-                    statusText.textContent = '새로운 스타일 적용 중...';
-                } else if (progress < 75) {
-                    statusText.textContent = '영상 편집 중...';
-                } else {
-                    statusText.textContent = '최종 렌더링 중...';
-                }
-                
-                // Complete when progress reaches 95%
-                if (progress >= 95) {
-                    clearInterval(progressInterval);
-                    
-                    // Complete the progress
-                    progressBar.style.width = '100%';
-                    statusText.textContent = '영상 재생성 완료!';
-                    
-                    setTimeout(() => {
-                        showToast('영상 재생성이 완료되었습니다! 🎬', 'success');
-                        this.goToStep(7);
-                    }, 1000);
-                }
-            }, 800);
-            
-            // Store interval for cleanup
-            window.videoRegenerationInterval = progressInterval;
-            
-        } catch (error) {
-            handleError(error, 'Video regeneration process');
         }
     }
 
@@ -1156,23 +1124,19 @@ class StepManager {
     }
 
     /**
-     * Handle video regeneration completion (deprecated - Advanced Edit Mode should always be visible)
+     * Hide advanced edit mode after video regeneration completion
      */
     hideAdvancedEditAfterCompletion() {
         try {
-            // Advanced Edit Mode should always remain visible in Step 7
-            // This method is now deprecated but kept for backwards compatibility
             const advancedEditSection = document.getElementById('advancedEditSection');
             if (advancedEditSection) {
-                // Instead of hiding, ensure it's visible
-                advancedEditSection.style.display = 'block';
-                console.log('Advanced Edit Mode kept visible (hideAdvancedEditAfterCompletion called)');
+                advancedEditSection.style.display = 'none';
             }
             
             // Show completion message
             showToast('영상 제작이 완료되었습니다! 다운로드하거나 새 광고를 만들어보세요.', 'success');
             
-            // Reset the completion flag
+            // Reset the completion flag but DON'T automatically show advanced edit section
             setTimeout(() => {
                 window.videoRegenerationCompleted = false;
                 window.advancedEditAlreadyHidden = false;
@@ -1183,6 +1147,8 @@ class StepManager {
                 } else {
                     window.cameFromImageSelection = false;
                 }
+                // Don't automatically show advanced edit section to prevent navigation loop
+                // User can manually scroll down to see it if needed
             }, 1500);
         } catch (error) {
             handleError(error, 'Advanced edit completion handling');
@@ -1277,106 +1243,6 @@ let app; // Global app instance
 function initializeApp() {
     try {
         app = new VideoCreationApp();
-        
-        // Set up URL state management for steps
-        if (window.urlStateManager) {
-            // Listen for step changes from URL (browser back/forward)
-            window.urlStateManager.addListener('step', function(step) {
-                if (step && app && app.stepManager) {
-                    const stepNumber = parseInt(step, 10);
-                    if (!isNaN(stepNumber) && stepNumber !== app.stepManager.currentStep) {
-                        // Use goToStep with updateURL=false to prevent infinite loop
-                        app.stepManager.goToStep(stepNumber, false);
-                    }
-                }
-            });
-            
-            // Check initial URL state
-            const initialStep = window.urlStateManager.getState('step');
-            if (initialStep && app && app.stepManager) {
-                const stepNumber = parseInt(initialStep, 10);
-                if (!isNaN(stepNumber) && stepNumber > 1 && stepNumber <= STEPS.TOTAL) {
-                    // Navigate to the step from URL (if valid and not step 1)
-                    setTimeout(() => {
-                        app.stepManager.goToStep(stepNumber, false);
-                    }, 100);
-                }
-            }
-        }
-        
-        // Check if we're coming from model showcase with a selected model
-        const skipToStep2 = sessionStorage.getItem('skipToStep2');
-        const selectedModelId = sessionStorage.getItem('selectedModelForMovie');
-        
-        if (skipToStep2 === 'true' && selectedModelId) {
-            // Clear the flags
-            sessionStorage.removeItem('skipToStep2');
-            sessionStorage.removeItem('selectedModelForMovie');
-            
-            // Wait for app to be fully initialized and models to load
-            setTimeout(async () => {
-                console.log('[App] Looking for model:', selectedModelId);
-                
-                // First, directly set the model in data service
-                app.dataService.updateField('model', selectedModelId);
-                
-                // Try to get model tier from any loaded model
-                let modelTier = 'basic';
-                
-                // Check all possible model containers
-                const allCards = document.querySelectorAll('.featured-model-card, .premium-model-card, .card[data-model-id]');
-                let modelFound = false;
-                
-                allCards.forEach(card => {
-                    const onclick = card.getAttribute('onclick') || '';
-                    const dataId = card.getAttribute('data-model-id') || '';
-                    
-                    if (onclick.includes(selectedModelId) || dataId === selectedModelId) {
-                        // Extract tier from onclick if possible
-                        const tierMatch = onclick.match(/['"](\w+)['"]\s*\)$/);
-                        if (tierMatch) {
-                            modelTier = tierMatch[1];
-                        }
-                        
-                        // Mark the card as selected
-                        card.classList.add('selected');
-                        modelFound = true;
-                    }
-                });
-                
-                // Set the tier
-                app.dataService.updateField('modelTier', modelTier);
-                
-                // Verify the model is actually set in dataService
-                const modelIsSet = app.dataService.selectedData.model !== null;
-                console.log('[App] Model selection status:', {
-                    modelFound,
-                    selectedModelId,
-                    modelIsSet,
-                    dataServiceModel: app.dataService.selectedData.model
-                });
-                
-                // Now we can safely go to step 2
-                if (modelIsSet) {
-                    console.log('[App] Model successfully set, moving to step 2');
-                    // Force update the UI to show model as selected
-                    app.stepManager.checkNextButton();
-                    
-                    // Small delay to ensure UI updates
-                    setTimeout(() => {
-                        app.stepManager.goToStep(2);
-                        showToast('선택한 모델로 동영상 제작을 시작합니다.', 'info');
-                    }, 100);
-                } else {
-                    console.log('[App] Model not properly set, staying on step 1');
-                    showToast('모델을 다시 선택해주세요.', 'warning');
-                    // Ensure we stay on step 1
-                    app.stepManager.goToStep(1);
-                }
-            }, 1500);
-        }
-        
-        // Featured models will be loaded when Firebase is ready
     } catch (error) {
         handleError(error, 'Application initialization');
     }
@@ -1385,7 +1251,7 @@ function initializeApp() {
 /**
  * Model selection handler
  */
-function selectModel(element, modelId, tier) {
+async function selectModel(element, modelId, tier) {
     try {
         app.uiController.clearSelections('#step1');
         element.classList.add('selected');
@@ -1393,31 +1259,39 @@ function selectModel(element, modelId, tier) {
         app.dataService.updateField('model', modelId);
         app.dataService.updateField('modelTier', tier);
         
-        // Stop premium carousel auto-scroll if it exists (for ANY model selection)
-        if (window.premiumManager && window.premiumManager.autoScrollAnimation) {
-            window.premiumManager.stopAutoScroll();
-        }
-        
-        // If this is a premium model in carousel, center it
-        if (element.closest('.premium-models-carousel')) {
-            // Center the selected model
-            const carousel = element.closest('.premium-models-carousel');
-            const cardRect = element.getBoundingClientRect();
-            const carouselRect = carousel.getBoundingClientRect();
-            const cardCenter = cardRect.left + cardRect.width / 2;
-            const carouselCenter = carouselRect.left + carouselRect.width / 2;
-            const scrollOffset = cardCenter - carouselCenter;
-            
-            carousel.scrollTo({
-                left: carousel.scrollLeft + scrollOffset,
-                behavior: 'smooth'
-            });
-        }
-        
-        if (tier === 'premium') {
+        // Handle registered models
+        if (modelId.startsWith('model_')) {
+            try {
+                // Load model details from database
+                const modelDetails = await xbrushDB.getModelDetails(modelId);
+                if (modelDetails) {
+                    app.dataService.updateField('modelDetails', modelDetails);
+                    
+                    // Check contract terms
+                    if (modelDetails.contract.requiresReview) {
+                        showToast('이 모델은 사전 검토가 필요합니다.', 'info');
+                    }
+                    
+                    // Check contract expiration
+                    const expiresAt = new Date(modelDetails.contract.expiresAt);
+                    if (expiresAt < new Date()) {
+                        showToast('⚠️ 이 모델의 계약이 만료되었습니다.', 'warning');
+                        return;
+                    }
+                }
+                
+                // Track usage
+                await xbrushDB.trackUsage(modelId);
+                
+                showToast('🎬 등록된 AI 모델이 선택되었습니다! 100 크레딧이 차감됩니다.', 'info');
+                
+            } catch (error) {
+                console.error('Error handling registered model:', error);
+                showToast('모델 정보를 불러오는데 실패했습니다.', 'error');
+                return;
+            }
+        } else if (tier === 'premium') {
             showToast('🎬 프리미엄 배우가 선택되었습니다! 100 크레딧이 차감됩니다.', 'info');
-        } else if (tier === 'vip') {
-            showToast('💎 VIP 모델이 선택되었습니다!', 'info');
         }
         
         app.stepManager.checkNextButton();
@@ -1492,90 +1366,10 @@ function selectImage(element, cut, imageId) {
         data.selectedImages[cut] = imageId;
         app.dataService.updateField('selectedImages', data.selectedImages);
         
-        // Update current image comparison area
-        updateCurrentImageComparison(cut, element);
-        
         app.stepManager.checkNextButton();
-        updateImageSelectionButton();
+        checkImageSelectionButton();
     } catch (error) {
         handleError(error, 'Image selection');
-    }
-}
-
-/**
- * Update current image comparison area
- */
-function updateCurrentImageComparison(cut, selectedElement) {
-    try {
-        const currentImageElement = document.getElementById(`${cut}CurrentImage`);
-        const placeholderElement = document.getElementById(`${cut}CurrentPlaceholder`);
-        const containerElement = currentImageElement?.parentElement;
-        
-        if (!currentImageElement || !placeholderElement || !containerElement) {
-            console.warn(`Current image comparison elements not found for ${cut}`);
-            return;
-        }
-        
-        if (selectedElement) {
-            // Get the selected image source
-            const selectedImg = selectedElement.querySelector('img');
-            if (selectedImg && selectedImg.src) {
-                // Update current image
-                currentImageElement.src = selectedImg.src;
-                currentImageElement.alt = `현재 ${cut} 이미지`;
-                currentImageElement.style.display = 'block';
-                
-                // Hide placeholder
-                placeholderElement.style.display = 'none';
-                
-                // Add visual indicator
-                containerElement.classList.add('has-image');
-                
-                console.log(`Updated current image for ${cut}`);
-            }
-        } else {
-            // Clear current image
-            currentImageElement.src = '';
-            currentImageElement.style.display = 'none';
-            
-            // Show placeholder
-            placeholderElement.style.display = 'flex';
-            
-            // Remove visual indicator
-            containerElement.classList.remove('has-image');
-            
-            console.log(`Cleared current image for ${cut}`);
-        }
-    } catch (error) {
-        console.error('Error updating current image comparison:', error);
-    }
-}
-
-/**
- * Initialize current image comparison on page load
- */
-function initializeCurrentImageComparison() {
-    try {
-        const data = app?.dataService?.getData();
-        if (!data || !data.selectedImages) return;
-        
-        const cuts = ['cut1', 'cut2', 'cut3'];
-        
-        cuts.forEach(cutId => {
-            const selectedImageId = data.selectedImages[cutId];
-            if (selectedImageId) {
-                // Find the selected image element
-                const selectedElement = document.querySelector(
-                    `.image-grid[data-cut-section="${cutId}"] .image-option.selected`
-                );
-                
-                if (selectedElement) {
-                    updateCurrentImageComparison(cutId, selectedElement);
-                }
-            }
-        });
-    } catch (error) {
-        console.error('Error initializing current image comparison:', error);
     }
 }
 
@@ -1583,47 +1377,7 @@ function initializeCurrentImageComparison() {
  * Navigation functions
  */
 function nextStep() {
-    console.log('nextStep called', {
-        app: !!app,
-        currentStep: app?.stepManager?.currentStep,
-        TermsPopup: !!window.TermsPopup,
-        termsAgreed: app?.dataService?.selectedData?.termsAgreed,
-        model: app?.dataService?.selectedData?.model
-    });
-    
-    // Show terms popup when moving from step 1 to step 2 (after model selection)
-    if (app && app.stepManager.currentStep === 1 && window.TermsPopup && !app.dataService.selectedData.termsAgreed) {
-        // Check if model is selected first
-        if (!app.dataService.selectedData.model) {
-            showToast('먼저 모델을 선택해주세요.', 'warning');
-            return;
-        }
-        
-        console.log('Showing terms popup for movie maker');
-        const termsPopup = new TermsPopup({
-            context: 'movie-maker',
-            onAgree: (agreements) => {
-                console.log('Terms agreed', agreements);
-                // Store agreements in app data
-                if (app.dataService) {
-                    app.dataService.selectedData.termsAgreements = agreements;
-                    app.dataService.selectedData.termsAgreedAt = new Date().toISOString();
-                    app.dataService.selectedData.termsAgreed = true;
-                }
-                
-                showToast('약관에 동의하셨습니다. 동영상 제작을 시작합니다!', 'success');
-                app.stepManager.nextStep();
-            },
-            onCancel: () => {
-                console.log('Terms cancelled');
-                showToast('약관 동의가 필요합니다.', 'warning');
-            }
-        });
-        termsPopup.show();
-    } else if (app) {
-        console.log('Proceeding to next step without terms popup');
-        app.stepManager.nextStep();
-    }
+    if (app) app.stepManager.nextStep();
 }
 
 function prevStep() {
@@ -1660,9 +1414,13 @@ function approveScenario() {
         app.dataService.updateField('scenarioApproved', true);
         app.stepManager.checkNextButton();
         
-        showToast('시나리오가 승인되었습니다! 영상 제작을 시작합니다.', 'success');
+        const nextButton = safeGetElement('step5Next');
+        if (nextButton) {
+            nextButton.style.display = 'block';
+        }
         
-        // Directly go to next step without showing the redundant button
+        showToast('시나리오가 승인되었습니다! 영상 제작을 시작할 수 있습니다.', 'success');
+        
         setTimeout(() => {
             nextStep();
         }, 1000);
@@ -1924,14 +1682,10 @@ function executeEditOption(option, cost) {
                 // Navigate to Step 8 (Video Cut Selection)
                 setTimeout(() => {
                     if (app && app.stepManager) {
-                        // Set flag to allow access to step 8
-                        window.isFromAdvancedEditMode = true;
                         app.stepManager.goToStep(8);
                         // Initialize video cuts after navigation
                         setTimeout(() => {
-                            initializeEnhancedVideoCuts();
-                            // Reset flag after navigation
-                            window.isFromAdvancedEditMode = false;
+                            initializeVideoCuts();
                         }, 300);
                     }
                 }, 500);
@@ -2005,11 +1759,6 @@ function showImagePreviewOption() {
         }
         if (imagePreviewSection) {
             imagePreviewSection.style.display = 'block';
-            
-            // Initialize current image comparison when image preview section becomes visible
-            setTimeout(() => {
-                initializeCurrentImageComparison();
-            }, 100);
         } else {
             // If imagePreviewSection doesn't exist, show a placeholder
             showToast('이미지 선택 인터페이스를 로드하고 있습니다...', 'info');
@@ -2103,7 +1852,7 @@ function regenerateImages(cut) {
             imageGrid.style.pointerEvents = 'auto';
             
             // Update selection status
-            updateImageSelectionButton();
+            checkImageSelectionButton();
             
             showToast(`${cut} 이미지가 새로 생성되었습니다!`, 'success');
         }, 2000);
@@ -2420,24 +2169,16 @@ function proceedWithSelectedCuts() {
     try {
         // Get current cut configuration
         const cutConfiguration = getCurrentCutConfiguration();
-        const costData = updateCostCalculation();
+        const { regenerationCount, totalCost } = updateCostCalculation();
         
         console.log('Cut configuration:', cutConfiguration);
-        console.log('Cost data returned:', costData);
-        
-        // Ensure we have valid values
-        const regenerationCount = costData?.regenerationCount || 0;
-        const totalCost = costData?.totalCost || 0;
-        
         console.log('Regeneration count:', regenerationCount, 'Total cost:', totalCost);
         
         // Store configuration for use during processing
         window.currentCutConfiguration = cutConfiguration;
         
         // Show appropriate message based on configuration
-        console.log('About to check regeneration count conditions...');
         if (regenerationCount === 0) {
-            console.log('Regeneration count is 0');
             showToast('기존 영상을 그대로 사용합니다.', 'info');
             
             // Skip regeneration and go directly to results
@@ -2459,7 +2200,6 @@ function proceedWithSelectedCuts() {
             }, 1000);
             
         } else if (regenerationCount === 3) {
-            console.log('Regeneration count is 3');
             showToast(`전체 컷을 새로 생성합니다... (${totalCost} 토큰 소모)`, 'info');
             
             // Navigate to Step 6 for full regeneration
@@ -2478,38 +2218,21 @@ function proceedWithSelectedCuts() {
             }, 1000);
             
         } else {
-            console.log('Regeneration count is:', regenerationCount, '(partial regeneration)');
-            try {
-                showToast(`${regenerationCount}개 컷을 새로 생성합니다... (${totalCost} 토큰 소모)`, 'info');
-            } catch (e) {
-                console.error('Error showing toast:', e);
-            }
-            
-            console.log('Setting up navigation to Step 6...');
+            showToast(`${regenerationCount}개 컷을 새로 생성합니다... (${totalCost} 토큰 소모)`, 'info');
             
             // Navigate to Step 6 for partial regeneration
             setTimeout(() => {
-                console.log('Timeout fired, checking app and stepManager...');
-                console.log('app exists:', !!app);
-                console.log('app.stepManager exists:', !!(app && app.stepManager));
-                
                 if (app && app.stepManager) {
-                    console.log('Calling goToStep(6)...');
                     app.stepManager.goToStep(6);
                     
                     // Set flag to trigger partial video regeneration progress
                     window.videoRegenerationInProgress = true;
                     window.partialRegenerationInProgress = true;
                     
-                    console.log('Flags set, scheduling regeneration progress...');
-                    
                     // Start the video regeneration progress
                     setTimeout(() => {
-                        console.log('Starting partial video regeneration progress...');
                         startPartialVideoRegenerationProgress();
                     }, 500);
-                } else {
-                    console.error('app or stepManager not available!');
                 }
             }, 1000);
         }
@@ -2687,75 +2410,51 @@ function initializeEnhancedVideoCuts() {
  */
 function initializeVideoElements() {
     try {
-        console.log('Starting video initialization...');
-        const containers = document.querySelectorAll('.video-cut-container');
+        const videos = document.querySelectorAll('.cut-video');
         
-        containers.forEach((container) => {
-            const cutData = container.getAttribute('data-cut');
-            const video = container.querySelector('.cut-video');
-            const placeholder = container.querySelector('.video-placeholder');
+        videos.forEach((video, index) => {
+            const cutId = `cut${index + 1}`;
+            const container = video.closest('.video-cut-container');
             
-            if (!video || !placeholder || !cutData) {
-                console.warn(`Missing elements for container:`, container);
-                return;
-            }
+            console.log(`Initializing video for ${cutId}`, video);
             
-            console.log(`Initializing video for ${cutData}`, { video, placeholder });
-            
-            // Show loading state initially
-            showVideoLoadingState(container, cutData);
+            // Add loading indicator
+            showVideoLoadingState(container);
             
             // Handle successful video load
             video.addEventListener('loadedmetadata', () => {
-                console.log(`Video ${cutData} metadata loaded successfully`);
-                hideVideoLoadingState(container, cutData);
+                console.log(`Video ${cutId} metadata loaded successfully`);
+                hideVideoLoadingState(container);
                 container.classList.add('video-loaded');
                 
                 // Try to play the video
                 video.play().catch(error => {
-                    console.warn(`Video ${cutData} autoplay failed:`, error);
-                    // Show play button if autoplay fails
-                    showVideoPlayButton(container, cutData);
+                    console.warn(`Video ${cutId} autoplay failed:`, error);
+                    // Autoplay failed, but video is loaded
                 });
             });
             
             // Handle video load errors
             video.addEventListener('error', (e) => {
-                console.error(`Video ${cutData} loading error:`, e);
-                showVideoErrorState(container, cutData);
+                console.error(`Video ${cutId} loading error:`, e);
+                showVideoErrorState(container, cutId);
             });
             
             // Handle video loading start
             video.addEventListener('loadstart', () => {
-                console.log(`Video ${cutData} loading started`);
-                showVideoLoadingState(container, cutData);
+                console.log(`Video ${cutId} loading started`);
+                showVideoLoadingState(container);
             });
             
             // Handle video ready to play
             video.addEventListener('canplay', () => {
-                console.log(`Video ${cutData} ready to play`);
-                hideVideoLoadingState(container, cutData);
-                container.classList.add('video-loaded');
-            });
-            
-            // Handle video loading
-            video.addEventListener('canplaythrough', () => {
-                console.log(`Video ${cutData} can play through`);
-                hideVideoLoadingState(container, cutData);
+                console.log(`Video ${cutId} ready to play`);
+                hideVideoLoadingState(container);
                 container.classList.add('video-loaded');
             });
             
             // Force video to load
             video.load();
-            
-            // Set timeout to handle stuck loading
-            setTimeout(() => {
-                if (!container.classList.contains('video-loaded') && 
-                    !container.classList.contains('video-error')) {
-                    console.warn(`Video ${cutData} loading timeout`);
-                    showVideoErrorState(container, cutData);
-                }
-            }, 8000); // 8 second timeout
         });
         
         console.log('Video elements initialized');
@@ -2768,25 +2467,21 @@ function initializeVideoElements() {
 /**
  * Show video loading state
  */
-function showVideoLoadingState(container, cutId) {
+function showVideoLoadingState(container) {
     try {
-        const placeholder = container.querySelector('.video-placeholder');
-        const video = container.querySelector('.cut-video');
-        
-        if (placeholder) {
-            placeholder.style.display = 'flex';
-            placeholder.innerHTML = `
-                <div class="loading-spinner"></div>
-                <p>비디오 로딩 중...</p>
+        const preview = container.querySelector('.video-cut-preview');
+        if (preview && !preview.querySelector('.video-loading-overlay')) {
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.className = 'video-loading-overlay';
+            loadingOverlay.innerHTML = `
+                <div class="loading-content">
+                    <div class="loading-spinner"></div>
+                    <p>비디오 로딩 중...</p>
+                </div>
             `;
+            preview.appendChild(loadingOverlay);
+            container.classList.add('video-loading');
         }
-        
-        if (video) {
-            video.style.display = 'none';
-        }
-        
-        container.classList.add('video-loading');
-        console.log(`Showing loading state for ${cutId}`);
     } catch (error) {
         console.error('Error in showVideoLoadingState:', error);
     }
@@ -2795,21 +2490,13 @@ function showVideoLoadingState(container, cutId) {
 /**
  * Hide video loading state
  */
-function hideVideoLoadingState(container, cutId) {
+function hideVideoLoadingState(container) {
     try {
-        const placeholder = container.querySelector('.video-placeholder');
-        const video = container.querySelector('.cut-video');
-        
-        if (placeholder) {
-            placeholder.style.display = 'none';
+        const loadingOverlay = container.querySelector('.video-loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.remove();
         }
-        
-        if (video) {
-            video.style.display = 'block';
-        }
-        
         container.classList.remove('video-loading');
-        console.log(`Hiding loading state for ${cutId}`);
     } catch (error) {
         console.error('Error in hideVideoLoadingState:', error);
     }
@@ -2820,29 +2507,30 @@ function hideVideoLoadingState(container, cutId) {
  */
 function showVideoErrorState(container, cutId) {
     try {
-        const placeholder = container.querySelector('.video-placeholder');
-        const video = container.querySelector('.cut-video');
+        const preview = container.querySelector('.video-cut-preview');
+        const video = preview.querySelector('.cut-video');
         
         // Hide the video element
-        if (video) {
-            video.style.display = 'none';
-        }
+        video.style.display = 'none';
         
-        // Show error message in placeholder
-        if (placeholder) {
-            placeholder.style.display = 'flex';
-            placeholder.innerHTML = `
+        // Remove loading overlay
+        hideVideoLoadingState(container);
+        
+        // Show error message
+        if (!preview.querySelector('.video-error-overlay')) {
+            const errorOverlay = document.createElement('div');
+            errorOverlay.className = 'video-error-overlay';
+            errorOverlay.innerHTML = `
                 <div class="error-content">
-                    <div class="error-icon">⚠️</div>
+                    <i class="error-icon">⚠️</i>
                     <p>비디오를 로드할 수 없습니다</p>
                     <button class="btn btn-outline" onclick="retryVideoLoad('${cutId}')">다시 시도</button>
                 </div>
             `;
+            preview.appendChild(errorOverlay);
         }
         
         container.classList.add('video-error');
-        container.classList.remove('video-loading');
-        console.log(`Showing error state for ${cutId}`);
         
     } catch (error) {
         console.error('Error in showVideoErrorState:', error);
@@ -2856,82 +2544,18 @@ function retryVideoLoad(cutId) {
     try {
         const container = document.querySelector(`[data-cut="${cutId}"]`);
         const video = container.querySelector('.cut-video');
-        const placeholder = container.querySelector('.video-placeholder');
+        const errorOverlay = container.querySelector('.video-error-overlay');
         
-        if (placeholder) {
-            placeholder.style.display = 'flex';
-            placeholder.innerHTML = `
-                <div class="loading-spinner"></div>
-                <p>비디오 재로딩 중...</p>
-            `;
+        if (errorOverlay) {
+            errorOverlay.remove();
         }
         
+        video.style.display = 'block';
         container.classList.remove('video-error');
-        container.classList.add('video-loading');
-        
-        if (video) {
-            video.style.display = 'none';
-            video.load();
-        }
-        
-        console.log(`Retrying video load for ${cutId}`);
+        video.load();
         
     } catch (error) {
         console.error('Error in retryVideoLoad:', error);
-    }
-}
-
-/**
- * Show video play button when autoplay fails
- */
-function showVideoPlayButton(container, cutId) {
-    try {
-        const video = container.querySelector('.cut-video');
-        const placeholder = container.querySelector('.video-placeholder');
-        
-        if (placeholder) {
-            placeholder.style.display = 'flex';
-            placeholder.innerHTML = `
-                <div class="play-button" onclick="playVideo('${cutId}')">
-                    <div class="play-icon">▶️</div>
-                    <p>클릭하여 재생</p>
-                </div>
-            `;
-        }
-        
-        // Add click event to video as well
-        if (video) {
-            video.addEventListener('click', () => playVideo(cutId));
-        }
-        
-    } catch (error) {
-        console.error('Error in showVideoPlayButton:', error);
-    }
-}
-
-/**
- * Play video manually
- */
-function playVideo(cutId) {
-    try {
-        const container = document.querySelector(`[data-cut="${cutId}"]`);
-        const video = container.querySelector('.cut-video');
-        const placeholder = container.querySelector('.video-placeholder');
-        
-        if (video) {
-            video.play().then(() => {
-                if (placeholder) {
-                    placeholder.style.display = 'none';
-                }
-                video.style.display = 'block';
-            }).catch(error => {
-                console.error(`Failed to play video ${cutId}:`, error);
-                showVideoErrorState(container, cutId);
-            });
-        }
-        
-    } catch (error) {
-        console.error('Error in playVideo:', error);
     }
 }
 
@@ -3028,24 +2652,6 @@ function toggleCutMode(cutId, mode) {
                 originalInfo.style.display = 'block';
             }
             
-            // Update current image comparison to show original placeholder
-            updateCurrentImageComparison(cutId, null);
-            
-            // Update placeholder text to indicate keeping original
-            const placeholderElement = document.getElementById(`${cutId}CurrentPlaceholder`);
-            const comparisonElement = document.getElementById(`${cutId}CurrentComparison`);
-            if (placeholderElement) {
-                const textElement = placeholderElement.querySelector('.placeholder-text');
-                if (textElement) {
-                    textElement.textContent = '원본 컷을 유지합니다';
-                }
-            }
-            
-            // Add visual styling for keeping original
-            if (comparisonElement) {
-                comparisonElement.classList.add('keeping-original');
-            }
-            
             // Mark this cut as using original
             if (app && app.dataService) {
                 app.dataService.updateImageSelection(cutId, 'original');
@@ -3058,32 +2664,6 @@ function toggleCutMode(cutId, mode) {
             }
             if (originalInfo) {
                 originalInfo.style.display = 'none';
-            }
-            
-            // Check if there's already a selected image and update current comparison
-            const selectedElement = document.querySelector(
-                `.image-grid[data-cut-section="${cutId}"] .image-option.selected`
-            );
-            if (selectedElement) {
-                updateCurrentImageComparison(cutId, selectedElement);
-            } else {
-                updateCurrentImageComparison(cutId, null);
-                
-                // Reset placeholder text to default
-                const placeholderElement = document.getElementById(`${cutId}CurrentPlaceholder`);
-                const comparisonElement = document.getElementById(`${cutId}CurrentComparison`);
-                if (placeholderElement) {
-                    const textElement = placeholderElement.querySelector('.placeholder-text');
-                    if (textElement) {
-                        const cutNumber = cutId.replace('cut', '');
-                        textElement.textContent = `컷 ${cutNumber} 이미지가 선택되지 않았습니다`;
-                    }
-                }
-                
-                // Remove keeping-original styling
-                if (comparisonElement) {
-                    comparisonElement.classList.remove('keeping-original');
-                }
             }
             
             // Clear original selection
@@ -3130,15 +2710,6 @@ function updateImageSelectionButton() {
         }
         
         proceedButton.disabled = !allCutsReady;
-        
-        // Update button styling based on enabled/disabled state
-        if (allCutsReady) {
-            proceedButton.classList.remove('btn-disabled');
-            proceedButton.classList.add('btn-primary');
-        } else {
-            proceedButton.classList.add('btn-disabled');
-            proceedButton.classList.remove('btn-primary');
-        }
         
         // Update button text based on selections
         const keepCount = cuts.filter(cutId => {
@@ -3213,272 +2784,6 @@ function initializeEnhancedImageSelection() {
         
     } catch (error) {
         console.error('Error in initializeEnhancedImageSelection:', error);
-    }
-}
-
-// ========================================
-// Featured Models Display
-// ========================================
-
-/**
- * Load and display featured models on the main page
- */
-async function loadFeaturedModels() {
-    const featuredModelsGrid = document.getElementById('featuredModelsGrid');
-    const modelCount = document.getElementById('modelCount');
-    
-    if (!featuredModelsGrid) {
-        console.error('featuredModelsGrid not found!');
-        return;
-    }
-    
-    // Show loading state (no sample models)
-    featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>모델을 불러오는 중...</p></div>';
-    
-    try {
-        // Wait for Firebase to be ready
-        console.log('[Featured Models] Waiting for Firebase...');
-        await waitForFirebase();
-        console.log('[Featured Models] Firebase ready!');
-        
-        // Get active models from Firebase
-        console.log('[Featured Models] Fetching models from Firebase...');
-        const allModels = await window.modelStorageAdapter.getActiveModels();
-        console.log('[Featured Models] Got all models:', allModels.length);
-        
-        // Filter out premium models (only show basic models)
-        const models = allModels.filter(model => 
-            !model.tier || model.tier === 'basic'
-        );
-        console.log('[Featured Models] After filtering premium, basic models:', models.length);
-        
-        // Update count (show only basic models count)
-        modelCount.textContent = `총 ${models.length}개`;
-        
-        if (models.length === 0) {
-            featuredModelsGrid.innerHTML = '<div class="loading-placeholder"><p>등록된 모델이 없습니다.</p></div>';
-            return;
-        }
-        
-        // Randomly select 4 models
-        const shuffled = [...models].sort(() => Math.random() - 0.5);
-        const featuredModels = shuffled.slice(0, 4);
-        
-        // Debug: log first model structure
-        if (featuredModels.length > 0) {
-            console.log('[Featured Models] First model structure:', featuredModels[0]);
-            console.log('[Featured Models] Portfolio:', featuredModels[0].portfolio);
-            console.log('[Featured Models] PersonalInfo:', featuredModels[0].personalInfo);
-        }
-        
-        // Create model cards HTML
-        const modelsHTML = featuredModels.map(model => {
-            // Try multiple possible locations for thumbnail
-            const thumbnailUrl = model.portfolio?.thumbnailUrl || 
-                                model.personalInfo?.thumbnailUrl || 
-                                model.thumbnailUrl ||
-                                model.photos?.[0] ||
-                                model.profileImage ||
-                                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0EwQUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg==';
-            
-            const tier = model.tier || 'basic';
-            const name = model.personalInfo?.name || '이름 없음';
-            
-            return `
-            <div class="featured-model-card card" onclick="selectModel(this, '${model.id}', '${tier}')" role="button" tabindex="0"
-                 onkeydown="if(event.key==='Enter') selectModel(this, '${model.id}', '${tier}')"
-                 aria-label="${name} 선택">
-                <img src="${thumbnailUrl}" 
-                     alt="${name}" 
-                     class="featured-model-image"
-                     loading="lazy"
-                     onload="this.classList.add('loaded');"
-                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTJFOEYwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI0E0QUVDMCIvPgo8cGF0aCBkPSJNNzAgMTMwQzcwIDExMy40MzEgODMuNDMxNSAxMDAgMTAwIDEwMEMxMTYuNTY5IDEwMCAxMzAgMTEzLjQzMSAxMzAgMTMwVjE2MEg3MFYxMzBaIiBmaWxsPSIjQTBBRUMwIi8+Cjwvc3ZnPg=='">
-                <div class="featured-model-info">
-                    <div class="featured-model-name">${name}</div>
-                    <div class="featured-model-intro">${model.personalInfo?.intro || '소개 없음'}</div>
-                    ${model.personalInfo?.categories?.length > 0 ? `
-                        <div class="featured-model-categories">
-                            ${model.personalInfo.categories.slice(0, 2).map(cat => 
-                                `<span class="featured-model-category">${cat}</span>`
-                            ).join('')}
-                        </div>
-                    ` : ''}
-                </div>
-            </div>
-        `}).join('');
-        
-        featuredModelsGrid.innerHTML = modelsHTML;
-        
-        // Optimize image loading by deferring large base64 images
-        setTimeout(() => {
-            const images = featuredModelsGrid.querySelectorAll('img');
-            images.forEach((img, index) => {
-                // If the image src is a large base64 string, load it progressively
-                if (img.src && img.src.startsWith('data:image') && img.src.length > 10000) {
-                    const originalSrc = img.src;
-                    // Show placeholder first
-                    img.style.filter = 'blur(10px)';
-                    img.style.transition = 'filter 0.3s ease';
-                    
-                    // Load the image after a small delay
-                    setTimeout(() => {
-                        img.onload = () => {
-                            img.style.filter = 'none';
-                        };
-                        // Force reload to trigger the transition
-                        img.src = '';
-                        img.src = originalSrc;
-                    }, index * 100); // Stagger loading
-                }
-            });
-        }, 100);
-        
-    } catch (error) {
-        console.error('Error loading featured models:', error);
-        // Show sample models as fallback
-        featuredModelsGrid.innerHTML = `
-            <div class="featured-model-card" style="background: white; border: 1px solid #ddd;">
-                <div style="width: 100%; height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
-                    <span style="font-size: 48px;">👤</span>
-                </div>
-                <div class="featured-model-info">
-                    <div class="featured-model-name">샘플 모델</div>
-                    <div class="featured-model-intro">테스트 모델입니다</div>
-                </div>
-            </div>
-        `;
-    }
-}
-
-/**
- * Wait for Firebase to be ready
- */
-async function waitForFirebase() {
-    let retries = 100; // 10 seconds total with 100ms intervals
-    while (retries > 0 && (!window.firebaseDB || !window.modelStorageAdapter)) {
-        await new Promise(resolve => setTimeout(resolve, 100)); // Reduced from 500ms to 100ms
-        retries--;
-    }
-    if (!window.modelStorageAdapter) {
-        console.error('[Featured Models] Firebase failed to initialize after 10 seconds');
-        throw new Error('Firebase initialization timeout');
-    }
-}
-
-/**
- * Load and display celebrity models
- */
-async function loadCelebrityModels() {
-    const celebritySection = document.getElementById('celebrityModelsSection');
-    const celebrityGrid = document.getElementById('celebrityModelsGrid');
-    
-    if (!celebritySection || !celebrityGrid) {
-        console.log('[Celebrity Models] Section not found, skipping...');
-        return;
-    }
-    
-    try {
-        console.log('[Celebrity Models] Loading celebrity models...');
-        
-        // Wait for Firebase
-        await waitForFirebase();
-        
-        // Query for celebrity models - simplified to avoid index requirement
-        const celebrityQuery = window.firebaseDB
-            .collection('models')
-            .where('isCelebrity', '==', true);
-            
-        const snapshot = await celebrityQuery.get();
-        
-        // Filter for featured models in memory
-        const celebrityDocs = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            if (data.featured === true) {
-                celebrityDocs.push({ id: doc.id, ...data });
-            }
-        });
-        
-        // Sort by name in memory
-        celebrityDocs.sort((a, b) => {
-            const nameA = a.personalInfo?.name || '';
-            const nameB = b.personalInfo?.name || '';
-            return nameA.localeCompare(nameB);
-        });
-        
-        if (celebrityDocs.length === 0) {
-            console.log('[Celebrity Models] No featured celebrity models found');
-            celebritySection.style.display = 'none';
-            return;
-        }
-        
-        console.log(`[Celebrity Models] Found ${celebrityDocs.length} featured celebrity models`);
-        
-        // Create celebrity model cards
-        const celebrityHTML = [];
-        
-        celebrityDocs.forEach(model => {
-            const modelId = model.id;
-            
-            // Get model details
-            const name = model.personalInfo?.name || 'Unknown';
-            const description = model.portfolio?.description || '';
-            const image = model.portfolio?.mainImage || 'https://via.placeholder.com/300x400';
-            const tier = model.pricing?.tier || 'premium';
-            const price = model.pricing?.basePrice || 100;
-            
-            celebrityHTML.push(`
-                <div class="card" onclick="selectModel(this, '${modelId}', '${tier}')" role="button" tabindex="0"
-                     onkeydown="if(event.key==='Enter') selectModel(this, '${modelId}', '${tier}')"
-                     aria-label="${name} 모델 선택"
-                     data-model-id="${modelId}">
-                    <div class="model-image" style="background-image: url('${image}'); background-size: cover; background-position: center;">
-                        <div class="badge ${tier === 'vip' ? 'vip-badge' : 'premium-badge'}">${price}💎</div>
-                    </div>
-                    <h3>${name}</h3>
-                    <p>${description}</p>
-                </div>
-            `);
-        });
-        
-        // Update grid
-        celebrityGrid.innerHTML = celebrityHTML.join('');
-        
-        // Show section
-        celebritySection.style.display = 'block';
-        
-        console.log('[Celebrity Models] Celebrity models loaded successfully');
-        
-    } catch (error) {
-        console.error('[Celebrity Models] Error loading celebrity models:', error);
-        celebritySection.style.display = 'none';
-    }
-}
-
-/**
- * Handle featured model selection
- */
-function selectFeaturedModel(modelId, modelName) {
-    // Select the model in step 1
-    const registeredRadio = document.querySelector('input[value="registered"][name="modelType"]');
-    if (registeredRadio) {
-        registeredRadio.checked = true;
-        toggleModelType('registered');
-        
-        // Set the selected model
-        const registeredSelect = document.getElementById('registeredModelSelect');
-        if (registeredSelect) {
-            // Add option if not exists
-            if (!registeredSelect.querySelector(`option[value="${modelId}"]`)) {
-                const option = new Option(modelName, modelId);
-                registeredSelect.add(option);
-            }
-            registeredSelect.value = modelId;
-        }
-        
-        // Show toast
-        showToast(`${modelName} 모델이 선택되었습니다.`, 'success');
     }
 }
 
